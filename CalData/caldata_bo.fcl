@@ -1,0 +1,8 @@
+#include "caldata.fcl"
+
+BEGIN_PROLOG
+
+bo_calwire:            @local::t962_calwire
+bo_calwireana:         @local::standard_calwireana
+
+END_PROLOG
