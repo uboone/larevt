@@ -14,6 +14,7 @@ services:
   user: {}
 }
 
+services.user.ExptGeoHelperInterface: @local::argoneut_geometry_helper
 services.user.Geometry: @local::argoneut_geo
 services.user.LArProperties: @local::argoneut_properties            
 services.user.LArFFT: @local::argoneut_larfft
