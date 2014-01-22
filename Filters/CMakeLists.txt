@@ -1,6 +1,5 @@
 
 art_make( BASENAME_ONLY
-          EXCLUDE ShowerSelectorFilter_module.cc
 	  LIBRARY_NAME  Filters
           LIB_LIBRARIES 
                         RecoBase
@@ -28,16 +27,6 @@ art_make( BASENAME_ONLY
                            LArProperties_service
 			   ${SIMULATIONBASE}
         )
-
-# Filters cannot depend on RecoAlg - this module needs to live elsewhere
-simple_plugin( ShowerSelectorFilter "module"
-         		  Filters
- 			  RecoAlg
- 		    	  RawData
-                          LArProperties_service
- 			  ${SIMULATIONBASE}
-               BASENAME_ONLY 
- 	     )     
 
 install_headers()
 install_fhicl()
