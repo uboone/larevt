@@ -13,16 +13,6 @@ t962_calwire:
 argoneut_calwire: @local::t962_calwire
 
 
-t1034_calwire:
-{
- module_type:        "CalWireT1034"
- DigitModuleLabel:   "daq"
- ResponseFile:       "LArIATResponse1.5.root"
- ExponentialEndBins: 300
- PostsampleBins:     300
-}
-
-
 microboone_calwire:
 {
  module_type:        "CalWireMicroBooNE"
