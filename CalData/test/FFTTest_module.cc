@@ -305,6 +305,6 @@ namespace caldata
   FFTTest::~FFTTest()
   {}
 
-  void FFTTest::analyze(const art::Event& evt)
+  void FFTTest::analyze(const art::Event& /* evt */)
  {}
 }

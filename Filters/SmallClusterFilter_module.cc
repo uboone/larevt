@@ -101,7 +101,7 @@ cluster::SmallClusterFilter::~SmallClusterFilter()
 }
 
 //____________________________________________________________________________
-bool cluster::SmallClusterFilter::beginRun(art::Run& run)
+bool cluster::SmallClusterFilter::beginRun(art::Run& /* run */)
 {
   //nothing to do at beginRun()
   return true;
@@ -126,7 +126,7 @@ void cluster::SmallClusterFilter::beginJob()
 // ************************************* //
 // Clear and resize - exactly what it sounds like?
 // Don't know why it takes the number of clusters...
-void cluster::SmallClusterFilter::ClearandResizeVectors(unsigned int nClusters) {
+void cluster::SmallClusterFilter::ClearandResizeVectors(unsigned int /* nClusters */) {
 
   ///////////////
   //   fMinWire.clear();
@@ -237,7 +237,7 @@ bool cluster::SmallClusterFilter::filter(art::Event& evt)
 // ******************************* //
 int cluster::SmallClusterFilter::GetPlaneAndTPC(art::Ptr<recob::Hit> a, //the hit
 						unsigned int &p, //plane
- 						unsigned int &cs,  //cryostat
+ 						unsigned int & /* cs */,  //cryostat
 						unsigned int &t, //time
 						unsigned int &w) //wire
 {
