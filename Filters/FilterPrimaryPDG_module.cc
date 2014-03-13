@@ -97,7 +97,7 @@ namespace filter {
   //-----------------------------------------------------------------------
   void FilterPrimaryPDG::beginJob()
   {
-    art::ServiceHandle<art::TFileService> tfs;
+    //    art::ServiceHandle<art::TFileService> tfs;
     art::ServiceHandle<geo::Geometry> geo;
   
   }

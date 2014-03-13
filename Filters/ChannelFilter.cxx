@@ -6,6 +6,13 @@
 //  pagebri3@msu.edu
 //
 ///////////////////////////////////////////////////////
+#include "art/Framework/Core/EDFilter.h"
+#include "art/Framework/Principal/Handle.h" 
+#include "art/Framework/Services/Registry/ServiceHandle.h" 
+#include "art/Framework/Services/Optional/TFileService.h" 
+#include "art/Framework/Services/Optional/TFileDirectory.h" 
+#include "messagefacility/MessageLogger/MessageLogger.h" 
+#include "cetlib/exception.h"
 
 #include "Filters/ChannelFilter.h"
 #include "Geometry/Geometry.h"
@@ -14,11 +21,11 @@
 ///////////////////////////////////////////////////////
 filter::ChannelFilter::ChannelFilter()
 {
-  art::ServiceHandle<geo::Geometry> geo;
+  art::ServiceHandle<geo::Geometry> geochan;
   
   // populate the set of bad channels for this detector
   ///\todo This code should eventually hook up to a database
-  if(geo->DetId() == geo::kArgoNeuT){
+  if(geochan->DetId() == geo::kArgoNeuT){
     fBadChannels.insert(22);
     fBadChannels.insert(65);
     fBadChannels.insert(237);
@@ -44,7 +51,7 @@ filter::ChannelFilter::ChannelFilter()
     fNoisyChannels.insert(399);
   }
 
-  if(geo->DetId() == geo::kBo){
+  if(geochan->DetId() == geo::kBo){
     fBadChannels.insert(64);
     fBadChannels.insert(65);
     fBadChannels.insert(66);
