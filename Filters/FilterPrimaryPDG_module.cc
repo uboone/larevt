@@ -5,8 +5,8 @@
 /// \version $Id: 
 /// \author  echurch@fnal.gov
 ////////////////////////////////////////////////////////////////////////
-#ifndef LBNE_FILTERPRIMARYPDG_H
-#define LBNE_FILTERPRIMARYPDG_H 
+#ifndef FILTER_FILTERPRIMARYPDG_H
+#define FILTER_FILTERPRIMARYPDG_H 
 
 /// Framework includes
 #include "art/Framework/Core/ModuleMacros.h"
@@ -44,7 +44,7 @@ namespace sim{
 }
 
 ///Geant4 interface 
-namespace lbnefilters {  
+namespace filter {  
  
   class FilterPrimaryPDG : public art::EDFilter 
   {  
@@ -77,9 +77,9 @@ namespace lbnefilters {
     */
   };
 
-} // namespace lbnefilters
+} // namespace filter
 
-namespace lbnefilters {
+namespace filter {
 
   //-----------------------------------------------------------------------
   // Constructor
@@ -148,13 +148,13 @@ namespace lbnefilters {
     return pdgDesired;
   }
 
-} // namespace lbnefilters
+} // namespace filter
 
-namespace lbnefilters {
+namespace filter {
 
   DEFINE_ART_MODULE(FilterPrimaryPDG)
 
-} // namespace Lbnefilters
+} // namespace filter
 
-#endif // LBNE_FILTERPRIMARYPDG_H
+#endif // FILTER_FILTERPRIMARYPDG_H
 
