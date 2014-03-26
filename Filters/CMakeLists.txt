@@ -26,7 +26,6 @@ art_make( BASENAME_ONLY
         MODULE_LIBRARIES Filters
 		    	   RawData
                          LArProperties_service
-			 Simulation
 			   ${SIMULATIONBASE}
         )
 
