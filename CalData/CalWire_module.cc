@@ -270,10 +270,10 @@ namespace caldata{
 	    holder[dataSize+bin]= expFit.Eval(bin+dataSize);
 	}
 	// This is actually deconvolution, by way of convolution with the inverted 
-        // kernel.  This code assumes the response function has already been
-        // been transformed and inverted.  This way a complex multiplication, rather
-        // than a complex division is performed saving 2 multiplications and 
-        // 2 divsions
+	// kernel.  This code assumes the response function has already been
+	// been transformed and inverted.  This way a complex multiplication, rather
+	// than a complex division is performed saving 2 multiplications and 
+	// 2 divsions
 	///\todo: This is bad coding practice - figure out how to get rid of 
 	///\todo: test of which detector is being used
 	if( geom->DetId() == geo::kArgoNeuT ){
@@ -289,12 +289,13 @@ namespace caldata{
 	    k = 1;
 	  else
 	    throw cet::exception("CalWire") << "Bad signal type = " << sigtype << "\n";
-	  assert(k < kernel.size());
+	  if (k >= kernel.size())
+	    throw cet::exception("CalWire") << "kernel size < " << k << "!\n";
 	  
 	  fFFT->Convolute(holder,kernel[k]);
 	}
 	else
-	  throw cet::exception("CalWire") << "Deconvolution not handled yet for this detector. " << "\n";
+	  throw cet::exception("CalWire") << "Deconvolution not handled yet for this detector.\n";
       } 
       
       holder.resize(dataSize,1e-5);
