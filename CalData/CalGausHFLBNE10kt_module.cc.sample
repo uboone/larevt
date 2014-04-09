@@ -68,7 +68,7 @@ namespace{
   {
     if (!h) {
       throw cet::exception("CalGausHFLBNE10kt")
-        << "vector_to_hist() got a null histogram";
+        << "vector_to_hist() got a null histogram\n";
     }
     int nvec = v.size();
     int nbins = h->GetNbinsX();

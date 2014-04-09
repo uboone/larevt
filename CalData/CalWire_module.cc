@@ -290,12 +290,12 @@ namespace caldata{
 	  else
 	    throw cet::exception("CalWire") << "Bad signal type = " << sigtype << "\n";
 	  if (k >= kernel.size())
-	    throw cet::exception("CalWire") << "kernel size < " << k << "!";
+	    throw cet::exception("CalWire") << "kernel size < " << k << "!\n";
 	  
 	  fFFT->Convolute(holder,kernel[k]);
 	}
 	else
-	  throw cet::exception("CalWire") << "Deconvolution not handled yet for this detector. " << "\n";
+	  throw cet::exception("CalWire") << "Deconvolution not handled yet for this detector.\n";
       } 
       
       holder.resize(dataSize,1e-5);

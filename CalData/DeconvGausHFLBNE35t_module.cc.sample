@@ -70,7 +70,7 @@ namespace{
   {
     if (!h) {
       throw cet::exception("DeconvGausHFLBNE35t")
-        << "vector_to_hist() got a null histogram";
+        << "vector_to_hist() got a null histogram\n";
     }
     int nvec = v.size();
     int nbins = h->GetNbinsX();
