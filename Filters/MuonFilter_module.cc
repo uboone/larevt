@@ -137,9 +137,9 @@ namespace filter {
     art::FindManyP<recob::Hit> fmh(clustHandle, evt, fClusterModuleLabel);
 
     art::PtrVector<recob::Cluster> clusters;
+    clusters.reserve(clustHandle->size());
     for(unsigned int i = 0; i < clustHandle->size(); ++i) {
-      art::Ptr<recob::Cluster> prod(clustHandle,i);
-      clusters.push_back(prod);
+      clusters.push_back(art::Ptr<recob::Cluster>(clustHandle,i));
     }
     double indIon(0),colIon(0);
     std::map<int,int> indMap;
@@ -161,13 +161,13 @@ namespace filter {
       else if(clusters[cluster]->View() == vView) colIon+=ionSum;
     }
     mf::LogInfo("MuonFilter") << "Ionizations: " << indIon << " " << colIon ;
-    art::Handle<std::vector<recob::Cluster > > lines; 
+    art::Handle<std::vector<recob::Cluster > > lines;
     art::PtrVector<recob::Cluster> inductionSegments, collectionSegments;
     evt.getByLabel(fLineModuleLabel,lines);
     art::PtrVector<recob::Cluster> lineVec;
+    lineVec.reserve(lines->size());
     for(unsigned int i = 0; i < lines->size(); ++i) {
-      art::Ptr<recob::Cluster> prod(lines,i);
-      lineVec.push_back(prod);
+      lineVec.push_back(art::Ptr<recob::Cluster>(lines,i));
     }
 
     for(size_t cl = 0;cl < clusters.size(); cl++) {
