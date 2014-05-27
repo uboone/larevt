@@ -199,8 +199,15 @@ namespace caldata{
       std::vector<double> signal(fft->FFTSize());
       for(unsigned int wd = 0; wd < wvec.size(); ++wd){
 	if (wvec[wd]->RawDigit() == rdvec[rd]){
-	  signal.insert(signal.begin(),wvec[wd]->Signal().begin(),wvec[wd]->Signal().end()); 
-	  signal.resize(fft->FFTSize());
+          std::vector<float> wirSig = wvec[wd]->Signal();
+          if(wirSig.size() > signal.size()) {
+            LOG_DEBUG("CalWireAna")<<"Incompatible vector size "<<wirSig.size()
+              <<" "<<signal.size();
+            return;
+          }
+          for(unsigned int ii = 0; ii < wirSig.size(); ++ii) {
+            signal[ii] = wirSig[ii];
+          }
 	  break;
 	}
 	if (wd == (wvec.size()-1) ){

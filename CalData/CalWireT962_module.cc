@@ -283,6 +283,8 @@ namespace caldata{
 	  average+=holder[holder.size()-1-bin]/(double)fPostsample;
         for(bin = 0; bin < holder.size(); ++bin) holder[bin]-=average;
       }  
+
+      // Make a single ROI that spans the entire data size
       wirecol->push_back(recob::Wire(holder,digitVec));
     }
     
