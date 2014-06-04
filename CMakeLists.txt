@@ -50,6 +50,7 @@ find_ups_product( art v1_09_00 )
 find_ups_product( messagefacility v1_10_00 )
 find_ups_product( cetbuildtools v3_10_00 )
 find_ups_root( root v5_34_00 )
+find_ups_product( postgresql v9_1_5 )
 
 # include search path
 # notice use of ENV to invoke an external variable
