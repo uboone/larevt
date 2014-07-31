@@ -70,6 +70,19 @@ simple_plugin(CalWireT962 "module"
                BASENAME_ONLY
 )
 
+simple_plugin(DumpWires "module"
+                        Filters
+	                RawData
+	                RecoBase
+                        ${ART_FRAMEWORK_CORE}
+			${ART_FRAMEWORK_PRINCIPAL}
+			${MF_MESSAGELOGGER}
+	                ${FHICLCPP}
+			${CETLIB}
+              BASENAME_ONLY
+)
+
+
 install_headers()
 install_fhicl()
 install_source()
