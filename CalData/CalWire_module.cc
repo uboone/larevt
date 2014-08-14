@@ -274,29 +274,24 @@ namespace caldata{
 	// been transformed and inverted.  This way a complex multiplication, rather
 	// than a complex division is performed saving 2 multiplications and 
 	// 2 divsions
-	///\todo: This is bad coding practice - figure out how to get rid of 
-	///\todo: test of which detector is being used
-	if( geom->DetId() == geo::kArgoNeuT ){
-	  fFFT->Convolute(holder,kernel[kernMap[channel]]);
-	}
-	else if( geom->DetId() == geo::kMicroBooNE ){
-	  // Figure out which kernel to use (0=induction, 1=collection).
-	  geo::SigType_t sigtype = geom->SignalType(channel);
-	  size_t k;
-	  if(sigtype == geo::kInduction)
-	    k = 0;
-	  else if(sigtype == geo::kCollection)
-	    k = 1;
-	  else
-	    throw cet::exception("CalWire") << "Bad signal type = " << sigtype << "\n";
-	  if (k >= kernel.size())
-	    throw cet::exception("CalWire") << "kernel size < " << k << "!\n";
-	  
-	  fFFT->Convolute(holder,kernel[k]);
-	}
+	
+	// the example below is for MicroBooNE, experiments should 
+	// adapt as appropriate
+
+	// Figure out which kernel to use (0=induction, 1=collection).
+	geo::SigType_t sigtype = geom->SignalType(channel);
+	size_t k;
+	if(sigtype == geo::kInduction)
+	  k = 0;
+	else if(sigtype == geo::kCollection)
+	  k = 1;
 	else
-	  throw cet::exception("CalWire") << "Deconvolution not handled yet for this detector.\n";
-      } 
+	  throw cet::exception("CalWire") << "Bad signal type = " << sigtype << "\n";
+	if (k >= kernel.size())
+	  throw cet::exception("CalWire") << "kernel size < " << k << "!\n";
+	
+	fFFT->Convolute(holder,kernel[k]);
+      }
       
       holder.resize(dataSize,1e-5);
       //This restores the DC component to signal removed by the deconvolution.
