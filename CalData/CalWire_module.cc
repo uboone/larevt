@@ -34,7 +34,6 @@ extern "C" {
 // LArSoft includes
 #include "Geometry/Geometry.h"
 #include "Geometry/PlaneGeo.h"
-#include "Filters/ChannelFilter.h"
 #include "RawData/RawDigit.h"
 #include "RawData/raw.h"
 #include "RecoBase/Wire.h"
@@ -227,8 +226,6 @@ namespace caldata{
     uint32_t channel(0); // channel number
     unsigned int bin(0);     // time bin loop variable
     
-    filter::ChannelFilter *chanFilt = new filter::ChannelFilter();  
-
     double decayConst = 0.;  // exponential decay constant of electronics shaping
     double fitAmplitude    = 0.;  //This is the seed value for the amplitude in the exponential tail fit 
     std::vector<float> holder;                // holds signal data
@@ -242,67 +239,64 @@ namespace caldata{
       art::Ptr<raw::RawDigit> digitVec(digitVecHandle, rdIter);
       channel = digitVec->Channel();
 
-      // skip bad channels
-      if(!chanFilt->BadChannel(channel)) {
-	holder.resize(transformSize);
-	
-	// uncompress the data
-	raw::Uncompress(digitVec->fADC, rawadc, digitVec->Compression());
-	
-	for(bin = 0; bin < dataSize; ++bin) 
-	  holder[bin]=(rawadc[bin]-digitVec->GetPedestal());
-	// fExpEndBins only nonzero for detectors needing exponential tail fitting
-	if(fExpEndBins && std::abs(decayConsts[channel]) > 0.0){
-	  
-	  TH1D expTailData("expTailData","Tail data for fit",
-			   fExpEndBins,dataSize-fExpEndBins,dataSize);
-	  TF1  expFit("expFit","[0]*exp([1]*x)");
-	  
-	  for(bin = 0; bin < (unsigned int)fExpEndBins; ++bin) 
-	    expTailData.Fill(dataSize-fExpEndBins+bin,holder[dataSize-fExpEndBins+bin]);
-	  decayConst = decayConsts[channel];
-	  fitAmplitude = holder[dataSize-fExpEndBins]/exp(decayConst*(dataSize-fExpEndBins));
-	  expFit.FixParameter(1,decayConst);
-	  expFit.SetParameter(0,fitAmplitude);
-	  expTailData.Fit(&expFit,"QWN","",dataSize-fExpEndBins,dataSize);
-	  expFit.SetRange(dataSize,transformSize);
-	  for(bin = 0; bin < dataSize; ++bin)
-	    holder[dataSize+bin]= expFit.Eval(bin+dataSize);
-	}
-	// This is actually deconvolution, by way of convolution with the inverted 
-	// kernel.  This code assumes the response function has already been
-	// been transformed and inverted.  This way a complex multiplication, rather
-	// than a complex division is performed saving 2 multiplications and 
-	// 2 divsions
-	
-	// the example below is for MicroBooNE, experiments should 
-	// adapt as appropriate
-
-	// Figure out which kernel to use (0=induction, 1=collection).
-	geo::SigType_t sigtype = geom->SignalType(channel);
-	size_t k;
-	if(sigtype == geo::kInduction)
-	  k = 0;
-	else if(sigtype == geo::kCollection)
-	  k = 1;
-	else
-	  throw cet::exception("CalWire") << "Bad signal type = " << sigtype << "\n";
-	if (k >= kernel.size())
-	  throw cet::exception("CalWire") << "kernel size < " << k << "!\n";
-	
-	fFFT->Convolute(holder,kernel[k]);
-      }
+      holder.resize(transformSize);
       
-      holder.resize(dataSize,1e-5);
-      //This restores the DC component to signal removed by the deconvolution.
-      if(fPostsample) {
-        double average=0.0;
-	for(bin=0; bin < (unsigned int)fPostsample; ++bin) 
-	  average+=holder[holder.size()-1-bin]/(double)fPostsample;
-        for(bin = 0; bin < holder.size(); ++bin) holder[bin]-=average;
+      // uncompress the data
+      raw::Uncompress(digitVec->fADC, rawadc, digitVec->Compression());
+      
+      for(bin = 0; bin < dataSize; ++bin) 
+	holder[bin]=(rawadc[bin]-digitVec->GetPedestal());
+      // fExpEndBins only nonzero for detectors needing exponential tail fitting
+      if(fExpEndBins && std::abs(decayConsts[channel]) > 0.0){
+	
+	TH1D expTailData("expTailData","Tail data for fit",
+			 fExpEndBins,dataSize-fExpEndBins,dataSize);
+	TF1  expFit("expFit","[0]*exp([1]*x)");
+	
+	for(bin = 0; bin < (unsigned int)fExpEndBins; ++bin) 
+	  expTailData.Fill(dataSize-fExpEndBins+bin,holder[dataSize-fExpEndBins+bin]);
+	decayConst = decayConsts[channel];
+	fitAmplitude = holder[dataSize-fExpEndBins]/exp(decayConst*(dataSize-fExpEndBins));
+	expFit.FixParameter(1,decayConst);
+	expFit.SetParameter(0,fitAmplitude);
+	expTailData.Fit(&expFit,"QWN","",dataSize-fExpEndBins,dataSize);
+	expFit.SetRange(dataSize,transformSize);
+	for(bin = 0; bin < dataSize; ++bin)
+	  holder[dataSize+bin]= expFit.Eval(bin+dataSize);
       }
-      wirecol->push_back(recob::Wire(holder,digitVec));
+      // This is actually deconvolution, by way of convolution with the inverted 
+      // kernel.  This code assumes the response function has already been
+      // been transformed and inverted.  This way a complex multiplication, rather
+      // than a complex division is performed saving 2 multiplications and 
+      // 2 divsions
+      
+      // the example below is for MicroBooNE, experiments should 
+      // adapt as appropriate
+      
+      // Figure out which kernel to use (0=induction, 1=collection).
+      geo::SigType_t sigtype = geom->SignalType(channel);
+      size_t k;
+      if(sigtype == geo::kInduction)
+	k = 0;
+      else if(sigtype == geo::kCollection)
+	k = 1;
+      else
+	throw cet::exception("CalWire") << "Bad signal type = " << sigtype << "\n";
+      if (k >= kernel.size())
+	throw cet::exception("CalWire") << "kernel size < " << k << "!\n";
+      
+      fFFT->Convolute(holder,kernel[k]);
     }
+    
+    holder.resize(dataSize,1e-5);
+    //This restores the DC component to signal removed by the deconvolution.
+    if(fPostsample) {
+      double average=0.0;
+      for(bin=0; bin < (unsigned int)fPostsample; ++bin) 
+	average+=holder[holder.size()-1-bin]/(double)fPostsample;
+      for(bin = 0; bin < holder.size(); ++bin) holder[bin]-=average;
+    }
+    wirecol->push_back(recob::Wire(holder,digitVec));
     
     if(wirecol->size() == 0)
       mf::LogWarning("CalWire") << "No wires made for this event.";
