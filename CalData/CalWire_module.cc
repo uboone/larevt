@@ -286,24 +286,23 @@ namespace caldata{
 	throw cet::exception("CalWire") << "kernel size < " << k << "!\n";
       
       fFFT->Convolute(holder,kernel[k]);
-    }
     
-    holder.resize(dataSize,1e-5);
-    //This restores the DC component to signal removed by the deconvolution.
-    if(fPostsample) {
-      double average=0.0;
-      for(bin=0; bin < (unsigned int)fPostsample; ++bin) 
-	average+=holder[holder.size()-1-bin]/(double)fPostsample;
-      for(bin = 0; bin < holder.size(); ++bin) holder[bin]-=average;
+      holder.resize(dataSize,1e-5);
+      //This restores the DC component to signal removed by the deconvolution.
+      if(fPostsample) {
+	double average=0.0;
+	for(bin=0; bin < (unsigned int)fPostsample; ++bin) 
+	  average+=holder[holder.size()-1-bin]/(double)fPostsample;
+	for(bin = 0; bin < holder.size(); ++bin) holder[bin]-=average;
+      }
+      wirecol->push_back(recob::Wire(holder,digitVec));
     }
-    wirecol->push_back(recob::Wire(holder,digitVec));
-    
+
     if(wirecol->size() == 0)
       mf::LogWarning("CalWire") << "No wires made for this event.";
     
     evt.put(std::move(wirecol));
     
-    delete chanFilt;
     return;
   }
   
