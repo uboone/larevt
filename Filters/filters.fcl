@@ -1,3 +1,4 @@
+#include "clusteralgorithms.fcl"
 BEGIN_PROLOG
 
 argoneut_scanfilter:
