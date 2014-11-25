@@ -1,0 +1,18 @@
+#
+# Channel filter service configuration for ArgoNeuT
+#
+#
+BEGIN_PROLOG
+
+channel_filter_argoneut: {
+  service_provider: SimpleChannelFilterService
+  
+  # list of bad channels:
+  BadChannels:   [ 22, 65, 237, 307, 308, 309, 310, 311, 410, 412, 438, 439, 448 ]
+  
+  # list of bad noisy channels:
+  NoisyChannels: [ 31, 41, 108, 120, 121, 124, 392, 399 ]
+  
+} # channel_filter_argoneut
+
+END_PROLOG

@@ -1,54 +1,66 @@
 ///////////////////////////////////////////////////////
 //
 // ChannelFilter Class
-//
-//
-//  pagebri3@msu.edu
+// 
+// This class has been obsoleted and is now a deprecated interface for
+// ChannelFilterServiceInterface.
+// 
+// Please update your code to use the service directly.
+// 
+// 
+// Original class: pagebri3@msu.edu
 //
 ///////////////////////////////////////////////////////
-#include "art/Framework/Core/EDFilter.h"
-#include "art/Framework/Principal/Handle.h" 
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Framework/Services/Optional/TFileService.h" 
-#include "art/Framework/Services/Optional/TFileDirectory.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h" 
-#include "cetlib/exception.h"
 
+
+// Our header
 #include "Filters/ChannelFilter.h"
-#include "Geometry/Geometry.h"
+
+
+// Framework libraries
+#include "messagefacility/MessageLogger/MessageLogger.h" 
+#include "art/Framework/Services/Registry/ServiceHandle.h" 
+#include "art/Utilities/Exception.h"
+
+// LArSoft libraries
+#include "Filters/ChannelFilterServiceInterface.h"
 
 
 ///////////////////////////////////////////////////////
-filter::ChannelFilter::ChannelFilter()
-{
-  art::ServiceHandle<geo::Geometry> geochan;
-
-  LOG_WARNING("ChannelFilter") << "ChannelFilter is not defined for any experiment. "
-			       << "\n Each experiment should implement its own filter for "
-			       << "bad channels in its experimental code base";
+filter::ChannelFilter::ChannelFilter() {
   
-  // populate the set of bad channels for this detector
-  // This code should eventually hook up to a database
+  if (!&*(art::ServiceHandle<filter::ChannelFilterServiceInterface>())) {
+    throw art::Exception(art::errors::Configuration)
+      << "Failed to obtain an instance of ChannelFilterServiceInterface service"
+      ;
+  }
+  LOG_ERROR("ChannelFilter") << "ChannelFilter is now deprecated."
+    " Replace it with ChannelFilterServiceInterface";
   
+} // filter::ChannelFilter::ChannelFilter()
+
+
+///////////////////////////////////////////////////////
+bool filter::ChannelFilter::BadChannel(uint32_t channel) const {
+  return art::ServiceHandle<filter::ChannelFilterServiceInterface>()
+    ->BadChannel(channel);
 }
 
 ///////////////////////////////////////////////////////
-filter::ChannelFilter::~ChannelFilter()
-{
+bool filter::ChannelFilter::NoisyChannel(uint32_t channel) const{
+  return art::ServiceHandle<filter::ChannelFilterServiceInterface>()
+    ->NoisyChannel(channel);
 }
 
 ///////////////////////////////////////////////////////
-bool filter::ChannelFilter::BadChannel(uint32_t channel) 
-{
-  if(fBadChannels.find(channel) != fBadChannels.end()) return true;
-  return false;  
+std::set<uint32_t> filter::ChannelFilter::SetOfBadChannels() const {
+  return art::ServiceHandle<filter::ChannelFilterServiceInterface>()
+    ->SetOfBadChannels();
 }
 
 ///////////////////////////////////////////////////////
-bool filter::ChannelFilter::NoisyChannel(uint32_t channel) 
-{
-  if(fNoisyChannels.find(channel) != fNoisyChannels.end()) return true;
-  return false;
+std::set<uint32_t> filter::ChannelFilter::SetOfNoisyChannels() const {
+  return art::ServiceHandle<filter::ChannelFilterServiceInterface>()
+    ->SetOfNoisyChannels();
 }
-
 

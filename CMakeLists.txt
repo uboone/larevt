@@ -64,7 +64,7 @@ include(BuildPlugins)
 add_subdirectory(CalData)
 add_subdirectory(Filters)
 # tests
-# add_subdirectory(test)
+add_subdirectory(test)
 
 # ups - table and config files
 add_subdirectory(ups)
