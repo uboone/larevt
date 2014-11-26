@@ -17,14 +17,17 @@
 #include <cstdlib> // std::uint32_t
 #include <set>
 #include <memory> // std::unique_ptr<>
+#include <type_traits> // std::is_same<>, std::enable_if<>
 
 // Framework libraries
 #include "fhiclcpp/ParameterSet.h" // for convenience to the including services
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Principal/Run.h"
 
 // LArSoft libraries
+#include "RawData/RawDigit.h"
 #include "Filters/ChannelFilterBaseInterface.h"
 
 
@@ -43,6 +46,27 @@ namespace filter {
    * Currently, the service provides interface for the following information:
    * - goodness of the channel: good or bad (dead or unusable)
    * - noisiness of the channel: good or noisy (or compromised in some way)
+   * 
+   * The use of this service replaces the deprecated ChannelFilter class.
+   * An algorithm that used to use ChannelFilter class can be updated. From:
+   *      
+   *      filter::ChannelFilter* chanFilt = new filter::ChannelFilter();
+   *      
+   * to
+   *      
+   *      art::ServiceHandle<filter::ChannelFilterServiceInterface> chanFilt;
+   *      
+   * (include files Filters/ChannelFilterServiceInterface.h instead of
+   * Filters/ChannelFilter.h) or
+   *      
+   *      const filter::ChannelFilterBaseInterface* chanFilt
+   *        = art::ServiceHandle<filter::ChannelFilterServiceInterface>()->GetFilter();
+   *      
+   * (include files Filters/ChannelFilterServiceInterface.h and
+   * Filters/ChannelFilterBaseInterface.h instead of Filters/ChannelFilter.h).
+   * The latter object can in principle be passed to algorithms that are not
+   * art-aware.
+   * 
    * 
    * @details
    * This class is not directly instanciable, although it can be copied or moved
@@ -140,10 +164,53 @@ namespace filter {
     std::unique_ptr<ChannelFilterBaseInterface> pFilter;
     
   }; // class ChannelFilterServiceInterface
+} // namespace filter
+
+
+DECLARE_ART_SERVICE_INTERFACE(filter::ChannelFilterServiceInterface, LEGACY)
+
+
+namespace filter {
   
+  
+  /** **************************************************************************
+   * @brief Filters out the bad channels
+   * @tparam Digits a collection of raw::RawDigit objects or pointers
+   * @param digits list of raw::RawDigit pointers
+   * @return a vector of pointers to good raw::RawDigit
+   * 
+   * This function can be used to filter out bad channels. For example:
+   *     
+   *     art::View<raw::RawDigit> rawdigits;
+   *     evt.getView("SimWire", rawdigits);
+   *     
+   *     // loop only through non-bad raw digits
+   *     for(const raw::RawDigit* digit: filter::SelectGoodChannels(rawdigits))
+   *       ...
+   *     
+   * Note that this function does not work with lists of digits, but only with
+   * list of digit pointers (including art::View, art::PtrVector<raw::RawDigit>,
+   * std::vector<art::Ptr<raw::Digit>> ...).
+   */
+  template <typename Digits>
+  std::vector<const raw::RawDigit*> SelectGoodChannels(const Digits& digits) {
+    
+    std::vector<const raw::RawDigit*> GoodDigits;
+    
+    const filter::ChannelFilterBaseInterface* pFilter =
+      art::ServiceHandle<filter::ChannelFilterServiceInterface>()->GetFilter();
+    
+    for (const auto& pDigit: digits) {
+      if (!pFilter->BadChannel(pDigit->Channel()))
+        GoodDigits.push_back(&*pDigit);
+    } // for
+    
+    return GoodDigits;
+  } // SelectGoodChannels()
   
 } // namespace filter
 
-DECLARE_ART_SERVICE_INTERFACE(filter::ChannelFilterServiceInterface, LEGACY)
+
+
 
 #endif // CHANNELFILTERSERVICEINTERFACE_H

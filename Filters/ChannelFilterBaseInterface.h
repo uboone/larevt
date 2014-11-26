@@ -19,6 +19,7 @@
 // C/C++ standard libraries
 #include <cstdlib> // std::uint32_t
 #include <set>
+#include <vector>
 
 // Additional libraries
 #include "fhiclcpp/ParameterSet.h"
@@ -79,7 +80,6 @@ namespace filter {
     virtual bool SetRun(RunNumber_t run) = 0;
     
   }; // class ChannelFilterBaseInterface
-  
   
 } // namespace filter
 
