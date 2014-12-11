@@ -11,11 +11,6 @@
 
 #include <stdint.h>
 
-extern "C" {
-#include <sys/types.h>
-#include <sys/stat.h>
-}
-
 // Framework includes
 #include "art/Framework/Core/ModuleMacros.h" 
 #include "art/Framework/Principal/Event.h" 
@@ -35,6 +30,7 @@ extern "C" {
 #include "Geometry/Geometry.h"
 #include "Filters/ChannelFilter.h"
 #include "RawData/RawDigit.h"
+#include "RawData/raw.h" // raw::Uncompress()
 #include "RecoBase/Wire.h"
 #include "Utilities/LArFFT.h"
 
@@ -239,7 +235,8 @@ namespace caldata{
       holder.clear();
       
       art::Ptr<raw::RawDigit> digitVec(digitVecHandle, rdIter);
-      std::vector<short> rawadc(digitVec->fADC);  // vector holding uncompressed adc values
+      raw::RawDigit::ADCvector_t rawadc(digitVec->Samples());  // vector holding uncompressed adc values
+      raw::Uncompress(digitVec->ADCs(), rawadc, digitVec->Compression());
       channel = digitVec->Channel();
 
       // skip bad channels

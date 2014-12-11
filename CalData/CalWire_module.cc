@@ -242,7 +242,7 @@ namespace caldata{
       holder.resize(transformSize);
       
       // uncompress the data
-      raw::Uncompress(digitVec->fADC, rawadc, digitVec->Compression());
+      raw::Uncompress(digitVec->ADCs(), rawadc, digitVec->Compression());
       
       for(bin = 0; bin < dataSize; ++bin) 
 	holder[bin]=(rawadc[bin]-digitVec->GetPedestal());
