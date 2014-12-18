@@ -10,6 +10,7 @@
 #include <algorithm> // std::min(), std::copy_n()
 #include <ios> // std::fixed
 #include <iomanip> // std::setprecision(), std::setw()
+#include <memory> // std::unique_ptr<>
 
 // support libraries
 #include "fhiclcpp/ParameterSet.h"
@@ -111,6 +112,9 @@ namespace caldata {
    *   for the output (useful for filtering)
    * - <b>DigitsPerLine</b> (integer, default: 20): the dump of digits and ticks
    *   will put this many of them for each line
+   * - <b>IgnoreFilters</b> (boolean, default: false): if true, channel filters
+   *   will be ignored; by default, only wires on channels that are not bad are
+   *   printed out
    *
    */
   class DumpWires : public art::EDAnalyzer {
@@ -128,6 +132,7 @@ namespace caldata {
     std::string fDetSimModuleLabel; ///< name of module that produced the digits
     std::string fOutputCategory; ///< category for LogInfo output
     unsigned int fDigitsPerLine; ///< ticks/digits per line in the output
+    bool bIgnoreFilters; ///< use all the wires, don't filter them
 
   }; // class DumpWires
 
@@ -143,6 +148,7 @@ namespace caldata {
     , fDetSimModuleLabel (pset.get<std::string>("DetSimModuleLabel", "daq"))
     , fOutputCategory    (pset.get<std::string>("OutputCategory", "DumpWires"))
     , fDigitsPerLine     (pset.get<unsigned int>("DigitsPerLine", 20))
+    , bIgnoreFilters     (pset.get<bool>("IgnoreFilters", false))
     {}
 
 
@@ -155,7 +161,11 @@ namespace caldata {
     art::ValidHandle<std::vector<recob::Wire>> Wires
       = evt.getValidHandle<std::vector<recob::Wire>>(fCalWireModuleLabel);
     
-    filter::ChannelFilter Filter;
+    // channel filter: create one only if requested
+    std::unique_ptr<filter::ChannelFilter> filter;
+    if (!bIgnoreFilters) {
+      filter.reset(new filter::ChannelFilter);
+    }
     
     mf::LogInfo(fOutputCategory) << "The event contains " << Wires->size() << " wires";
     
@@ -170,7 +180,7 @@ namespace caldata {
       { // limit the scope of out:
         mf::LogVerbatim out(fOutputCategory);
         out << "  #" << wire.Channel() << ":";
-        if (Filter.BadChannel(wire.Channel())) {
+        if (filter && filter->BadChannel(wire.Channel())) {
           out << " bad channel";
           continue;
         }
