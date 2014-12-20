@@ -25,8 +25,9 @@ simple_plugin(CalWireAna "module"
 
 simple_plugin(CalWire "module"
                         Filters
-	                RawData
-	                RecoBase
+                        RawData
+                        RecoBase
+                        RecoBaseArt
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -48,7 +49,8 @@ simple_plugin(CalWire "module"
 
 simple_plugin(CalWireT962 "module"
                         Filters
-	                RecoBase
+                        RecoBase
+                        RecoBaseArt
                         Geometry_service
                         Geometry
                         ${ART_FRAMEWORK_CORE}

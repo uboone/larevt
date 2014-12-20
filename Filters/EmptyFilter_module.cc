@@ -33,10 +33,6 @@
 #include "TH2I.h"
 #include "TH2D.h"
 
-extern "C" {
-#include <sys/types.h>
-#include <sys/stat.h>
-}
 #include <math.h>
 #include <algorithm>
 #include <iostream>
@@ -144,7 +140,7 @@ namespace filt {
 	unsigned int j(0);  
 	//advances j to collection plane
 	while(hitvec[j]->WireID().Plane == 0) {
-	  indIon+=hitvec[j]->Charge();
+	  indIon+=hitvec[j]->Integral();
 	  j++;
 	  if(j == hitvec.size()) {
 	    failFlag=2;
@@ -152,7 +148,7 @@ namespace filt {
 	  }
 	}
 	for(; j < hitvec.size(); j++){
-	  colIon+=hitvec[j]->Charge();
+	  colIon+=hitvec[j]->Integral();
 	}
 	double minIon=0;
 	if((1.92*indIon)>colIon) minIon = colIon;

@@ -155,7 +155,7 @@ namespace filter {
       ionSum=0.0;
       std::vector< art::Ptr<recob::Hit> > hits = fmh.at(cluster);
       for(unsigned int hit = 0; hit < hits.size(); hit++) {
-	ionSum+=hits[hit]->Charge(true);
+	ionSum+=hits[hit]->PeakAmplitude();
       }
       if(clusters[cluster]->View() == uView) indIon+=ionSum;
       else if(clusters[cluster]->View() == vView) colIon+=ionSum;
@@ -277,14 +277,14 @@ namespace filter {
 	      mf::LogInfo("MuonFilter") << "outside   Removed induction ion: ";          
 
 	      for(size_t h = 0; h < indHits.size(); h++){
-		mf::LogInfo("MuonFilter") << indHits[h]->Charge(true) << " ";
-		indIon -= indHits[h]->Charge(true);
+		mf::LogInfo("MuonFilter") << indHits[h]->PeakAmplitude() << " ";
+		indIon -= indHits[h]->PeakAmplitude();
 	      }
 	      mf::LogInfo("MuonFilter")  <<"Removed collection ion: ";
 
 	      for(size_t h = 0; h < colHits.size(); h++){ 
-		    mf::LogInfo("MuonFilter") << colHits[h]->Charge(true) << " ";
-		    colIon -= colHits[h]->Charge(true);
+		    mf::LogInfo("MuonFilter") << colHits[h]->PeakAmplitude() << " ";
+		    colIon -= colHits[h]->PeakAmplitude();
 	      }
 	      mf::LogInfo("MuonFilter")<<"Ionization outside track I/C: " << indIon << " "<<colIon;	 
 	    }
@@ -294,13 +294,13 @@ namespace filter {
 	      tGoing.push_back(pointTemp);
 	      mf::LogInfo("MuonFilter") << "stopping   Removed induction ion: ";          
 	      for(size_t h = 0; h < indHits.size(); h++){
-		mf::LogInfo("MuonFilter") <<indHits[h]->Charge(true) << " ";
-		indIon -= indHits[h]->Charge(true);
+		mf::LogInfo("MuonFilter") <<indHits[h]->PeakAmplitude() << " ";
+		indIon -= indHits[h]->PeakAmplitude();
 	      }
 	      mf::LogInfo("MuonFilter")  <<"Removed collection ion: ";
 	      for(size_t h = 0; h < colHits.size(); h++){ 
-		mf::LogInfo("MuonFilter") << colHits[h]->Charge(true)<< " ";
-		colIon -= colHits[h]->Charge(true);
+		mf::LogInfo("MuonFilter") << colHits[h]->PeakAmplitude()<< " ";
+		colIon -= colHits[h]->PeakAmplitude();
 	      }
 	      mf::LogInfo("MuonFilter") <<"Ionization outside track I/C: " << indIon << " "<<colIon;
 	    }
@@ -332,10 +332,10 @@ namespace filter {
 	    mf::LogInfo("MuonFilter") <<"Removing delta ion "<<rLook.size()<<" "<<rLook[j].first<<" "<<matchNum;
 	    std::vector< art::Ptr<recob::Hit> > temp = fmhi.at(rLook[j].first);
 	    for(unsigned int h = 0; h < temp.size();h++)	 
-	      indIon -= temp[h]->Charge(true);
+	      indIon -= temp[h]->PeakAmplitude();
 	    temp = fmhc.at(rLook[j].second);
 	    for(unsigned int h = 0; h < temp.size();h++)	   
-	      colIon -= temp[h]->Charge(true);   
+	      colIon -= temp[h]->PeakAmplitude();   
 	  }
 	}
       } 

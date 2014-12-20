@@ -184,11 +184,6 @@ namespace caldata {
           out << " bad channel";
           continue;
         }
-        switch (wire.SignalType()) {
-          case geo::kCollection:  out << " collection wire"; break;
-          case geo::kInduction:   out << " induction wire"; break;
-          case geo::kMysteryType: out << " secret wire"; break;
-        } // switch signal type
         switch (wire.View()) {
           case geo::kU:       out << " on U plane"; break;
           case geo::kV:       out << " on V plane"; break;
