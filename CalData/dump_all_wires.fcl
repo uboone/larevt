@@ -3,17 +3,28 @@
 # Purpose:  Dump on screen wire content, including bad wires
 # Author:   Gianluca Petrillo (petrillo@fnal.gov)
 # Date:     December 17th, 2014
-# Version:  1.0
+# Version:  1.1
 #
 # Service dependencies:
 # - message facility
+# - geometry is commented out (would be used by filters in DumpWires module)
+# 
+# Changes:
+# 20141217 (petrillo@fnal.gov) [v1.0]
+#   added the explicit configuration of the new parameter IgnoreFilters
+# 20150114 (petrillo@fnal.gov) [v1.1]
+#   geometry commented out as it is not used
 #
 
-#include "geometry_microboone.fcl"
+# #include "geometry.fcl"
 
 process_name: DumpWires
 
 services: {
+#  user: {
+#    Geometry:               @local::standard_geo             # defined in geometry.fcl
+#    ExptGeoHelperInterface: @local::standard_geometry_helper # defined in geometry.fcl
+#  } # user
   
   message: {
   #   debugModules: [ "*" ]
@@ -75,10 +86,10 @@ physics: {
     #  CalWireModuleLabel: "caldata"
     #  DetSimModuleLabel:  "daq"
       
-      # set IgnoreFilters to true to dump all wires, regardless their goodness
+       # set IgnoreFilters to true to dump all wires, regardless their goodness
       IgnoreFilters: true
       
-    } # dumpwires
+   } # dumpwires
   } # analyzers
   
   ana:  [ dumpwires ]
@@ -86,4 +97,3 @@ physics: {
   trigger_paths: []
   end_paths:     [  ana ]
 } # physics
-

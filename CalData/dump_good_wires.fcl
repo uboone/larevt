@@ -1,6 +1,6 @@
 #
 # File:     dump_good_wires.fcl
-# Purpose:  Dump on screen wire content,for good wires only
+# Purpose:  Dump on screen wire content, for good wires only
 # Author:   Gianluca Petrillo (petrillo@fnal.gov)
 # Date:     July 31st, 2014
 # Version:  1.1
@@ -10,18 +10,20 @@
 # - geometry (used by filters in DumpWires module)
 # 
 # Changes:
+# 20140731 (petrillo@fnal.gov) [v1.0]
+#   initial version
 # 20141217 (petrillo@fnal.gov) [v1.1]
 #   added the explicit configuration of the new parameter IgnoreFilters
 #
 
-#include "geometry_microboone.fcl"
+#include "geometry.fcl"
 
 process_name: DumpWires
 
 services: {
   user: {
-    ExptGeoHelperInterface: @local::microboone_geometry_helper   # defined in geometry_microboone.fcl
-    Geometry:               @local::microboone_geo               # defined in geometry_microboone.fcl
+    Geometry:               @local::standard_geo             # defined in geometry.fcl
+    ExptGeoHelperInterface: @local::standard_geometry_helper # defined in geometry.fcl
   } # user
   
   message: {
