@@ -203,20 +203,20 @@ namespace filter {
 	  
 	  std::vector< art::Ptr<recob::Hit> > colHits = fmhc.at(j);
           
-	  double trk1Start = indSeg->StartPos()[1]+fDelay;
-	  double trk1End = indSeg->EndPos()[1]+fDelay;
-	  double trk2Start =colSeg->StartPos()[1];
-	  double trk2End =colSeg->EndPos()[1];
+	  double trk1Start = indSeg->StartTick()+fDelay;
+	  double trk1End = indSeg->EndTick()+fDelay;
+	  double trk2Start =colSeg->StartTick();
+	  double trk2End =colSeg->EndTick();
 	  
-	  uPos1 = indSeg->StartPos()[0];
-	  uPos2 = indSeg->EndPos()[0]; 
-	  vPos1 = colSeg->StartPos()[0];
-	  vPos2 = colSeg->EndPos()[0];
+	  uPos1 = indSeg->StartWire();
+	  uPos2 = indSeg->EndWire(); 
+	  vPos1 = colSeg->StartWire();
+	  vPos2 = colSeg->EndWire();
 	  mf::LogInfo("MuonFilter") << "I J " << i <<" " << j ;
-	  mf::LogInfo("MuonFilter") << "Start/end " << indSeg->StartPos()[0] 
-				    <<" "<< colSeg->StartPos()[0] 
-				    <<" "<< indSeg->EndPos()[0] 
-				    <<" "<< colSeg->EndPos()[0] ;
+	  mf::LogInfo("MuonFilter") << "Start/end " << indSeg->StartWire() 
+				    <<" "<< colSeg->StartWire() 
+				    <<" "<< indSeg->EndWire() 
+				    <<" "<< colSeg->EndWire() ;
           mf::LogInfo("MuonFilter")<<"U's "<< uPos1 <<" " << uPos2 
 				   <<"V's "<< vPos1 <<" " << vPos2 
 				   << " times " << trk1End <<" "<< trk2End 
