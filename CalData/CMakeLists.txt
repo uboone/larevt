@@ -49,6 +49,7 @@ simple_plugin(CalWire "module"
 
 simple_plugin(CalWireT962 "module"
                         Filters
+                        RawData
                         RecoBase
                         RecoBaseArt
                         Geometry_service
