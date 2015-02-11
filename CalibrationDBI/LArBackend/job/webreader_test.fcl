@@ -1,0 +1,38 @@
+#include "webreader.fcl"
+
+process_name: WebReaderTest
+
+services:
+{
+  TFileService: { fileName: "ana_hist.root" }
+  Timing:       {}
+  user:         { WebReaderService: @local::standard_webreader }
+}
+
+source:
+{
+  module_type: EmptyEvent
+  maxEvents:  -1 
+}
+
+physics:
+{
+
+ analyzers:
+ {
+   test: {module_type: "WebReaderTest"}
+ }
+
+ analyzeIt: [ test ]
+
+ end_paths:     [ analyzeIt ]
+}
+
+# Override service parameters temporarily for UB (testing)
+
+services.user.WebReaderService.WDA_SERVER:  "dbdata0.fnal.gov"
+services.user.WebReaderService.WDA_PORT:    "8086"
+services.user.WebReaderService.WDA_DBNAME:  "uboonecon_dev"
+services.user.WebReaderService.WDA_TIMEOUT: 5
+
+
