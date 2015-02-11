@@ -53,7 +53,7 @@ namespace cluster {
     
     void ClearandResizeVectors(unsigned int nHits);
     
-    int GetPlaneAndTPC(	art::Ptr<recob::Hit> a,
+    void GetPlaneAndTPC(art::Ptr<recob::Hit> a,
 			unsigned int &p,
 			unsigned int &cs,
 			unsigned int &t,
@@ -198,11 +198,11 @@ bool cluster::SmallClusterFilter::filter(art::Event& evt)
 
     theHit = art::Ptr< recob::Hit>(HitListHandle, iHit);
 
-    unsigned int p(0),w(0), t(0),cs(0); //c=channel, p=plane, w=wire, but what is t?
+    unsigned int p(0),w(0), t(0),cs(0); //c=channel, p=plane, w=wire, t=TPC
     GetPlaneAndTPC(theHit,p,cs,t,w);  //Find out what plane this hit is on.
     
     //Do a check to catch crazy hits:
-    if (theHit -> Charge() > 500 ) continue;
+    if (theHit -> Integral() > 500 ) continue;
     
     //add this hit to the total list
     hitlist.push_back(theHit);
@@ -235,18 +235,16 @@ bool cluster::SmallClusterFilter::filter(art::Event& evt)
 
 // ******************************* //
 // ******************************* //
-int cluster::SmallClusterFilter::GetPlaneAndTPC(art::Ptr<recob::Hit> a, //the hit
+void cluster::SmallClusterFilter::GetPlaneAndTPC(art::Ptr<recob::Hit> a, //the hit
 						unsigned int &p, //plane
- 						unsigned int & /* cs */,  //cryostat
-						unsigned int &t, //time
+ 						unsigned int &cs, //cryostat
+						unsigned int &t, //tpc
 						unsigned int &w) //wire
 {
-  unsigned int channel = a->Wire()->RawDigit()->Channel(); 
-  geom->ChannelToWire(channel);
+  cs = a -> WireID().Cryostat;
   p = a -> WireID().Plane;
-  t = a -> PeakTime();
+  t = a -> WireID().TPC;
   w = a -> WireID().Wire;
-  return 0;
 }
 
 

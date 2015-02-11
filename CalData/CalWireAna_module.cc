@@ -6,22 +6,22 @@
 //
 //
 ////////////////////////////////////////////////////////////////////////
-extern "C" {
-#include <sys/types.h>
-#include <sys/stat.h>
-}
 
 #include "art/Framework/Core/EDAnalyzer.h"
+
+// C++ includes
+#include <algorithm>
 #include <string>
+#include <vector>
 
 // Framework includes
 #include "art/Framework/Core/ModuleMacros.h"
+#include "art/Framework/Core/FindOneP.h"
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
-#include "art/Framework/Services/Optional/TFileDirectory.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // LArSoft includes
@@ -37,13 +37,6 @@ extern "C" {
 #include <TH1.h>
 #include <TH2.h>
 #include <TGraph.h>
-#include <TFile.h>
-
-// C++ includes
-#include <algorithm>
-#include <sstream>
-#include <fstream>
-#include <bitset>
 
 class TH2F;
 class TH1F;
@@ -170,7 +163,11 @@ namespace caldata{
     evt.getByLabel(fDetSimModuleLabel,rdHandle);
     art::Handle< std::vector<recob::Wire> > wHandle;
     evt.getByLabel(fCalWireModuleLabel,wHandle);
-
+    
+    // get the raw::RawDigit associated by fCalWireModuleLabel to wires in wHandle;
+    // RawDigitsFromWire.at(index) will be a art::Ptr<raw::RawDigit>
+    art::FindOneP<raw::RawDigit> RawDigitsFromWire(wHandle, evt, fCalWireModuleLabel);
+    
     art::PtrVector<recob::Wire> wvec;
     for(unsigned int i = 0; i < wHandle->size(); ++i){
       art::Ptr<recob::Wire> w(wHandle,i);
@@ -198,7 +195,8 @@ namespace caldata{
       // Find corresponding wire.
       std::vector<double> signal(fft->FFTSize());
       for(unsigned int wd = 0; wd < wvec.size(); ++wd){
-	if (wvec[wd]->RawDigit() == rdvec[rd]){
+      //  if (wvec[wd]->RawDigit() == rdvec[rd]){
+        if (RawDigitsFromWire.at(wd) == rdvec[rd]){
           std::vector<float> wirSig = wvec[wd]->Signal();
           if(wirSig.size() > signal.size()) {
             LOG_DEBUG("CalWireAna")<<"Incompatible vector size "<<wirSig.size()
@@ -274,7 +272,7 @@ namespace caldata{
 	sigMin = TMath::MinElement(signalSize,&adc[0]);
 	tmin = std::max(indMax-window,0);
 	tmax = std::min(indMin+window,(int)signalSize-1);
-	LOG_DEBUG("CalWireAna") << std::cout << "Induction channel, indMin,tmin,tmax " 
+	LOG_DEBUG("CalWireAna") << "Induction channel, indMin,tmin,tmax " 
 				   << rd<< " " << indMin<< " " << tmin << " " << tmax;
       } 
       else if (sigMax>=pulseHeight){
