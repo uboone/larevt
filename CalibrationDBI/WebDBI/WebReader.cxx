@@ -10,18 +10,22 @@
 #include "CalibrationDBI/IOVData/UtilFunc.h"
 #include "WebError.h"
 namespace lariov {
+
+  template <class T>
+  WebReader<T>* WebReader<T>::_me = nullptr;
+
+  template <class T>
+  WebReader<T>::WebReader()
+  {}
   
   template <class T>
-  WebReader<T>::WebReader(std::string  server,
-			  std::string  port,
-			  std::string  dbname,
-			  unsigned int timeout)
-    : _timeout (timeout)
-  {
-    _server = (server != "default" ? server : getenv("LIBWDA_SERVER") );
-    _port   = (port   != "default" ? port   : getenv("LIBWDA_PORT"  ) );
-    _dbname = (dbname != "default" ? dbname : getenv("LIBWDA_DBNAME") );
-  }
+  WebReader<T>::WebReader(const WDAConnInfo& conn)
+    : _conn(conn)
+  {}
+
+  template <class T>
+  void WebReader<T>::SetConnInfo(const WDAConnInfo& conn)
+  { if(_conn != conn) _conn = conn; }
 
   template <class T>
   const Snapshot<T>& WebReader<T>::Request(const std::string& name,
@@ -32,17 +36,14 @@ namespace lariov {
     if(iter != _data_m.end() && (*iter).second.Valid(ts))
       return (*iter).second;
 
-    std::string url("http://");
-    url += _server;
-    if(!_port.empty()) url += ":" + _port;
-    url += "/" + _dbname + "/app";
+    auto url = _conn.URLPrefix();
     url += "/data?f=" + name;
     url += "&t=" + std::to_string(ts.GetSec()) + "." + std::to_string(int(ts.GetNanoSec()/1.e9));
     
     int err_code=0;
     TStopwatch fWatch;
     fWatch.Start();
-    auto data = getDataWithTimeout(url.c_str(),NULL,_timeout,&err_code);
+    auto data = getDataWithTimeout(url.c_str(),NULL,_conn._timeout,&err_code);
     if(err_code) {
       std::cerr << "\033[93m" 
 		<< __FUNCTION__
@@ -63,14 +64,14 @@ namespace lariov {
 	msg << "Not enough information loaded (#rows = " << nrows << " < 4)";
       else {
 	auto time_taken = fWatch.RealTime();
-	if(time_taken > (double)(_timeout))
+	if(time_taken > (double)(_conn._timeout))
 	  msg << "No data ... likely connection timed-out!" ;
 	else
 	  msg << "No data ... likely incorrect folder name / invalid timestamp!" ;
 
 	msg << std::endl
 	    << "URL: " << url << std::endl
-	    << "Time taken: " << time_taken << " / " << _timeout << " [s]" << std::endl;
+	    << "Time taken: " << time_taken << " / " << _conn._timeout << " [s]" << std::endl;
 	throw WebError(msg.str());
       }
     }

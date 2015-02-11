@@ -174,43 +174,6 @@ namespace lariov {
     _tag = tag;
   }
 
-  template <class T>
-  const lariov::ChData<T>& Snapshot<T>::Row(const size_t n) const
-  {
-    if(n >= this->size())
-      throw IOVDataError("Invalid row number requested!");
-    return (*this)[n];
-  }
-
-  template <class T>
-  const lariov::ChData<T>& Snapshot<T>::ChData(const unsigned int ch) const
-  {
-    auto iter = std::lower_bound (this->begin(), this->end(), ch);
-    if(iter == this->end()) {
-      std::string msg("Channel not found: ");
-      msg += std::to_string(ch);
-      throw IOVDataError(msg);
-    }
-    return (*iter);
-  }
-  
-  template <class T>
-  void Snapshot<T>::push_back(const lariov::ChData<T>& data)
-  {
-    
-    if(!(_field_type.size())) throw IOVDataError("Not configured yet toadd ChData!!");
-    
-    if(data.size() != (_field_type.size()))
-      throw IOVDataError("Invalid number of columns in the new row!");
-    
-    bool sort = (this->size() && data < this->back());
-    
-    std::vector<lariov::ChData<T> >::push_back(data);
-    
-    if(sort) std::sort(this->begin(),this->end());
-    
-  }
-
 }
 
 #endif

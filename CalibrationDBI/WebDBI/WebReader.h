@@ -15,9 +15,11 @@
 #define WEBDBI_WEBREADER_H
 
 #include "CalibrationDBI/IOVData/Snapshot.h"
+#include "WDAConnInfo.h"
 #include <map>
 namespace lariov {
 
+  class WebReaderService;
   /**
      \class WebReader
      User defined class WebReader ... these comments are used to generate
@@ -25,28 +27,52 @@ namespace lariov {
   */
   template <class T>
   class WebReader{
-    
-  public:
-    
-    /// Default constructor
-    WebReader(std::string  server  = "default",
-	      std::string  port    = "default",
-	      std::string  dbname  = "default",
-	      unsigned int timeout = 10);
-    
-    /// Default destructor
-    virtual ~WebReader(){}
 
+  private:
+    /// Default ctor
+    WebReader();
+
+    /// Alternative ctor
+    WebReader(const WDAConnInfo& conn_info);
+
+    /// Default destructor
+    ~WebReader(){}
+
+    /// Connection info updater
+    void SetConnInfo(const WDAConnInfo& conn);
+
+  public:
+    /// Singleton getter
+    static WebReader<T>& GetME() {
+      if(!_me) _me = new WebReader<T>();
+      return *_me;
+    }
+
+    static WebReader<T>& GetME(const WDAConnInfo& conn) {
+      if(!_me) _me = new WebReader<T>(conn);
+      else _me->SetConnInfo(conn);
+      return *_me;
+    }
+
+    static WebReader<T>& GetME(const std::string& server,
+			       const std::string& port,
+			       const std::string& dbname,
+			       const unsigned int timeout=kDEFAULT_WDA_TIMEOUT_SEC)
+    {
+      WDAConnInfo conn(server,port,dbname,timeout);
+      return GetME(conn);
+    }
+
+  public:
+
+    /// Single useful function to load DB contents
     const Snapshot<T>& Request(const std::string& name,
 			       const TTimeStamp&  ts,
-			       const std::string tag="");
+			       const std::string  tag="");
     
   private:
-
-    std::string  _server;  ///< HTML server dns
-    std::string  _port;    ///< Port ID
-    std::string  _dbname;  ///< HTML server db name
-    unsigned int _timeout; ///< Query timeout period [s]
+    static WebReader<T>* _me;
+    WDAConnInfo _conn;   ///< Connection information
     std::map<std::string, lariov::Snapshot<T> > _data_m;
 
   };
