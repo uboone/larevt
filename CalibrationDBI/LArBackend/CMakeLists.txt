@@ -31,6 +31,8 @@ simple_plugin(WebReaderService "service"
               BASENAME_ONLY
 )
 
+add_subdirectory(job)
+
 install_headers()
 install_fhicl()
 install_source()
