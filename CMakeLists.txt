@@ -63,6 +63,8 @@ include(BuildPlugins)
 # source
 add_subdirectory(CalData)
 add_subdirectory(Filters)
+add_subdirectory(CalibrationDBI)
+
 # tests
 # add_subdirectory(test)
 
