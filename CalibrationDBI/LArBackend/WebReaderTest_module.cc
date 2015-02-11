@@ -83,12 +83,9 @@ void WebReaderTest::analyze(art::Event const & e)
     TTimeStamp now   (start);
 
     // Now create DBI instance and loop over sampling points
-    //art::ServiceHandle<lariov::WebReaderService> db_handle;
-    //auto& db = db_handle->Get<double>();
-    auto& db = lariov::WebReader<double>::GetME("dbdata0.fnal.gov",
-						"8086",
-						"uboonecon_dev",
-						5);
+    art::ServiceHandle<lariov::WebReaderService> db_handle;
+    auto& db = db_handle->GetWebReader<double>();
+
     int period = (int)( (end.GetSec() - start.GetSec()) / (double)(npoints) );
     for(size_t i=0; i<npoints; ++i) {
 

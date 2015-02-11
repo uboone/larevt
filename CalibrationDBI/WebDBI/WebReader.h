@@ -27,7 +27,7 @@ namespace lariov {
   */
   template <class T>
   class WebReader{
-
+    friend class WebReaderService;
   private:
     /// Default ctor
     WebReader();
@@ -41,7 +41,6 @@ namespace lariov {
     /// Connection info updater
     void SetConnInfo(const WDAConnInfo& conn);
 
-  public:
     /// Singleton getter
     static WebReader<T>& GetME() {
       if(!_me) _me = new WebReader<T>();

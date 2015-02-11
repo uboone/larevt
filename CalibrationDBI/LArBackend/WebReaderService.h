@@ -31,7 +31,7 @@ namespace lariov{
     virtual ~WebReaderService(){}
 
     template <class T>
-    WebReader<T>& Get()
+    WebReader<T>& GetWebReader()
     {
       return WebReader<T>::GetME(_server,_port,_db,_timeout);
     }

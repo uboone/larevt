@@ -13,5 +13,8 @@ namespace lariov {
     , _timeout ( pset.get< unsigned int >( "WDA_TIMEOUT" ) )
   {}
 
+  DEFINE_ART_SERVICE(WebReaderService)
+
 }
+
 #endif
