@@ -1,0 +1,18 @@
+BEGIN_PROLOG
+
+standard_spacecharge:
+{
+  EnableSimulationSCE:    false
+  EnableCorrectionsSCE:   false
+  RepresentationType:     "Parametric"
+  InputFilename:          "SCEoffsets.root"
+}
+
+bo_spacecharge:         @local::standard_spacecharge
+jp250L_spacecharge:     @local::standard_spacecharge
+argoneut_spacecharge:   @local::standard_spacecharge
+microboone_spacecharge: @local::standard_spacecharge
+lbne35t_spacecharge:    @local::standard_spacecharge
+lbnefd_spacecharge:     @local::standard_spacecharge
+
+END_PROLOG

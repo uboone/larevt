@@ -155,7 +155,7 @@ namespace filter {
       ionSum=0.0;
       std::vector< art::Ptr<recob::Hit> > hits = fmh.at(cluster);
       for(unsigned int hit = 0; hit < hits.size(); hit++) {
-	ionSum+=hits[hit]->Charge(true);
+	ionSum+=hits[hit]->PeakAmplitude();
       }
       if(clusters[cluster]->View() == uView) indIon+=ionSum;
       else if(clusters[cluster]->View() == vView) colIon+=ionSum;
@@ -203,20 +203,20 @@ namespace filter {
 	  
 	  std::vector< art::Ptr<recob::Hit> > colHits = fmhc.at(j);
           
-	  double trk1Start = indSeg->StartPos()[1]+fDelay;
-	  double trk1End = indSeg->EndPos()[1]+fDelay;
-	  double trk2Start =colSeg->StartPos()[1];
-	  double trk2End =colSeg->EndPos()[1];
+	  double trk1Start = indSeg->StartTick()+fDelay;
+	  double trk1End = indSeg->EndTick()+fDelay;
+	  double trk2Start =colSeg->StartTick();
+	  double trk2End =colSeg->EndTick();
 	  
-	  uPos1 = indSeg->StartPos()[0];
-	  uPos2 = indSeg->EndPos()[0]; 
-	  vPos1 = colSeg->StartPos()[0];
-	  vPos2 = colSeg->EndPos()[0];
+	  uPos1 = indSeg->StartWire();
+	  uPos2 = indSeg->EndWire(); 
+	  vPos1 = colSeg->StartWire();
+	  vPos2 = colSeg->EndWire();
 	  mf::LogInfo("MuonFilter") << "I J " << i <<" " << j ;
-	  mf::LogInfo("MuonFilter") << "Start/end " << indSeg->StartPos()[0] 
-				    <<" "<< colSeg->StartPos()[0] 
-				    <<" "<< indSeg->EndPos()[0] 
-				    <<" "<< colSeg->EndPos()[0] ;
+	  mf::LogInfo("MuonFilter") << "Start/end " << indSeg->StartWire() 
+				    <<" "<< colSeg->StartWire() 
+				    <<" "<< indSeg->EndWire() 
+				    <<" "<< colSeg->EndWire() ;
           mf::LogInfo("MuonFilter")<<"U's "<< uPos1 <<" " << uPos2 
 				   <<"V's "<< vPos1 <<" " << vPos2 
 				   << " times " << trk1End <<" "<< trk2End 
@@ -277,14 +277,14 @@ namespace filter {
 	      mf::LogInfo("MuonFilter") << "outside   Removed induction ion: ";          
 
 	      for(size_t h = 0; h < indHits.size(); h++){
-		mf::LogInfo("MuonFilter") << indHits[h]->Charge(true) << " ";
-		indIon -= indHits[h]->Charge(true);
+		mf::LogInfo("MuonFilter") << indHits[h]->PeakAmplitude() << " ";
+		indIon -= indHits[h]->PeakAmplitude();
 	      }
 	      mf::LogInfo("MuonFilter")  <<"Removed collection ion: ";
 
 	      for(size_t h = 0; h < colHits.size(); h++){ 
-		    mf::LogInfo("MuonFilter") << colHits[h]->Charge(true) << " ";
-		    colIon -= colHits[h]->Charge(true);
+		    mf::LogInfo("MuonFilter") << colHits[h]->PeakAmplitude() << " ";
+		    colIon -= colHits[h]->PeakAmplitude();
 	      }
 	      mf::LogInfo("MuonFilter")<<"Ionization outside track I/C: " << indIon << " "<<colIon;	 
 	    }
@@ -294,13 +294,13 @@ namespace filter {
 	      tGoing.push_back(pointTemp);
 	      mf::LogInfo("MuonFilter") << "stopping   Removed induction ion: ";          
 	      for(size_t h = 0; h < indHits.size(); h++){
-		mf::LogInfo("MuonFilter") <<indHits[h]->Charge(true) << " ";
-		indIon -= indHits[h]->Charge(true);
+		mf::LogInfo("MuonFilter") <<indHits[h]->PeakAmplitude() << " ";
+		indIon -= indHits[h]->PeakAmplitude();
 	      }
 	      mf::LogInfo("MuonFilter")  <<"Removed collection ion: ";
 	      for(size_t h = 0; h < colHits.size(); h++){ 
-		mf::LogInfo("MuonFilter") << colHits[h]->Charge(true)<< " ";
-		colIon -= colHits[h]->Charge(true);
+		mf::LogInfo("MuonFilter") << colHits[h]->PeakAmplitude()<< " ";
+		colIon -= colHits[h]->PeakAmplitude();
 	      }
 	      mf::LogInfo("MuonFilter") <<"Ionization outside track I/C: " << indIon << " "<<colIon;
 	    }
@@ -332,10 +332,10 @@ namespace filter {
 	    mf::LogInfo("MuonFilter") <<"Removing delta ion "<<rLook.size()<<" "<<rLook[j].first<<" "<<matchNum;
 	    std::vector< art::Ptr<recob::Hit> > temp = fmhi.at(rLook[j].first);
 	    for(unsigned int h = 0; h < temp.size();h++)	 
-	      indIon -= temp[h]->Charge(true);
+	      indIon -= temp[h]->PeakAmplitude();
 	    temp = fmhc.at(rLook[j].second);
 	    for(unsigned int h = 0; h < temp.size();h++)	   
-	      colIon -= temp[h]->Charge(true);   
+	      colIon -= temp[h]->PeakAmplitude();   
 	  }
 	}
       } 

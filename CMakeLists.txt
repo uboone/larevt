@@ -63,6 +63,7 @@ include(BuildPlugins)
 # source
 add_subdirectory(CalData)
 add_subdirectory(Filters)
+add_subdirectory(SpaceCharge)
 # tests
 # add_subdirectory(test)
 

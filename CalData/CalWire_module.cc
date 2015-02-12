@@ -9,41 +9,36 @@
 #ifndef CALWIRE_H
 #define CALWIRE_H
 
-extern "C" {
-#include <sys/types.h>
-#include <sys/stat.h>
-}
-
-#include <stdint.h>
+// ROOT includes
+#include <TFile.h>
+#include <TH2D.h>
+#include <TH1D.h>
+#include <TF1.h>
+#include <TComplex.h>
 
 // Framework includes
-#include "art/Framework/Principal/Event.h" 
-#include "fhiclcpp/ParameterSet.h" 
-#include "art/Framework/Principal/Handle.h" 
-#include "art/Persistency/Common/Ptr.h" 
-#include "art/Persistency/Common/PtrVector.h" 
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Framework/Services/Optional/TFileService.h" 
-#include "art/Framework/Services/Optional/TFileDirectory.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h" 
+#include "fhiclcpp/ParameterSet.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 #include "cetlib/exception.h"
 #include "cetlib/search_path.h"
+#include "art/Persistency/Common/Ptr.h"
+#include "art/Persistency/Common/Assns.h"
+#include "art/Framework/Principal/Event.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "art/Framework/Core/EDProducer.h" // include the proper bit of the framework
 #include "art/Framework/Core/ModuleMacros.h" 
 
 // LArSoft includes
+#include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 #include "Geometry/Geometry.h"
 #include "Geometry/PlaneGeo.h"
 #include "RawData/RawDigit.h"
 #include "RawData/raw.h"
 #include "RecoBase/Wire.h"
+#include "RecoBaseArt/WireCreator.h"
 #include "Utilities/LArFFT.h"
-
-// ROOT includes
-#include <TFile.h>
-#include <TH2D.h>
-#include <TF1.h>
-#include <TComplex.h>
+#include "Utilities/AssociationUtil.h"
 
 ///creation of calibrated signals on wires
 namespace caldata {
@@ -94,8 +89,9 @@ namespace caldata{
   CalWire::CalWire(fhicl::ParameterSet const& pset)
   {
     this->reconfigure(pset);
-
+    
     produces< std::vector<recob::Wire> >();
+    produces<art::Assns<raw::RawDigit, recob::Wire>>();
     
   }
   
@@ -209,6 +205,9 @@ namespace caldata{
 
     // make a collection of Wires
     std::unique_ptr<std::vector<recob::Wire> > wirecol(new std::vector<recob::Wire>);
+    // ... and an association set
+    std::unique_ptr<art::Assns<raw::RawDigit,recob::Wire> > WireDigitAssn
+      (new art::Assns<raw::RawDigit,recob::Wire>);
     
     // Read in the digit List object(s). 
     art::Handle< std::vector<raw::RawDigit> > digitVecHandle;
@@ -223,7 +222,7 @@ namespace caldata{
     unsigned int dataSize = digitVec0->Samples(); //size of raw data vectors
     
     int transformSize = fFFT->FFTSize();
-    uint32_t channel(0); // channel number
+    raw::ChannelID_t channel(raw::InvalidChannelID); // channel number
     unsigned int bin(0);     // time bin loop variable
     
     double decayConst = 0.;  // exponential decay constant of electronics shaping
@@ -242,7 +241,7 @@ namespace caldata{
       holder.resize(transformSize);
       
       // uncompress the data
-      raw::Uncompress(digitVec->fADC, rawadc, digitVec->Compression());
+      raw::Uncompress(digitVec->ADCs(), rawadc, digitVec->Compression());
       
       for(bin = 0; bin < dataSize; ++bin) 
 	holder[bin]=(rawadc[bin]-digitVec->GetPedestal());
@@ -290,18 +289,26 @@ namespace caldata{
       holder.resize(dataSize,1e-5);
       //This restores the DC component to signal removed by the deconvolution.
       if(fPostsample) {
-	double average=0.0;
-	for(bin=0; bin < (unsigned int)fPostsample; ++bin) 
-	  average+=holder[holder.size()-1-bin]/(double)fPostsample;
-	for(bin = 0; bin < holder.size(); ++bin) holder[bin]-=average;
+        double average=0.0;
+        for(bin=0; bin < (unsigned int)fPostsample; ++bin) 
+          average+=holder[holder.size()-1-bin]/(double)fPostsample;
+        for(bin = 0; bin < holder.size(); ++bin) holder[bin]-=average;
       }
-      wirecol->push_back(recob::Wire(holder,digitVec));
-    }
+      wirecol->push_back(recob::WireCreator(holder,*digitVec).move());
+      // add an association between the last object in wirecol
+      // (that we just inserted) and digitVec
+      if (!util::CreateAssn(*this, evt, *wirecol, digitVec, *WireDigitAssn)) {
+        throw art::Exception(art::errors::InsertFailure)
+          << "Can't associate wire #" << (wirecol->size() - 1)
+          << " with raw digit #" << digitVec.key();
+      } // if failed to add association
+    } // for raw digits
 
     if(wirecol->size() == 0)
       mf::LogWarning("CalWire") << "No wires made for this event.";
     
     evt.put(std::move(wirecol));
+    evt.put(std::move(WireDigitAssn));
     
     return;
   }

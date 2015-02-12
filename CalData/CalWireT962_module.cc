@@ -11,32 +11,29 @@
 
 #include <stdint.h>
 
-extern "C" {
-#include <sys/types.h>
-#include <sys/stat.h>
-}
-
 // Framework includes
+#include "messagefacility/MessageLogger/MessageLogger.h" 
+#include "fhiclcpp/ParameterSet.h" 
+#include "cetlib/exception.h"
+#include "cetlib/search_path.h"
 #include "art/Framework/Core/ModuleMacros.h" 
 #include "art/Framework/Principal/Event.h" 
-#include "fhiclcpp/ParameterSet.h" 
 #include "art/Framework/Core/EDProducer.h"
 #include "art/Framework/Principal/Handle.h" 
 #include "art/Persistency/Common/Ptr.h" 
-#include "art/Persistency/Common/PtrVector.h" 
+#include "art/Persistency/Common/Assns.h" 
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Framework/Services/Optional/TFileService.h" 
-#include "art/Framework/Services/Optional/TFileDirectory.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h" 
-#include "cetlib/exception.h"
-#include "cetlib/search_path.h"
 
 // LArSoft includes
+#include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 #include "Geometry/Geometry.h"
 #include "Filters/ChannelFilter.h"
 #include "RawData/RawDigit.h"
+#include "RawData/raw.h" // raw::Uncompress()
 #include "RecoBase/Wire.h"
+#include "RecoBaseArt/WireCreator.h"
 #include "Utilities/LArFFT.h"
+#include "Utilities/AssociationUtil.h"
 
 // ROOT includes
 #include <TFile.h>
@@ -95,6 +92,7 @@ namespace caldata{
     this->reconfigure(pset);
 
     produces< std::vector<recob::Wire> >();
+    produces<art::Assns<raw::RawDigit, recob::Wire>>();
     
   }
   
@@ -210,6 +208,9 @@ namespace caldata{
 
     // make a collection of Wires
     std::unique_ptr<std::vector<recob::Wire> > wirecol(new std::vector<recob::Wire>);
+    // ... and an association set
+    std::unique_ptr<art::Assns<raw::RawDigit,recob::Wire> > WireDigitAssn
+      (new art::Assns<raw::RawDigit,recob::Wire>);
     
     // Read in the digit List object(s). 
     art::Handle< std::vector<raw::RawDigit> > digitVecHandle;
@@ -224,7 +225,7 @@ namespace caldata{
     unsigned int dataSize = digitVec0->Samples(); //size of raw data vectors
     
     int transformSize = fFFT->FFTSize();
-    uint32_t     channel(0); // channel number
+    raw::ChannelID_t channel = raw::InvalidChannelID; // channel number
     unsigned int bin(0);     // time bin loop variable
     
     filter::ChannelFilter *chanFilt = new filter::ChannelFilter();  
@@ -239,7 +240,8 @@ namespace caldata{
       holder.clear();
       
       art::Ptr<raw::RawDigit> digitVec(digitVecHandle, rdIter);
-      std::vector<short> rawadc(digitVec->fADC);  // vector holding uncompressed adc values
+      raw::RawDigit::ADCvector_t rawadc(digitVec->Samples());  // vector holding uncompressed adc values
+      raw::Uncompress(digitVec->ADCs(), rawadc, digitVec->Compression());
       channel = digitVec->Channel();
 
       // skip bad channels
@@ -285,13 +287,22 @@ namespace caldata{
       }  
 
       // Make a single ROI that spans the entire data size
-      wirecol->push_back(recob::Wire(holder,digitVec));
+      wirecol->push_back(recob::WireCreator(holder,*digitVec).move());
+      
+      // add an association between the last object in wirecol
+      // (that we just inserted) and digitVec
+      if (!util::CreateAssn(*this, evt, *wirecol, digitVec, *WireDigitAssn)) {
+        throw art::Exception(art::errors::InsertFailure)
+          << "Can't associate wire #" << (wirecol->size() - 1)
+          << " with raw digit #" << digitVec.key();
+      } // if failed to add association
     }
     
     if(wirecol->size() == 0)
       mf::LogWarning("CalWireT962") << "No wires made for this event.";
     
     evt.put(std::move(wirecol));
+    evt.put(std::move(WireDigitAssn));
     
     delete chanFilt;
     return;
