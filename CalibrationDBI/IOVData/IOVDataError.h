@@ -28,17 +28,17 @@ namespace lariov {
 
     IOVDataError(std::string msg="") : std::exception()
     {
-      _msg = "\033[93m";
-      _msg += msg;
-      _msg += "\033[00m";
+      fMsg = "\033[93m";
+      fMsg += msg;
+      fMsg += "\033[00m";
     }
     
     virtual ~IOVDataError() throw(){};
     virtual const char* what() const throw()
-    { return _msg.c_str(); }
+    { return fMsg.c_str(); }
 
   private:
-    std::string _msg;
+    std::string fMsg;
   };
 
 }
