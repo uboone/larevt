@@ -11,148 +11,109 @@
 /** \addtogroup Snapshot
 
     @{*/
-#ifndef WEBDB_WEBDATA_H
-#define WEBDB_WEBDATA_H
+#ifndef IOVDATA_SNAPSHOT_H
+#define IOVDATA_SNAPSHOT_H
 
-#include <iostream>
 #include <algorithm>
-#include <map>
 #include <vector>
 #include <TTimeStamp.h>
-//#include <TObject.h>
 #include "ChData.h"
 #include "IOVDataError.h"
 #include "IOVDataConstants.h"
-namespace lariov {
 
-  template <class T>
-  class WebReader;
+#ifdef CALIBDB_LOCALL_BUILD
+  #include <TObject.h>
+#endif
+
+namespace lariov {
 
   /**
      \class Snapshot
   */
   template <class T>
-  class Snapshot : public std::vector< lariov::ChData<T> > 
-#ifdef CALIBDB_LOCAL_BUILD
+  class Snapshot : public std::vector<T> 
+  #ifdef CALIBDB_LOCAL_BUILD
 		 , public TObject
-#endif
+  #endif
   {
 		   
-    friend class WebReader<T>;
-  public:
-    
-    /// Default constructor
-    Snapshot(std::string folder="noname" );
-    
-    /// Default destructor
-    virtual ~Snapshot(){}
+    public:
 
-    /// Alternative ctor ... for creating Snapshot to be uploaded
-    Snapshot(const std::string& folder,
-	     const std::vector<std::string>& field_name,
-	     const std::vector<std::string>& field_type);
+      /// Default constructor
+      Snapshot() {}
 
-    Snapshot(const std::string& name,
-	     const std::vector<std::string>& field_name,
-	     const std::vector< ::lariov::ValueType_t>& field_type);
+      /// Default destructor
+      ~Snapshot(){}
 
-    void clear();
+      void clear();
 
-    const std::string& Folder() const;
-    const TTimeStamp&  Start() const;
-    const TTimeStamp&  End()   const;
-    const std::string& Tag() const;
-    bool   Valid(const TTimeStamp& ts) const;
-    size_t NChannels()    const;
-    size_t NFields() const;
+      const TTimeStamp&  Start() const {return fStart;}
+      const TTimeStamp&  End()   const {return fEnd;}
+      void SetIoV(const TTimeStamp& start, const TTimeStamp& end);
+      
+      bool  IsValid(const TTimeStamp& ts) const;
+      
+      size_t NChannels() const {return this->size();}
 
-    const std::string& FieldName(const size_t column) const;
-    ValueType_t        FieldType(const size_t column) const;
-    const std::string  FieldTypeString(const size_t column) const;
-    const std::vector<std::string>& FieldName() const;
-    const std::vector<lariov::ValueType_t>& FieldType() const;
-    const std::vector<std::string>  FieldTypeString() const;
-    size_t Name2Index(const std::string& field_name) const;
-
-    bool Compat(const Snapshot<T>& data) const;
-
-    bool Compat(const std::vector<std::string>& field_name,
-		const std::vector<std::string>& field_type) const;
-
-    bool Compat(const std::vector<std::string>& field_name,
-		const std::vector< ::lariov::ValueType_t> field_type) const;
-
-    void Reset(const TTimeStamp start = ::lariov::kMIN_TIME);
-
-  private:
-    
-    void Reset(const TTimeStamp& start, const TTimeStamp& end, const std::string tag="");
-    
-    //
-    // Template functions
-    //
-  public:
-
-    const lariov::ChData<T>& Row(const size_t n) const
-    {
-      if(n >= this->size())
-	throw IOVDataError("Invalid row number requested!");
-      return (*this)[n];
-    }
-
-    const lariov::ChData<T>& ChData(const unsigned int ch) const
-    {
-      auto iter = std::lower_bound (this->begin(), this->end(), ch);
-      if(iter == this->end()) {
+      
+      /// Only valid if T has base class ChData
+      typename std::enable_if<std::is_base_of<lariov::ChData, T>::value, const T&>::type
+      GetRow(const unsigned int ch) const
+      {
+        for (typename std::vector<T>::iterator it=this->begin(); it!=this->end(); ++it) {
+	  if ( it->Channel() == ch ) return *it;
+	}
+	
 	std::string msg("Channel not found: ");
 	msg += std::to_string(ch);
 	throw IOVDataError(msg);
       }
-      return (*iter);
-    }
 
-    inline void push_back(const lariov::ChData<T>& data)
-    {
+      /// keep vector sorted just in case it is useful
+      inline void push_back(const T& data)
+      {
+	bool sort = (this->size() && data < this->back());
+	std::vector<T>::push_back(data);
+	if(sort) std::sort(this->begin(),this->end());
+      }
 
-      if(!(_field_type.size())) throw IOVDataError("Not configured yet toadd ChData!!");
+    private:
 
-      if(data.size() != (_field_type.size()))
-	throw IOVDataError("Invalid number of columns in the new row!");
-
-      bool sort = (this->size() && data < this->back());
-
-      std::vector<lariov::ChData<T> >::push_back(data);
-
-      if(sort) std::sort(this->begin(),this->end());
-
-    }
-
-  private:
-
-  std::string _folder;
-    TTimeStamp  _iov_start;
-    TTimeStamp  _iov_end;
-    std::vector<std::string> _field_name;
-    std::vector<lariov::ValueType_t> _field_type;
-    std::string _tag;
-    std::map<std::string,size_t> _field_name_to_index;
-
-#ifdef CALIBDB_LOCAL_BUILD
-    ClassDef(Snapshot,1)
-#endif
+      TTimeStamp  fStart;
+      TTimeStamp  fEnd;
+    
+    //needed to derive from TObject
+    #ifdef CALIBDB_LOCAL_BUILD
+      ClassDef(Snapshot,1)
+    #endif
   };
-}
 
-template class lariov::Snapshot< std::string >;
-template class lariov::Snapshot< float  >;
-template class lariov::Snapshot< double >;
-template class lariov::Snapshot< short  >;
-template class lariov::Snapshot< int    >;
-template class lariov::Snapshot< long   >;
-template class lariov::Snapshot< unsigned short >;
-template class lariov::Snapshot< unsigned int   >;
-template class lariov::Snapshot< unsigned long  >;
+  //=============================================
+  // Class implementation
+  //=============================================
+  template <class T>
+  void Snapshot<T>::clear() {
+    this->std::vector<T>::clear();
+    fStart = kMAX_TIME;
+    fEnd = kMAX_TIME;
+  }
+  
+  template <class T>
+  void Snapshot<T>::SetIoV(const TTimeStamp& start, const TTimeStamp& end) {
+    if (start >= end) {
+      throw IOVDataError("Called Snapshot::SetIoV with start timestamp >= end timestamp!");
+    }
+    
+    fStart = start;
+    fEnd   = end;
+  }
+      
+  template <class T>
+  bool Snapshot<T>::IsValid(const TTimeStamp& ts) const {
+    return (fStart < ts && ts < fEnd); 
+  }
 
+}//end namespace lariov
 #endif
 /** @} */ // end of doxygen group 
 
