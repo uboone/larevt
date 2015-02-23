@@ -14,6 +14,8 @@
 #ifndef IOVDATA_CHDATA_H
 #define IOVDATA_CHDATA_H
 
+#include <functional>
+
 namespace lariov {
   /**
      \class ChData
@@ -30,7 +32,7 @@ namespace lariov {
 
       unsigned int Channel() const  { return fChannel; }
 
-      inline bool operator<(const U& rhs) const
+      inline bool operator<(unsigned int rhs) const
       { return fChannel < rhs;}
 
       inline bool operator<(const ChData& ch) const
@@ -44,6 +46,7 @@ namespace lariov {
 }
 
 namespace std {
+  template <>
   class less<lariov::ChData*>
   {
     public:
