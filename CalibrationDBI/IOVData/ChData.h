@@ -14,61 +14,44 @@
 #ifndef IOVDATA_CHDATA_H
 #define IOVDATA_CHDATA_H
 
-#include <vector>
-#include <string>
-
 namespace lariov {
   /**
      \class ChData
   */
-  template <class T>
-  class ChData : public std::vector<T> {
+  class ChData {
     
-  public:
-    
-    /// Default constructor
-    ChData() : std::vector<T>() {}
-    
-    /// Default destructor
-    virtual ~ChData(){}
+    public:
 
-    void Channel(unsigned int ch) { _ch = ch;   }
+      /// Constructor
+      ChData(unsigned int ch) : fChannel(ch) {}
 
-    unsigned int Channel() const  { return _ch; }
+      /// Default destructor
+      virtual ~ChData(){}
 
-    template <class U>
-    inline bool operator<(const U& rhs) const
-    { return _ch < rhs;}
+      unsigned int Channel() const  { return fChannel; }
 
-    inline bool operator<(const ChData& ch) const
-    { return _ch < ch.Channel(); }
+      inline bool operator<(const U& rhs) const
+      { return fChannel < rhs;}
 
-  protected:
+      inline bool operator<(const ChData& ch) const
+      { return fChannel < ch.Channel(); }
 
-    unsigned int _ch;
+    protected:
+
+      unsigned int fChannel;
     
   };
 }
 
 namespace std {
-  template <class T>
-  class less<lariov::ChData<T>*>
+  class less<lariov::ChData*>
   {
-  public:
-    bool operator()( const lariov::ChData<T>* lhs, const lariov::ChData<T>* rhs )
-    { return (*lhs) < (*rhs); }
+    public:
+      bool operator()( const lariov::ChData* lhs, const lariov::ChData* rhs )
+      { return (*lhs) < (*rhs); }
   };
 }
 
-template class lariov::ChData< std::string >;
-template class lariov::ChData< float  >;
-template class lariov::ChData< double >;
-template class lariov::ChData< short  >;
-template class lariov::ChData< int    >;
-template class lariov::ChData< long   >;
-template class lariov::ChData< unsigned short >;
-template class lariov::ChData< unsigned int   >;
-template class lariov::ChData< unsigned long  >;
 
 #endif
 /** @} */ // end of doxygen group 
