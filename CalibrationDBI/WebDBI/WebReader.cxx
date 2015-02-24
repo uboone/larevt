@@ -6,44 +6,33 @@
 #include <limits>
 #include <sstream>
 #include <wda.h>
-
-#include "CalibrationDBI/IOVData/UtilFunc.h"
 #include "WebError.h"
+
 namespace lariov {
 
-  template <class T>
-  WebReader<T>* WebReader<T>::_me = nullptr;
 
-  template <class T>
-  WebReader<T>::WebReader()
-  {}
-  
-  template <class T>
-  WebReader<T>::WebReader(const WDAConnInfo& conn)
-    : _conn(conn)
-  {}
-
-  template <class T>
-  void WebReader<T>::SetConnInfo(const WDAConnInfo& conn)
-  { if(_conn != conn) _conn = conn; }
-
-  template <class T>
-  const Snapshot<T>& WebReader<T>::Request(const std::string& name,
-					   const TTimeStamp&  ts,
-					   const std::string tag)
-  {
-    auto iter = _data_m.find(name);
-    if(iter != _data_m.end() && (*iter).second.Valid(ts))
-      return (*iter).second;
-
-    auto url = _conn.URLPrefix();
-    url += "/data?f=" + name;
+  void WebReader::SetConnInfo(const WDAConnInfo& conn, 
+  			      const std::string& folder, 
+			      const std::string& tag /*=0*/) {
+    if (fConn != conn) fConn = conn;
+    fFolder = folder;
+    fTag = tag;
+  }
+      
+  void* WebReader::Request(const TTimeStamp& ts, DBHeader& header) const {
+    
+    header.fields.clear();
+    header.types.clear();
+    
+    std::string url = fConn.URLPrefix();
+    url += "/data?f=" + fFolder;
     url += "&t=" + std::to_string(ts.GetSec()) + "." + std::to_string(int(ts.GetNanoSec()/1.e9));
     
     int err_code=0;
     TStopwatch fWatch;
     fWatch.Start();
-    auto data = getDataWithTimeout(url.c_str(),NULL,_conn._timeout,&err_code);
+    
+    void* data = getDataWithTimeout(url.c_str(),NULL,fConn._timeout,&err_code);
     if(err_code) {
       std::cerr << "\033[93m" 
 		<< __FUNCTION__
@@ -57,124 +46,101 @@ namespace lariov {
 
     size_t nrows = getNtuples(data);
 
-    if(nrows < 4) {
+    if(nrows < kNUMBER_HEADER_ROWS) {
       releaseDataset(data);
       std::ostringstream msg;
       if(nrows)
-	msg << "Not enough information loaded (#rows = " << nrows << " < 4)";
+	msg << "Not enough information loaded (#rows = " << nrows << " < "<<kNUMBER_HEADER_ROWS<<")";
       else {
 	auto time_taken = fWatch.RealTime();
-	if(time_taken > (double)(_conn._timeout))
+	if(time_taken > (double)(fConn._timeout))
 	  msg << "No data ... likely connection timed-out!" ;
 	else
 	  msg << "No data ... likely incorrect folder name / invalid timestamp!" ;
 
 	msg << std::endl
 	    << "URL: " << url << std::endl
-	    << "Time taken: " << time_taken << " / " << _conn._timeout << " [s]" << std::endl;
+	    << "Time taken: " << time_taken << " / " << fConn._timeout << " [s]" << std::endl;
 	throw WebError(msg.str());
       }
     }
 
-    TTimeStamp start, end;
-    ChData<T> values;
-    std::string str_value;
-    std::vector<std::string> str_array;
-    std::vector<std::string> field_name;
-    std::vector<std::string> field_type;
     char indefinite[30]="-";
     char buf[30];
-    int ch_column = -1;
-    for(size_t row=0; row<nrows; ++row) {
+    for(size_t row=0; row<kNUMBER_HEADER_ROWS; ++row) {
+      
       auto tup = getTuple(data,row);
-      str_array.resize(getNfields(tup),"");
-
-      if(row==0) {
-	double t = getDoubleValue(tup,0,&err_code);
-	if(err_code) {
-	  releaseTuple(tup);
-	  releaseDataset(data);
-	  throw WebError("Failed to parse the IOV start time stamp!");
-	}
-	start.SetSec(int(t));
-	start.SetNanoSec(int((t - start.GetSec())*1.e9));
-
-      }
-      else if(row==1) {
-	int str_size = getStringValue(tup,0,buf,sizeof(buf),&err_code);
-	if(err_code) {
-	  releaseTuple(tup);
-	  releaseDataset(data);
-	  throw WebError("Failed to parse the IOV end time stamp!");
-	}
-	if(!(strncmp(buf,indefinite,str_size)))
-	  end.SetSec(std::numeric_limits<int>::max());
-	else{
+      
+      switch (row) {
+        
+	case 0: //beginning timestamp
+        {
 	  double t = getDoubleValue(tup,0,&err_code);
+	  if(err_code) {
+	    releaseTuple(tup);
+	    releaseDataset(data);
+	    throw WebError("Failed to parse the IOV start time stamp!");
+	  }
+	  header.begin.SetSec(int(t));
+	  header.begin.SetNanoSec(int((t - header.begin.GetSec())*1.e9));
+	  
+	  break;
+	}
+	case 1: //end timestamp
+        {
+	  int str_size = getStringValue(tup,0,buf,sizeof(buf),&err_code);
 	  if(err_code) {
 	    releaseTuple(tup);
 	    releaseDataset(data);
 	    throw WebError("Failed to parse the IOV end time stamp!");
 	  }
-	  end.SetSec(int(t));
-	  end.SetNanoSec(int((t - end.GetSec())*1.e9));	  
-	}
-      }
-      else{
-	for(size_t column=0; column<(size_t)(getNfields(tup)); ++column) {
-	  int str_size = getStringValue(tup,column,buf,sizeof(buf),&err_code);
-	  if(err_code) {
-	    releaseTuple(tup);
-	    releaseDataset(data);
-	    throw WebError("Failed to parse the table field names!");
-	  }
-	  str_array[column].assign(buf,str_size);
-	}
-
-	if (!field_name.size()) {
-	  field_name.reserve(str_array.size());
-	  for(size_t i=0; i<str_array.size(); ++i) {
-	    auto const& str = str_array[i];
-	    if(str == "channel") ch_column = i;
-	    else field_name.push_back(str);
-	  }
-	  if( ch_column < 0)
-	    throw WebError("Channel field not found!");
-	}
-	else if (!field_type.size()) {
-	  field_type.reserve(str_array.size());
-	  for(size_t i=0; i<str_array.size(); ++i) {
-	    auto const& str = str_array[i];
-	    if(ch_column == ((int)i)) continue;
-	    field_type.push_back(str);
-	  }
-	  if(iter==_data_m.end()) 
-	    iter = _data_m.insert(std::make_pair(name,Snapshot<T>(name,field_name,field_type))).first;
-	  (*iter).second.Compat(field_name,field_type);
-	  (*iter).second.Reset(start, end, tag);
-	  (*iter).second.reserve(nrows-4);
-	}
-	else{
-	  values.resize(str_array.size()-1);
-	  for(size_t column=0; column<str_array.size(); ++column) {
-	    auto const& str = str_array[column];
-	    try{
-	      if(ch_column == ((int)column)) values.Channel(FromString<unsigned int>(str));
-	      else values[column-1] = FromString<T>(str);
-	    }catch(const std::exception& e) {
-	      std::ostringstream msg;
-	      msg<<"Failed to parse the string: "<<str.c_str()<<std::endl;
-	      throw WebError(msg.str());
+	  if(!(strncmp(buf,indefinite,str_size)))
+	    header.end.SetSec(std::numeric_limits<int>::max());
+	  else{
+	    double t = getDoubleValue(tup,0,&err_code);
+	    if(err_code) {
+	      releaseTuple(tup);
+	      releaseDataset(data);
+	      throw WebError("Failed to parse the IOV end time stamp!");
 	    }
+	    header.end.SetSec(int(t));
+	    header.end.SetNanoSec(int((t - header.end.GetSec())*1.e9));	  
 	  }
-	  (*iter).second.push_back(values);
+	  
+	  break;
+        }
+        default: //field names, types
+        {
+          if (row>3) {
+	    throw WebError("Read too many rows in WebReader!");
+	    break;
+	  }
+
+	  int ch_column = -1;
+	  for(size_t column=0; column < (size_t)getNfields(tup); ++column) {
+	    int str_size = getStringValue(tup,column,buf,sizeof(buf),&err_code);
+	    if(err_code) {
+	      releaseTuple(tup);
+	      releaseDataset(data);
+	      throw WebError("Failed to parse the table field names!");
+	    }
+	    
+	    std::string tmp_str(buf,str_size);
+	    if (tmp_str == "channel") ch_column = column;
+	    
+	    if      (row==2) header.fields.push_back(tmp_str);
+	    else if (row==3) header.types.push_back(tmp_str);
+	  }
+	  if (row==2 && ch_column < 0)
+	    throw WebError("Channel field not found!");
+	    
+	  break;
 	}
-      }
-      releaseTuple(tup);
-    }
-    releaseDataset(data);
-    return (*iter).second;
-  }
-}
+      }//end switch(row)
+    }//loop over header rows
+    
+    return data;
+  } //end WebReader::Request
+} //end namespace lariov
 
 #endif
