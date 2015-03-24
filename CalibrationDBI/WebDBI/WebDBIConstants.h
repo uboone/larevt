@@ -8,5 +8,6 @@ namespace lariov{
   const unsigned int kDEFAULT_WDA_TIMEOUT_SEC = 5;
   
   const unsigned int kNUMBER_HEADER_ROWS = 4;
+  const unsigned int kBUFFER_SIZE = 40;
 }
 #endif
