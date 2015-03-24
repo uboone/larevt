@@ -16,14 +16,11 @@
 
 #include <algorithm>
 #include <vector>
-#include <TTimeStamp.h>
+#include "IOVTimeStamp.h"
 #include "ChData.h"
+#include <sstream>
 #include "IOVDataError.h"
 #include "IOVDataConstants.h"
-
-#ifdef CALIBDB_LOCALL_BUILD
-  #include <TObject.h>
-#endif
 
 namespace lariov {
 
@@ -31,61 +28,75 @@ namespace lariov {
      \class Snapshot
   */
   template <class T>
-  class Snapshot : public std::vector<T> 
-  #ifdef CALIBDB_LOCAL_BUILD
-		 , public TObject
-  #endif
-  {
+  class Snapshot : public std::vector<T> {
 		   
     public:
 
       /// Default constructor
-      Snapshot() {}
+      Snapshot() : 
+        fStart(0,0), fEnd(0,0) {}
 
       /// Default destructor
       ~Snapshot(){}
 
       void clear();
 
-      const TTimeStamp&  Start() const {return fStart;}
-      const TTimeStamp&  End()   const {return fEnd;}
-      void SetIoV(const TTimeStamp& start, const TTimeStamp& end);
+      const IOVTimeStamp&  Start() const {return fStart;}
+      const IOVTimeStamp&  End()   const {return fEnd;}
+      void SetIoV(const IOVTimeStamp& start, const IOVTimeStamp& end);
       
-      bool  IsValid(const TTimeStamp& ts) const;
+      bool  IsValid(const IOVTimeStamp& ts) const;
       
       size_t NChannels() const {return this->size();}
 
       
-      /// Only valid if T has base class ChData
-      typename std::enable_if<std::is_base_of<lariov::ChData, T>::value, const T&>::type
-      GetRow(const unsigned int ch) const
-      {
-        for (typename std::vector<T>::iterator it=this->begin(); it!=this->end(); ++it) {
-	  if ( it->Channel() == ch ) return *it;
+      /// Only included with class if T has base class ChData
+      template< class U = T,
+                typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
+      const T& GetRow(unsigned int ch) const {
+       
+        typename Snapshot<T>::const_iterator it = std::lower_bound(this->begin(), this->end(), ch);
+	
+	if ( it == this->end() || it->Channel() != ch ) {
+          std::string msg("Channel not found: ");
+	  msg += std::to_string(ch);
+	  throw IOVDataError(msg);
 	}
 	
-	std::string msg("Channel not found: ");
-	msg += std::to_string(ch);
-	throw IOVDataError(msg);
+	return *it;
       }
 
-      /// keep vector sorted just in case it is useful
-      inline void push_back(const T& data)
-      {
-	bool sort = (this->size() && data < this->back());
-	std::vector<T>::push_back(data);
-	if(sort) std::sort(this->begin(),this->end());
+      template< class U = T,
+      		typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
+      void AddOrReplaceRow(const T& data) {
+        typename Snapshot<T>::iterator it = std::lower_bound(this->begin(), this->end(), data.Channel());	
+        if (it == this->end() || data.Channel() != it->Channel() ) {
+	  bool sort = ( !(this->empty()) && data < this->back());
+	  this->std::vector<T>::push_back(data);
+	  if (sort) std::sort(this->begin(), this->end());
+        }
+        else {
+	  *it = data;
+	}
       }
 
+      template< class U = T,
+      		typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
+      void push_back(const T& data) {
+        size_t original_size = this->size();
+        this->AddOrReplaceRow(data);
+	if (original_size == this->size()) {
+	  std::stringstream msg;
+	  msg <<"Warning: You just called push_back() and overwrote the cached data for channel "<<data.Channel();
+	  msg <<".  Was this intended?";
+	  throw IOVDataError(msg.str());
+	}
+      }
+        
     private:
 
-      TTimeStamp  fStart;
-      TTimeStamp  fEnd;
-    
-    //needed to derive from TObject
-    #ifdef CALIBDB_LOCAL_BUILD
-      ClassDef(Snapshot,1)
-    #endif
+      IOVTimeStamp  fStart;
+      IOVTimeStamp  fEnd;
   };
 
   //=============================================
@@ -94,12 +105,12 @@ namespace lariov {
   template <class T>
   void Snapshot<T>::clear() {
     this->std::vector<T>::clear();
-    fStart = kMAX_TIME;
+    fStart.SetStamp(kMAX_TIME.Stamp()-1, kMAX_TIME.SubStamp());
     fEnd = kMAX_TIME;
   }
   
   template <class T>
-  void Snapshot<T>::SetIoV(const TTimeStamp& start, const TTimeStamp& end) {
+  void Snapshot<T>::SetIoV(const IOVTimeStamp& start, const IOVTimeStamp& end) {
     if (start >= end) {
       throw IOVDataError("Called Snapshot::SetIoV with start timestamp >= end timestamp!");
     }
@@ -109,10 +120,10 @@ namespace lariov {
   }
       
   template <class T>
-  bool Snapshot<T>::IsValid(const TTimeStamp& ts) const {
-    return (fStart < ts && ts < fEnd); 
+  bool Snapshot<T>::IsValid(const IOVTimeStamp& ts) const {
+    return (ts >= fStart && ts < fEnd); 
   }
-
+    
 }//end namespace lariov
 #endif
 /** @} */ // end of doxygen group 

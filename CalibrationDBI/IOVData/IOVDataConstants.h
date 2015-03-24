@@ -1,26 +1,15 @@
 #ifndef IOVDATA_CONSTANTS_H
 #define IOVDATA_CONSTANTS_H
 
-#include <TTimeStamp.h>
+#include "IOVTimeStamp.h"
 #include <string>
 #include <limits>
 namespace lariov {
 
-  enum ValueType_t {
-    kSTRING,
-    kSHORT,
-    kINT,
-    kLONG,
-    kFLOAT,
-    kDOUBLE,
-    kTIMESTAMP,
-    kUNKNOWN
-  };
-
   const std::string kTREE_PREFIX = "iov";
   
-  const int kMAX_INT = std::numeric_limits<int>::max();
-  const TTimeStamp kMAX_TIME = TTimeStamp(kMAX_INT,kMAX_INT);
-  const TTimeStamp kMIN_TIME = TTimeStamp(0,0);
+  //do not set substamp to anything other than 0 just incase its digit limit is changed in IOVTimeStamp
+  const IOVTimeStamp kMAX_TIME = IOVTimeStamp( std::numeric_limits<unsigned long>::max(), 0);
+  const IOVTimeStamp kMIN_TIME = IOVTimeStamp(0,0);
 }
 #endif
