@@ -12,7 +12,7 @@
 
     @{*/
 #ifndef IOVDATA_DETPEDESTAL_H
-#define IOVDATA_DETPEDESTAL_H
+#define IOVDATA_DETPEDESTAL_H 1
 
 #include "ChData.h"
 
@@ -28,8 +28,8 @@ namespace lariov {
       DetPedestal(unsigned int ch) : ChData(ch) {}
       
       /// Default destructor
-      ~ChData() {}
-      
+      ~DetPedestal() {}
+            
       float PedMean()    const { return fPedMean; }
       float PedRms()     const { return fPedRms; }
       float PedMeanErr() const { return fPedMeanErr; }
