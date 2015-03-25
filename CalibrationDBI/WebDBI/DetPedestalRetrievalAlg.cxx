@@ -53,8 +53,8 @@ namespace lariov {
     if (fUseDefault) {
       float default_mean     = p.get<float>("DefaultMean", 400.0);
       float default_rms      = p.get<float>("DefaultRms", 0.3);
-      float default_mean_err = p.get<float>("DefaultMeanErr", 0.1);
-      float default_rms_err  = p.get<float>("DefaultRmsErr", 0.03);
+      float default_mean_err = p.get<float>("DefaultMeanErr", 0.0);
+      float default_rms_err  = p.get<float>("DefaultRmsErr", 0.0);
 
       fDefault.SetPedMean(default_mean);
       fDefault.SetPedMeanErr(default_mean_err);
@@ -103,7 +103,7 @@ namespace lariov {
   }
   
   void DetPedestalRetrievalAlg::SetOneDefault(const DetPedestal& def) {
-    fData.AddOrReplaceRow(def);
+    if (fUseDefault) fData.AddOrReplaceRow(def);
   }
 
   const DetPedestal& DetPedestalRetrievalAlg::Pedestal(unsigned int ch) {  
