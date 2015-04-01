@@ -105,8 +105,8 @@ namespace lariov {
   template <class T>
   void Snapshot<T>::clear() {
     this->std::vector<T>::clear();
-    fStart.SetStamp(kMAX_TIME.Stamp()-1, kMAX_TIME.SubStamp());
-    fEnd = kMAX_TIME;
+    fStart  = fEnd = IOVTimeStamp::MaxTimeStamp();
+    fStart.SetStamp(fStart.Stamp()-1, fStart.SubStamp());
   }
   
   template <class T>

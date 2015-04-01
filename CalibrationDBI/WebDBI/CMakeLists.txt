@@ -7,6 +7,8 @@ art_make( LIBRARY_NAME  CalibrationDBI_WebDBI
           LIB_LIBRARIES
 			CalibrationDBI_IOVData
 			${WDA_LIB}
+			Geometry
+			Geometry_service
         )
 
 install_headers()

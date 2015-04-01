@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstring>
+#include "wda.h"
 
 namespace lariov {
 
@@ -200,7 +201,7 @@ namespace lariov {
     tup = getTuple(fCachedDataset, 1);
     getStringValue(tup,0, buf, kBUFFER_SIZE, &err);
     if ( 0 == strcmp(buf,"-") ) {
-      fCachedEnd = kMAX_TIME;
+      fCachedEnd = IOVTimeStamp::MaxTimeStamp();
     }
     else {
       fCachedEnd = IOVTimeStamp::GetFromString(std::string(buf));

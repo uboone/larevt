@@ -5,6 +5,10 @@
 #include "WebError.h"
 #include "CalibrationDBI/IOVData/IOVDataConstants.h"
 
+// art/LArSoft libraries
+#include "art/Framework/Services/Registry/ServiceHandle.h" 
+#include "Geometry/Geometry.h"
+
 namespace lariov {
 
   //constructors
@@ -15,17 +19,20 @@ namespace lariov {
     fUseDB(true),
     fUseFile(false),
     fUseDefault(false),
-    fDefault(0) {
+    fDefaultColl(0),
+    fDefaultInd(0) {
     
     fData.clear();
-    IOVTimeStamp tmp(kMAX_TIME.Stamp()-1, kMAX_TIME.SubStamp());
-    fData.SetIoV(tmp, kMAX_TIME);
+    IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
+    tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
+    fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
   }
 	
       
   DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(fhicl::ParameterSet const& p) :
     DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
-    fDefault(0) {	
+    fDefaultColl(0),
+    fDefaultInd(0) {	
     
     this->Reconfigure(p);
   }
@@ -34,8 +41,9 @@ namespace lariov {
     
     this->DatabaseRetrievalAlg::Reconfigure(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"));
     fData.clear();
-    IOVTimeStamp tmp(kMAX_TIME.Stamp()-1, kMAX_TIME.SubStamp());
-    fData.SetIoV(tmp, kMAX_TIME);
+    IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
+    tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
+    fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
 
     fUseDB      = p.get<bool>("UseDB", false);
     fUseFile   = p.get<bool>("UseTable", false);
@@ -51,15 +59,24 @@ namespace lariov {
     else if (!fUseDefault) fUseDefault = true;
 
     if (fUseDefault) {
-      float default_mean     = p.get<float>("DefaultMean", 400.0);
-      float default_rms      = p.get<float>("DefaultRms", 0.3);
+      float default_mean     = p.get<float>("DefaultCollMean", 400.0);
+      float default_rms      = p.get<float>("DefaultCollRms", 0.3);
       float default_mean_err = p.get<float>("DefaultMeanErr", 0.0);
       float default_rms_err  = p.get<float>("DefaultRmsErr", 0.0);
 
-      fDefault.SetPedMean(default_mean);
-      fDefault.SetPedMeanErr(default_mean_err);
-      fDefault.SetPedRms(default_rms);
-      fDefault.SetPedRmsErr(default_rms_err);
+      fDefaultColl.SetPedMean(default_mean);
+      fDefaultColl.SetPedMeanErr(default_mean_err);
+      fDefaultColl.SetPedRms(default_rms);
+      fDefaultColl.SetPedRmsErr(default_rms_err);
+      
+      default_mean     = p.get<float>("DefaultIndMean", 400.0);
+      default_rms      = p.get<float>("DefaultIndRms", 0.3);
+      
+      fDefaultInd.SetPedMean(default_mean);
+      fDefaultInd.SetPedMeanErr(default_mean_err);
+      fDefaultInd.SetPedRms(default_rms);
+      fDefaultInd.SetPedRmsErr(default_rms_err);
+
     }
     else if (fUseFile) {
       //need to implement
@@ -73,6 +90,7 @@ namespace lariov {
         throw WebError("DetPedestal DB cache update failed!");
       }
       
+      fData.clear();
       fData.SetIoV(this->Begin(), this->End());
      
       std::vector<unsigned int> channels;
@@ -105,18 +123,30 @@ namespace lariov {
   void DetPedestalRetrievalAlg::SetOneDefault(const DetPedestal& def) {
     if (fUseDefault) fData.AddOrReplaceRow(def);
   }
-
+  
   const DetPedestal& DetPedestalRetrievalAlg::Pedestal(unsigned int ch) {  
     try {
       return fData.GetRow(ch);
     }
     catch(IOVDataError& e) {
       if (fUseDefault) {
+        art::ServiceHandle<geo::Geometry> geo;
+      
         DetPedestal tmp_ped(ch);
-	tmp_ped.SetPedMean( fDefault.PedMean() );
-        tmp_ped.SetPedMeanErr( fDefault.PedMeanErr() );
-	tmp_ped.SetPedRms( fDefault.PedRms() );
-	tmp_ped.SetPedRmsErr( fDefault.PedRmsErr() );
+	if (geo->SignalType(ch) == geo::kCollection) {
+	  tmp_ped.SetPedMean( fDefaultColl.PedMean() );
+          tmp_ped.SetPedMeanErr( fDefaultColl.PedMeanErr() );
+	  tmp_ped.SetPedRms( fDefaultColl.PedRms() );
+	  tmp_ped.SetPedRmsErr( fDefaultColl.PedRmsErr() );
+	}
+	else if (geo->SignalType(ch) == geo::kInduction) {
+	  tmp_ped.SetPedMean( fDefaultInd.PedMean() );
+          tmp_ped.SetPedMeanErr( fDefaultInd.PedMeanErr() );
+          tmp_ped.SetPedRms( fDefaultInd.PedRms() );
+          tmp_ped.SetPedRmsErr( fDefaultInd.PedRmsErr() );
+	}
+	else throw e;
+	
 	fData.AddOrReplaceRow(tmp_ped);
 	return fData.GetRow(ch);
       }

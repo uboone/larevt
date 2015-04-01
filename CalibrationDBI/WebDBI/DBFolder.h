@@ -4,10 +4,12 @@
 #include "CalibrationDBI/IOVData/IOVTimeStamp.h"
 #include <string>
 #include <vector>
-#include "wda.h"
 #include <memory>
 
 namespace lariov {
+
+  typedef void *Dataset;
+  typedef void *Tuple;
 
   class DBFolder {
   

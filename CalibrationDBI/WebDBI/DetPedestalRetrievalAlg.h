@@ -67,7 +67,8 @@ namespace lariov {
       bool fUseDefault;
           
       Snapshot<DetPedestal> fData; 
-      DetPedestal fDefault;
+      DetPedestal fDefaultColl;
+      DetPedestal fDefaultInd;
   };
 }//end namespace lariov
 

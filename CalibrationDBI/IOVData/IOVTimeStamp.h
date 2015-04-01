@@ -16,6 +16,11 @@
 
 #include <string>
 
+//forward declarations
+namespace art {
+  class Event;
+}
+
 namespace lariov {
   /**
      \class IOVTimeStamp
@@ -30,6 +35,8 @@ namespace lariov {
         fStamp(stamp), fSubStamp(substamp) {
 	this->CalcDBStamp();
       }
+      
+      IOVTimeStamp(const art::Event& evt);
 	
       ///Default destructor
       virtual ~IOVTimeStamp(){}
@@ -48,6 +55,8 @@ namespace lariov {
       void CalcDBStamp(); 
       
       static IOVTimeStamp GetFromString(const std::string& ts);
+      static IOVTimeStamp MinTimeStamp();
+      static IOVTimeStamp MaxTimeStamp();
       
       
       ///comparison operators     

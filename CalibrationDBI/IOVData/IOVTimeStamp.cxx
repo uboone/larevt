@@ -16,20 +16,30 @@
 
 #include "IOVTimeStamp.h"
 #include "IOVDataError.h"
+#include "IOVDataConstants.h"
 #include <sstream>
+#include <limits>
 #include <iomanip>
+#include "art/Framework/Principal/Event.h"
 
 namespace lariov {
+  
+  IOVTimeStamp::IOVTimeStamp(const art::Event& evt) {
+    fStamp = evt.time().timeHigh();
+    fSubStamp = std::stoi(std::to_string(evt.time().timeLow()).substr(0,kMAX_SUBSTAMP_LENGTH));
+    this->CalcDBStamp();
+  }
+    
   
   /**Create unique database timestamp of the form <fStamp>.<fSubStamp>, 
      where fSubStamp is prepended with zeroes to ensure six digits
   */
   void IOVTimeStamp::CalcDBStamp() {
-    if (fSubStamp >= (unsigned int)(1e6)) {
+    if (fSubStamp > kMAX_SUBSTAMP_VALUE) {
       throw IOVDataError("SubStamp of an IOVTimeStamp cannot have more than six digits!");
     }
     std::stringstream stream;
-    stream << fStamp <<"."<<std::setfill('0')<<std::setw(6)<< fSubStamp;
+    stream << fStamp <<"."<<std::setfill('0')<<std::setw(kMAX_SUBSTAMP_LENGTH)<< fSubStamp;
     fDBStamp = stream.str();
   }
   
@@ -37,13 +47,21 @@ namespace lariov {
     unsigned long stamp = std::stoul(ts.substr(0, ts.find_first_of(".")));
     
     std::string substamp_str = ts.substr(ts.find_first_of(".")+1);
-    if (substamp_str.length() > 6) {
+    if (substamp_str.length() > kMAX_SUBSTAMP_LENGTH) {
       throw IOVDataError("SubStamp of an IOVTimeStamp cannot have more than six digits!");
     }
-    while (substamp_str.length() < 6) substamp_str += "0";
+    while (substamp_str.length() < kMAX_SUBSTAMP_LENGTH) substamp_str += "0";
     unsigned int substamp = std::stoi(substamp_str);
     
     return IOVTimeStamp(stamp,substamp);
+  }
+  
+  IOVTimeStamp IOVTimeStamp::MinTimeStamp() {
+    return IOVTimeStamp(0,0);
+  }
+  
+  IOVTimeStamp IOVTimeStamp::MaxTimeStamp() {
+    return IOVTimeStamp(std::numeric_limits<unsigned long>::max(), kMAX_SUBSTAMP_VALUE);
   }
   
   ///implementation of assignment operator
