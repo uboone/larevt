@@ -24,10 +24,25 @@
 
 namespace lariov {
   
+  /**Need to convert art::TimeStamp to IOVTimeStamp, but the meaning of art::TimeStamp is experiment-specific.
+     For now we assume the art::TimeStamp is some sort of seconds/ms/us/ns from the epoch.
+  */
   IOVTimeStamp::IOVTimeStamp(const art::Event& evt) {
-    fStamp = evt.time().timeHigh();
-    fSubStamp = std::stoi(std::to_string(evt.time().timeLow()).substr(0,kMAX_SUBSTAMP_LENGTH));
-    this->CalcDBStamp();
+  
+    std::string time = std::to_string(evt.time().value());
+    if (time.length() <= 10) {
+      time += ".0";
+    }
+    else if (time.length() > 10 + kMAX_SUBSTAMP_LENGTH)  {
+      time = time.substr(0, 10+kMAX_SUBSTAMP_LENGTH);
+      time.insert(10,".");
+    }
+    else {
+      time.insert(10,".");
+    }
+    
+    *this = GetFromString(time);
+      
   }
     
   
