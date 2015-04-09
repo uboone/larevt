@@ -31,6 +31,8 @@ set(CMAKE_MODULE_PATH $ENV{ART_DIR}/Modules
 include(CetCMakeEnv)
 cet_cmake_env()
 
+set_install_root()
+
 cet_set_compiler_flags(DIAGS CAUTIOUS
   WERROR
   NO_UNDEFINED
@@ -45,7 +47,7 @@ find_ups_product( lardata v1_00_00 )
 find_ups_product( nutools v1_00_00 )
 find_ups_product( art v1_09_00 )
 find_ups_product( messagefacility v1_10_00 )
-find_ups_product( cetbuildtools v4_09_00 )
+find_ups_product( cetbuildtools v3_10_00 )
 find_ups_root( root v5_34_00 )
 find_ups_product( postgresql v9_1_5 )
 
@@ -61,7 +63,9 @@ include(BuildPlugins)
 # source
 add_subdirectory(CalData)
 add_subdirectory(Filters)
+add_subdirectory(CalibrationDBI)
 add_subdirectory(SpaceCharge)
+
 # tests
 # add_subdirectory(test)
 

@@ -1,0 +1,13 @@
+CalibrationDBI package originally imported from:
+github.com:drinkingkazu/CalibrationDBI
+
+much has changed since the import!
+
+Currently the build requires to set up libwda ups product.  If mrb i fails,
+Try:
+
+> setup libwda v2_20_1
+
+
+Kazu & Brandon
+

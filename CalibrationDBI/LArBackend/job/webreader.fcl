@@ -1,0 +1,11 @@
+BEGIN_PROLOG
+
+standard_webreader:
+{
+  WDA_SERVER:  ""
+  WDA_PORT:    ""
+  WDA_DBNAME:  ""
+  WDA_TIMEOUT: 0
+}
+
+END_PROLOG
