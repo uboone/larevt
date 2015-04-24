@@ -48,7 +48,7 @@ find_ups_product( messagefacility v1_10_00 )
 find_ups_product( cetbuildtools v4_09_00 )
 find_ups_root( root v5_34_00 )
 find_ups_product( postgresql v9_1_5 )
-find_ups_product( libwda v2_20_0 )
+find_ups_product( libwda v2_21_0 )
 
 # include search path
 # notice use of ENV to invoke an external variable
