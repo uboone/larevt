@@ -28,7 +28,7 @@ namespace lariov {
      \class Snapshot
   */
   template <class T>
-  class Snapshot : public std::vector<T> {
+  class Snapshot {
 		   
     public:
 
@@ -39,7 +39,7 @@ namespace lariov {
       /// Default destructor
       ~Snapshot(){}
 
-      void clear();
+      void Clear();
 
       const IOVTimeStamp&  Start() const {return fStart;}
       const IOVTimeStamp&  End()   const {return fEnd;}
@@ -47,7 +47,7 @@ namespace lariov {
       
       bool  IsValid(const IOVTimeStamp& ts) const;
       
-      size_t NChannels() const {return this->size();}
+      size_t NChannels() const {return fData.size();}
 
       
       /// Only included with class if T has base class ChData
@@ -55,9 +55,9 @@ namespace lariov {
                 typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
       const T& GetRow(unsigned int ch) const {
        
-        typename Snapshot<T>::const_iterator it = std::lower_bound(this->begin(), this->end(), ch);
+        typename std::vector<T>::const_iterator it = std::lower_bound(fData.begin(), fData.end(), ch);
 	
-	if ( it == this->end() || it->Channel() != ch ) {
+	if ( it == fData.end() || it->Channel() != ch ) {
           std::string msg("Channel not found: ");
 	  msg += std::to_string(ch);
 	  throw IOVDataError(msg);
@@ -69,27 +69,14 @@ namespace lariov {
       template< class U = T,
       		typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
       void AddOrReplaceRow(const T& data) {
-        typename Snapshot<T>::iterator it = std::lower_bound(this->begin(), this->end(), data.Channel());	
-        if (it == this->end() || data.Channel() != it->Channel() ) {
-	  bool sort = ( !(this->empty()) && data < this->back());
-	  this->std::vector<T>::push_back(data);
-	  if (sort) std::sort(this->begin(), this->end());
+        typename std::vector<T>::iterator it = std::lower_bound(fData.begin(), fData.end(), data.Channel());	
+        if (it == fData.end() || data.Channel() != it->Channel() ) {
+	  bool sort = ( !(fData.empty()) && data < fData.back());
+	  fData.push_back(data);
+	  if (sort) std::sort(fData.begin(), fData.end());
         }
         else {
 	  *it = data;
-	}
-      }
-
-      template< class U = T,
-      		typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
-      void push_back(const T& data) {
-        size_t original_size = this->size();
-        this->AddOrReplaceRow(data);
-	if (original_size == this->size()) {
-	  std::stringstream msg;
-	  msg <<"Warning: You just called push_back() and overwrote the cached data for channel "<<data.Channel();
-	  msg <<".  Was this intended?";
-	  throw IOVDataError(msg.str());
 	}
       }
         
@@ -97,14 +84,15 @@ namespace lariov {
 
       IOVTimeStamp  fStart;
       IOVTimeStamp  fEnd;
+      std::vector<T> fData;
   };
 
   //=============================================
   // Class implementation
   //=============================================
   template <class T>
-  void Snapshot<T>::clear() {
-    this->std::vector<T>::clear();
+  void Snapshot<T>::Clear() {
+    fData.clear();
     fStart  = fEnd = IOVTimeStamp::MaxTimeStamp();
     fStart.SetStamp(fStart.Stamp()-1, fStart.SubStamp());
   }

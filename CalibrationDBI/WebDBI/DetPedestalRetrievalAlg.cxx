@@ -22,7 +22,7 @@ namespace lariov {
     fDefaultColl(0),
     fDefaultInd(0) {
     
-    fData.clear();
+    fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
     fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
@@ -40,7 +40,7 @@ namespace lariov {
   void DetPedestalRetrievalAlg::Reconfigure(fhicl::ParameterSet const& p) {
     
     this->DatabaseRetrievalAlg::Reconfigure(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"));
-    fData.clear();
+    fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
     fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
@@ -90,7 +90,7 @@ namespace lariov {
         throw WebError("DetPedestal DB cache update failed!");
       }
       
-      fData.clear();
+      fData.Clear();
       fData.SetIoV(this->Begin(), this->End());
      
       std::vector<unsigned int> channels;
