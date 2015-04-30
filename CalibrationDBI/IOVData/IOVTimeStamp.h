@@ -35,8 +35,6 @@ namespace lariov {
         fStamp(stamp), fSubStamp(substamp) {
 	this->CalcDBStamp();
       }
-      
-      IOVTimeStamp(const art::Event& evt);
 	
       ///Default destructor
       virtual ~IOVTimeStamp(){}
@@ -72,7 +70,7 @@ namespace lariov {
       IOVTimeStamp& operator=( const IOVTimeStamp& ts);
 
       
-    private:
+    protected:
     
       unsigned long fStamp;
       unsigned int fSubStamp;

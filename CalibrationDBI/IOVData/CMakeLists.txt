@@ -17,7 +17,6 @@ art_make( LIBRARY_NAME  CalibrationDBI_IOVData
 			${CETLIB}
                         ${CLHEP}
 			${ROOT_BASIC_LIB_LIST}
-                        ${ROOT_MINUIT}
         )
 
 install_headers()
