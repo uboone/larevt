@@ -14,6 +14,7 @@
 #ifndef WEBDBI_DETPEDESTALRETRIEVALALG_H
 #define WEBDBI_DETPEDESTALRETRIEVALALG_H
 
+#include "art/Framework/Principal/Event.h"
 #include "CalibrationDBI/IOVData/DetPedestal.h"
 #include "CalibrationDBI/IOVData/Snapshot.h"
 #include "DatabaseRetrievalAlg.h"
@@ -41,6 +42,11 @@ namespace lariov {
       
       /// Default destructor
       ~DetPedestalRetrievalAlg() {}
+      
+      /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
+      /// This version accepts an art::Event object from which to form a time stamp, is meant
+      /// to be a temporary workaround to address detector independence issues... (TU)
+      bool Update(const art::Event& event);
       
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
       bool Update(const IOVTimeStamp& ts);
