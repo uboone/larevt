@@ -9,6 +9,7 @@ art_make( LIBRARY_NAME  CalibrationDBI_WebDBI
 			${LIBWDA}
 			Geometry
 			Geometry_service
+                        ${Boost_SYSTEM_LIBRARY}
         )
 
 install_headers()
