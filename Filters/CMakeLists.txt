@@ -19,6 +19,7 @@ art_make( BASENAME_ONLY
 			${MF_UTILITIES}
 	                ${FHICLCPP}
 			${CETLIB}
+                        ${Boost_SYSTEM_LIBRARY}
                       ${ROOT_GEOM}
                       ${ROOT_XMLIO}
                       ${ROOT_GDML}
