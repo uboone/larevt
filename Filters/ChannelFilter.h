@@ -24,18 +24,27 @@ namespace filter {
   class ChannelFilter {
 
   public:
+      
+    enum ChannelStatus { GOOD        = 0,
+                         NOISY       = 1,
+                         DEAD        = 2,
+                         NOTPHYSICAL = 3
+                       };
 
     ChannelFilter();
     ~ChannelFilter();
 
     bool BadChannel(uint32_t channel);
     bool NoisyChannel(uint32_t channel);
+    ChannelStatus GetChannelStatus(uint32_t channel) const;
     std::set<uint32_t> SetOfBadChannels()   const { return fBadChannels;   }
     std::set<uint32_t> SetOfNoisyChannels() const { return fNoisyChannels; }
   private:
 
     std::set<uint32_t> fBadChannels;   ///< list of bad channels
     std::set<uint32_t> fNoisyChannels; ///< list of bad channels
+      
+    std::map<uint32_t, ChannelStatus> fChannelStatusMap;
 
   }; //class ChannelFilter
 }

@@ -82,8 +82,26 @@ namespace lariov {
       //need to implement
     }
   }
+    
 
-  bool DetPedestalRetrievalAlg::Update(const IOVTimeStamp& ts) {
+    bool DetPedestalRetrievalAlg::Update(const art::Event& event) {
+        // This allows for a temporary kludge so that the event display will
+        // both work for experiments other than uboone and, in the short term,
+        // handle uboone's data runs where the time stamp in the data is not yet valid.
+        // NOTE: It is assumed that for the short term experiments other than uboone will
+        // NOT be accessing a database so the timestamp value is irrelevant, while
+        // uboone data will access the database but doesn't yet have a valid timestamp
+        // in art::Event so must be hardwired...
+        unsigned long timeStamp(0);
+        if (event.isRealData()) timeStamp = 1430000000;
+        
+        lariov::IOVTimeStamp ts(timeStamp);
+
+        return this->Update(timeStamp);
+    }
+    
+    
+    bool DetPedestalRetrievalAlg::Update(const IOVTimeStamp& ts) {
     if (fUseDB && !fData.IsValid(ts)) {
       
       if (!this->DatabaseRetrievalAlg::Update(ts)) {
