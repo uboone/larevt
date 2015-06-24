@@ -1,12 +1,12 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	larevt	v04_08_01
+parent	larevt	v04_08_02
 defaultqual	e7
 #
 fcldir product_dir job
 #
 product         version
-lardata		v04_09_00
+lardata		v04_09_01
 gcc		v4_9_2
 libwda          v2_21_0a
 cetbuildtools	v4_11_03	-	only_for_build
