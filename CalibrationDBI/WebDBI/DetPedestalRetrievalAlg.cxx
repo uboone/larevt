@@ -16,9 +16,7 @@ namespace lariov {
       			      			   const std::string& url, 
 			      			   const std::string& tag /*=""*/) : 
     DatabaseRetrievalAlg(foldername, url, tag),
-    fUseDB(true),
-    fUseFile(false),
-    fUseDefault(false),
+    fDataSource(DataSource::Database),
     fDefaultColl(0),
     fDefaultInd(0) {
     
@@ -45,20 +43,16 @@ namespace lariov {
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
     fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
 
-    fUseDB      = p.get<bool>("UseDB", false);
-    fUseFile   = p.get<bool>("UseTable", false);
-    fUseDefault = p.get<bool>("UseDefault", true);
+    bool UseDB      = p.get<bool>("UseDB", false);
+    bool UseFile   = p.get<bool>("UseFile", false);
 
     //priority:  (1) use db, (2) use table, (3) use defaults
     //If none are specified, use defaults
-    if ( fUseDB ) {
-      fUseFile = false;
-      fUseDefault = false;
-    }
-    else if (fUseFile) fUseDefault = false;
-    else if (!fUseDefault) fUseDefault = true;
+    if ( UseDB )      fDataSource = DataSource::Database;
+    else if (UseFile) fDataSource = DataSource::File;
+    else              fDataSource = DataSource::Default;
 
-    if (fUseDefault) {
+    if (fDataSource == DataSource::Default) {
       float default_mean     = p.get<float>("DefaultCollMean", 400.0);
       float default_rms      = p.get<float>("DefaultCollRms", 0.3);
       float default_mean_err = p.get<float>("DefaultMeanErr", 0.0);
@@ -69,7 +63,7 @@ namespace lariov {
       fDefaultColl.SetPedRms(default_rms);
       fDefaultColl.SetPedRmsErr(default_rms_err);
       
-      default_mean     = p.get<float>("DefaultIndMean", 400.0);
+      default_mean     = p.get<float>("DefaultIndMean", 2048.0);
       default_rms      = p.get<float>("DefaultIndRms", 0.3);
       
       fDefaultInd.SetPedMean(default_mean);
@@ -78,72 +72,58 @@ namespace lariov {
       fDefaultInd.SetPedRmsErr(default_rms_err);
 
     }
-    else if (fUseFile) {
+    else if (fDataSource == DataSource::File) {
       //need to implement
     }
   }
 
-  bool DetPedestalRetrievalAlg::Update(const IOVTimeStamp& ts) {
-    if (fUseDB && !fData.IsValid(ts)) {
-      
-      if (!this->DatabaseRetrievalAlg::Update(ts)) {
-        throw WebError("DetPedestal DB cache update failed!");
-      }
-      
-      fData.Clear();
-      fData.SetIoV(this->Begin(), this->End());
-     
-      std::vector<unsigned int> channels;
-      fFolder->GetChannelList(channels);
-      for (auto it = channels.begin(); it != channels.end(); ++it) {
-
-	double mean, mean_err, rms, rms_err;
-	fFolder->GetNamedChannelData(*it, "mean",     mean);
-	fFolder->GetNamedChannelData(*it, "mean_err", mean_err);
-	fFolder->GetNamedChannelData(*it, "rms",      rms);
-	fFolder->GetNamedChannelData(*it, "rms_err",  rms_err);
-
-	DetPedestal pd(*it);
-	pd.SetPedMean( (float)mean );
-	pd.SetPedMeanErr( (float)mean_err );
-	pd.SetPedRms( (float)rms );
-	pd.SetPedRmsErr( (float)rms_err );
-
-	fData.AddOrReplaceRow(pd);
-      }
-
-      return true;
+  bool DetPedestalRetrievalAlg::Update(std::uint64_t ts) {
     
+    if (fDataSource != DataSource::Database) return false;
+      
+    if (!this->UpdateFolder(ts)) return false;
+
+    //DBFolder was updated, so now update the Snapshot
+    fData.Clear();
+    fData.SetIoV(this->Begin(), this->End());
+
+    std::vector<std::uint64_t> channels;
+    fFolder->GetChannelList(channels);
+    for (auto it = channels.begin(); it != channels.end(); ++it) {
+
+      double mean, mean_err, rms, rms_err;
+      fFolder->GetNamedChannelData(*it, "mean",     mean);
+      fFolder->GetNamedChannelData(*it, "mean_err", mean_err);
+      fFolder->GetNamedChannelData(*it, "rms",      rms);
+      fFolder->GetNamedChannelData(*it, "rms_err",  rms_err);
+
+      DetPedestal pd(*it);
+      pd.SetPedMean( (float)mean );
+      pd.SetPedMeanErr( (float)mean_err );
+      pd.SetPedRms( (float)rms );
+      pd.SetPedRmsErr( (float)rms_err );
+
+      fData.AddOrReplaceRow(pd);
     }
-    
-    //Not using the DB or no need to update
-    return false;
+
+    return true;
+
   }
   
-  void DetPedestalRetrievalAlg::SetOneDefault(const DetPedestal& def) {
-    if (fUseDefault) fData.AddOrReplaceRow(def);
-  }
-  
-  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(unsigned int ch) {  
+  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(std::uint64_t ch) const {  
     try {
       return fData.GetRow(ch);
     }
     catch(IOVDataError& e) {
-      if (fUseDefault) {
+      if (fDataSource == DataSource::Default) {
         art::ServiceHandle<geo::Geometry> geo;
       
         DetPedestal tmp_ped(ch);
 	if (geo->SignalType(ch) == geo::kCollection) {
-	  tmp_ped.SetPedMean( fDefaultColl.PedMean() );
-          tmp_ped.SetPedMeanErr( fDefaultColl.PedMeanErr() );
-	  tmp_ped.SetPedRms( fDefaultColl.PedRms() );
-	  tmp_ped.SetPedRmsErr( fDefaultColl.PedRmsErr() );
+	  tmp_ped = fDefaultColl;
 	}
 	else if (geo->SignalType(ch) == geo::kInduction) {
-	  tmp_ped.SetPedMean( fDefaultInd.PedMean() );
-          tmp_ped.SetPedMeanErr( fDefaultInd.PedMeanErr() );
-          tmp_ped.SetPedRms( fDefaultInd.PedRms() );
-          tmp_ped.SetPedRmsErr( fDefaultInd.PedRmsErr() );
+	  tmp_ped = fDefaultInd;
 	}
 	else throw e;
 	
@@ -154,19 +134,19 @@ namespace lariov {
     }
   }
       
-  float DetPedestalRetrievalAlg::PedMean(unsigned int ch) {
+  float DetPedestalRetrievalAlg::PedMean(std::uint64_t ch) const {
     return this->Pedestal(ch).PedMean();
   }
   
-  float DetPedestalRetrievalAlg::PedRms(unsigned int ch) {
+  float DetPedestalRetrievalAlg::PedRms(std::uint64_t ch) const {
     return this->Pedestal(ch).PedRms();
   }
   
-  float DetPedestalRetrievalAlg::PedMeanErr(unsigned int ch) {
+  float DetPedestalRetrievalAlg::PedMeanErr(std::uint64_t ch) const {
     return this->Pedestal(ch).PedMeanErr();
   }
   
-  float DetPedestalRetrievalAlg::PedRmsErr(unsigned int ch) {
+  float DetPedestalRetrievalAlg::PedRmsErr(std::uint64_t ch) const {
     return this->Pedestal(ch).PedRmsErr();
   }
 

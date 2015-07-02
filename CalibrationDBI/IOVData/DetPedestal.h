@@ -40,6 +40,16 @@ namespace lariov {
       void SetPedMeanErr(float pedMeanErr) { fPedMeanErr = pedMeanErr; }
       void SetPedRmsErr(float pedRmsErr)   { fPedRmsErr  = pedRmsErr; }
       
+      ///assignment
+      DetPedestal& operator=( const DetPedestal& p) {
+        if (this == &p) return *this;
+	fPedMean    = p.PedMean();
+	fPedRms     = p.PedRms();
+	fPedMeanErr = p.PedMeanErr();
+	fPedRmsErr  = p.PedRmsErr();
+	return *this;
+      }
+      
     private:
     
       float fPedMean;

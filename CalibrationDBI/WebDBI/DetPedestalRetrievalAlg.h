@@ -16,6 +16,8 @@
 
 #include "CalibrationDBI/IOVData/DetPedestal.h"
 #include "CalibrationDBI/IOVData/Snapshot.h"
+#include "CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "CalibrationDBI/Interface/IDetPedestalProvider.h"
 #include "DatabaseRetrievalAlg.h"
 
 namespace lariov {
@@ -25,7 +27,7 @@ namespace lariov {
      User defined class DetPedestalRetrievalAlg ... these comments are used to generate
      doxygen documentation!
   */
-  class DetPedestalRetrievalAlg : public DatabaseRetrievalAlg {
+  class DetPedestalRetrievalAlg : public DatabaseRetrievalAlg, public IDetPedestalProvider {
   
     public:
     
@@ -43,17 +45,14 @@ namespace lariov {
       ~DetPedestalRetrievalAlg() {}
       
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-      bool Update(const IOVTimeStamp& ts);
-      
-      /// Set defaults for one channel
-      void SetOneDefault(const DetPedestal& def);
+      bool Update(std::uint64_t ts) override;
       
       /// Retrieve pedestal information
-      const DetPedestal& Pedestal(unsigned int ch);      
-      float PedMean(unsigned int ch);
-      float PedRms(unsigned int ch);
-      float PedMeanErr(unsigned int ch);
-      float PedRmsErr(unsigned int ch);
+      const DetPedestal& Pedestal(std::uint64_t ch) const;      
+      float PedMean(std::uint64_t ch) const override;
+      float PedRms(std::uint64_t ch) const override;
+      float PedMeanErr(std::uint64_t ch) const override;
+      float PedRmsErr(std::uint64_t ch) const override;
            
       //hardcoded information about database folder - useful for debugging cross checks
       const unsigned int NCOLUMNS = 5;    
@@ -62,11 +61,9 @@ namespace lariov {
       
     private:
     
-      bool fUseDB;
-      bool fUseFile;
-      bool fUseDefault;
+      DataSource::ds fDataSource;
           
-      Snapshot<DetPedestal> fData; 
+      mutable Snapshot<DetPedestal> fData; //I hate making this mutable
       DetPedestal fDefaultColl;
       DetPedestal fDefaultInd;
   };

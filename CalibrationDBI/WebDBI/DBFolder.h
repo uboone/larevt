@@ -17,9 +17,9 @@ namespace lariov {
       DBFolder(const std::string& name, const std::string& url, const std::string& tag = "");
       virtual ~DBFolder();
       
-      int GetNamedChannelData(unsigned long channel, const std::string& name, long& data);
-      int GetNamedChannelData(unsigned long channel, const std::string& name, double& data);
-      int GetNamedChannelData(unsigned long channel, const std::string& name, std::string& data);
+      int GetNamedChannelData(std::uint64_t channel, const std::string& name, long& data);
+      int GetNamedChannelData(std::uint64_t channel, const std::string& name, double& data);
+      int GetNamedChannelData(std::uint64_t channel, const std::string& name, std::string& data);
  
       const std::string& URL() const {return fURL;}
       const std::string& FolderName() const {return fFolderName;}
@@ -28,12 +28,12 @@ namespace lariov {
       const IOVTimeStamp& CachedStart() const {return fCachedStart;}
       const IOVTimeStamp& CachedEnd() const   {return fCachedEnd;}
       
-      int UpdateData(const IOVTimeStamp& time);
+      bool UpdateData(std::uint64_t raw_time);
       
-      int GetChannelList( std::vector<unsigned int>& channels ) const;
+      int GetChannelList( std::vector<std::uint64_t>& channels ) const;
      
     private:  
-      size_t GetTupleColumn( unsigned long channel, const std::string& name, Tuple& tup );
+      size_t GetTupleColumn( std::uint64_t channel, const std::string& name, Tuple& tup );
       
       bool IsValid(const IOVTimeStamp& time) const {
         if (time >= fCachedStart && time < fCachedEnd) return true;
@@ -52,7 +52,7 @@ namespace lariov {
       std::vector<std::string> fColumns;       //Column names
       std::vector<std::string> fTypes;         //Column types
       int                      fCachedRow;     //Cache most recently retrieved row and channel numbers
-      unsigned long            fCachedChannel;      
+      std::uint64_t            fCachedChannel;      
   };
 }
 
