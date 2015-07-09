@@ -2,7 +2,6 @@
 #define IDETPEDESTALSERVICE_H
 
 #include "art/Framework/Services/Registry/ServiceMacros.h"
-#include <iostream>
 
 //forward declarations
 namespace lariov {
@@ -23,7 +22,6 @@ namespace lariov{
 
       //retrieve pedestal provider
       const IDetPedestalProvider& GetPedestalProvider() const {
-        std::cout<<"Calling implementation of DoGetPedestalProvider"<<std::endl;
         return this->DoGetPedestalProvider();
       }
       

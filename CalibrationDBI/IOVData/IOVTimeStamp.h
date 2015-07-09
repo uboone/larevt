@@ -16,11 +16,6 @@
 
 #include <string>
 
-//forward declarations
-namespace art {
-  class Event;
-}
-
 namespace lariov {
   /**
      \class IOVTimeStamp
