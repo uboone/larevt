@@ -5,7 +5,7 @@
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "CalibrationDBI/Interface/IDetPedestalService.h"
+#include "CalibrationDBI/Services/IDetPedestalService.h"
 #include "CalibrationDBI/WebDBI/DetPedestalRetrievalAlg.h"
 
 namespace lariov{
@@ -23,15 +23,16 @@ namespace lariov{
       SIOVDetPedestalService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
       ~SIOVDetPedestalService(){}
       
-      const DetPedestalRetrievalAlg& GetPedestalProvider() const override {
-        return fProvider;
-      }
-      
       void PreProcessEvent(const art::Event& evt) {
         fProvider.Update(evt.time().value());
       }
      
     private:
+    
+      const IDetPedestalProvider& DoGetPedestalProvider() const override {
+        std::cout<<"SIOVDetPedestalService::DoGetPedestalProvider"<<std::endl;
+        return fProvider;
+      }    
     
       DetPedestalRetrievalAlg fProvider;
   };

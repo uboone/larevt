@@ -24,4 +24,10 @@ standard_pedestalretrievalalg:
     DefaultRmsErr:   0.0
 }
 
+standard_siov_detpedestal_service:
+{
+  service_provider: SIOVDetPedestalService
+  DetPedestalRetrievalAlg: @local::standard_pedestalretrievalalg
+}
+
 END_PROLOG

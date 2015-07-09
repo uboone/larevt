@@ -8,6 +8,8 @@
 
 namespace lariov {
 
+  //Do NOT change to following code without very good reason!
+  //MicroBooNE and other experiments depend on it!
   IOVTimeStamp TimeStampDecoder::DecodeTimeStamp(std::uint64_t ts) {
         
     std::string time = std::to_string(ts);
