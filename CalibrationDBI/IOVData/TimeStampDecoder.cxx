@@ -27,7 +27,7 @@ namespace lariov {
       return tmp;
     }
     else {
-      std::string msg = "TimeStampDecoder: I do not know how to convert this timestamp: " + ts;
+      std::string msg = "TimeStampDecoder: I do not know how to convert this timestamp: " + time;
       throw IOVDataError(msg);
     } 
   }
