@@ -87,10 +87,15 @@ namespace filter {
       evt.getView(fDigitModuleLabel, rawdigitView);
       
       if(!rawdigitView.size()) return false;
+      
+      ChannelFilterBaseInterface const& channelFilter
+        = art::ServiceHandle<ChannelFilterServiceInterface>()->GetFilter();
 
       // look through the good channels
-      for(const raw::RawDigit* digit: filter::SelectGoodChannels(rawdigitView))
+//      for(const raw::RawDigit* digit: filter::SelectGoodChannels(rawdigitView))
+      for(const raw::RawDigit* digit: rawdigitView)
       {
+         if (!channelFilter.isGood(digit->Channel())) continue;
          //get ADC values after decompressing
          std::vector<short> rawadc(digit->Samples());
          raw::Uncompress(digit->ADCs(),rawadc,digit->Compression());

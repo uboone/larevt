@@ -17,6 +17,14 @@ cet_test(ChannelFilterServiceTest HANDBUILT
   TEST_ARGS --rethrow-all --config ./test_channel_filter.fcl
 )
 
+cet_test(SimpleChannelFilter_test
+  SOURCES SimpleChannelFilter_test.cxx
+  LIBRARIES Filters
+            CalibrationDBI_IOVData
+            ${FHICLCPP}
+  USE_BOOST_UNIT
+)
+
 # install_headers()
 # install_fhicl()
 # install_source()

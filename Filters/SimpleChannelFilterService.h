@@ -17,6 +17,11 @@
 #include "Filters/ChannelFilterServiceInterface.h"
 
 
+namespace art {
+  class ActivityRegistry;
+} // namespace art
+
+
 namespace filter {
 
   /**
@@ -30,8 +35,10 @@ namespace filter {
    * Configuration parameters
    * =========================
    * 
-   * - *BadChannels* (list, default: empty): list of the IDs of bad channels
-   * - *NoisyChannels* (list, default: empty): list of the IDs of noisy channels
+   * In addition to the parameters supported by filter::SimpleChannelFilter,
+   * this service supports:
+   * 
+   * - *service_type* (string): must be set to "SimpleChannelFilterService"
    * 
    */
   class SimpleChannelFilterService: public ChannelFilterServiceInterface {
@@ -42,18 +49,7 @@ namespace filter {
       (fhicl::ParameterSet const& pset, art::ActivityRegistry&);
     
     
-    /// Returns a pointer to the information provider (nullptr if not available)
-    virtual SimpleChannelFilter const* GetFilter() const override
-      {
-        return static_cast<const SimpleChannelFilter*>
-          (ChannelFilterServiceInterface::GetFilter());
-      } // GetFilter()
-    
-    
       protected:
-    
-    SimpleChannelFilter* filter()
-      { return const_cast<SimpleChannelFilter*>(GetFilter()); }
     
   }; // class SimpleChannelFilterService
   

@@ -15,6 +15,7 @@
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Principal/Run.h"
 
 // LArSoft includes
 #include "Filters/ChannelFilterServiceInterface.h"
@@ -51,7 +52,7 @@ namespace filter {
     std::vector<unsigned int> KnownBadChannels;
     
     template <typename Obj>
-    unsigned int testObject(Obj* pFilter) const;
+    unsigned int testObject(Obj const* pFilter) const;
     
     
     static const std::vector<unsigned int> EmptyVect; ///< for initializations
@@ -115,18 +116,21 @@ namespace filter {
     mf::LogVerbatim("SimpleChannelFilterTest")
       << "\nTesting service interface...";
     art::ServiceHandle<filter::ChannelFilterServiceInterface> FilterSrvHandle;
+  /* // since the service does not share the interface of the provider,
+     // this test can't be
     const filter::ChannelFilterServiceInterface* pFilterSrv = &*FilterSrvHandle;
     nErrors = testObject(pFilterSrv);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
         << nErrors << " errors while testing ChannelFilterServiceInterface!";
     } // if errors
+  */
     
     //---
     mf::LogVerbatim("SimpleChannelFilterTest")
       << "\nTesting base interface...";
-    filter::ChannelFilterBaseInterface* pFilter = FilterSrvHandle->GetFilter();
-    pFilter->SetRun(run.run());
+    filter::ChannelFilterBaseInterface const* pFilter
+      = FilterSrvHandle->GetFilterPtr();
     nErrors = testObject(pFilter);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
@@ -138,7 +142,7 @@ namespace filter {
   
   //......................................................................
   template <typename Obj>
-  unsigned int SimpleChannelFilterTest::testObject(Obj* pFilter) const
+  unsigned int SimpleChannelFilterTest::testObject(Obj const* pFilter) const
   {
     // 1. print all the channels marked non-good
     {
@@ -147,7 +151,7 @@ namespace filter {
       
       // this is a copy of the list;
       // to avoid creating temporary objects, check channels one by one
-      auto BadChannels = pFilter->SetOfBadChannels();
+      auto BadChannels = pFilter->BadChannels();
       log << "\nChannels marked as bad:   " << BadChannels.size();
       if (!BadChannels.empty()) {
         log << " (";
@@ -155,7 +159,7 @@ namespace filter {
         log << ")";
       } // if bad channels
       
-      auto NoisyChannels = pFilter->SetOfNoisyChannels();
+      auto NoisyChannels = pFilter->NoisyChannels();
       log << "\nChannels marked as noisy: " << NoisyChannels.size();
       if (!NoisyChannels.empty()) {
         log << " (";
@@ -167,7 +171,7 @@ namespace filter {
     // 2. test the channels as in the configuration
     unsigned int nErrors = 0;
     for (const auto chId: KnownBadChannels) {
-      if (!pFilter->BadChannel(chId)) {
+      if (!pFilter->isBad(chId)) {
         mf::LogError("SimpleChannelFilterTest")
           << "channel #" << chId << " is not bad as it should";
         ++nErrors;
@@ -175,7 +179,7 @@ namespace filter {
     } // for knwon bad channels
     
     for (const auto chId: KnownNoisyChannels) {
-      if (!pFilter->NoisyChannel(chId)) {
+      if (!pFilter->isNoisy(chId)) {
         mf::LogError("SimpleChannelFilterTest")
           << "channel #" << chId << " is not noisy as it should";
         ++nErrors;
@@ -183,12 +187,12 @@ namespace filter {
     } // for knwon noisy channels
     
     for (const auto chId: KnownGoodChannels) {
-      if (pFilter->BadChannel(chId)) {
+      if (pFilter->isBad(chId)) {
         mf::LogError("SimpleChannelFilterTest")
           << "channel #" << chId << " is bad, while it should not";
         ++nErrors;
       }
-      if (pFilter->NoisyChannel(chId)) {
+      if (pFilter->isNoisy(chId)) {
         mf::LogError("SimpleChannelFilterTest")
           << "channel #" << chId << " is noisy, while it should not";
         ++nErrors;

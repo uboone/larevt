@@ -9,6 +9,8 @@
 # with some hard-coded channels (actually taken from ArgoNeuT configuration).
 #
 
+#include "geometry.fcl"
+
 ################################################################################
 BEGIN_PROLOG
 #
@@ -32,9 +34,6 @@ END_PROLOG
 process_name: testChannelFilter
 
 services: {
-  user: {
-    ChannelFilterServiceInterface: @local::channel_filter
-  }
   message: {
     destinations: {
     #  LogDebugFile: { 
@@ -66,6 +65,11 @@ services: {
       } # LogStandardError
     } # destinations
   } # message
+
+  Geometry:                      @local::standard_geo             # from geometry.fcl
+  ExptGeoHelperInterface:        @local::standard_geometry_helper # from geometry.fcl
+  ChannelFilterServiceInterface: @local::channel_filter
+
 } # services
 
 source: {

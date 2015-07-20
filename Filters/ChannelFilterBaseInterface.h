@@ -16,25 +16,20 @@
 #ifndef CHANNELFILTERBASEINTERFACE_H
 #define CHANNELFILTERBASEINTERFACE_H 1
 
-// C/C++ standard libraries
-#include <cstdlib> // std::uint32_t
-#include <set>
-#include <vector>
+// LArSoft libraries
+#include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
+#include "CalibrationDBI/IOVData/IOVTimeStamp.h" // lariov::IOVTimeStamp
 
 // Additional libraries
 #include "fhiclcpp/ParameterSet.h"
 
+// C/C++ standard libraries
+#include <set>
+
 
 /// Filters for channels, events, etc
 namespace filter {
-
-
-#ifdef art_Persistency_Provenance_RunID_h
-  using RunNumber_t = art::RunNumber_t;
-#else
-  using RunNumber_t = std::uint32_t;
-#endif
-
+  
   /** **************************************************************************
    * @brief Class providing information about the quality of channels
    *
@@ -47,37 +42,46 @@ namespace filter {
    * Currently, the class provides interface for the following information:
    * - goodness of the channel: good or bad (dead or unusable)
    * - noisiness of the channel: good or noisy (or compromised in some way)
+   * - physical channel: physically connected to a wire or not
    * 
-   * It also has a stub interface to inform the object of which run we are
+   * It also has a stub interface to inform the object of which time we are
    * interested in.
    * 
    */
   class ChannelFilterBaseInterface {
       public:
-    using channel_type = std::uint32_t; ///< type of channel ID
-    using channel_list_type = std::set<channel_type>;
-      ///< type of a list of channel IDs
+    /// type of a list of channel IDs
+    using ChannelSet_t = std::set<raw::ChannelID_t>;
     
     
     virtual ~ChannelFilterBaseInterface() = default;
     
+    /// Returns whether the specified channel is physical and connected to wire
+    virtual bool isPresent(raw::ChannelID_t channel) const = 0;
+    
+    /// Returns whether the specified channel is physical and good
+    virtual bool isGood(raw::ChannelID_t channel) const
+      { return isPresent(channel) && !isBad(channel) && !isNoisy(channel); }
+    
     /// Returns whether the specified channel is bad in the current run
-    virtual bool BadChannel(channel_type channel) const
-      { return SetOfBadChannels().count(channel) > 0; }
+    virtual bool isBad(raw::ChannelID_t channel) const = 0;
     
     /// Returns whether the specified channel is noisy in the current run
-    virtual bool NoisyChannel(channel_type channel) const
-      { return SetOfNoisyChannels().count(channel) > 0; }
+    virtual bool isNoisy(raw::ChannelID_t channel) const = 0;
+    
+    
+    /// Returns a copy of set of good channel IDs for the current run
+    virtual ChannelSet_t GoodChannels() const = 0;
     
     /// Returns a copy of set of bad channel IDs for the current run
-    virtual channel_list_type SetOfBadChannels()   const = 0;
+    virtual ChannelSet_t BadChannels() const = 0;
     
     /// Returns a copy of set of noisy channel IDs for the current run
-    virtual channel_list_type SetOfNoisyChannels() const = 0;
+    virtual ChannelSet_t NoisyChannels() const = 0;
     
-    /// Prepares the object to provide information about the specified run
-    /// @return whether information is available for the specified run
-    virtual bool SetRun(RunNumber_t run) = 0;
+    /// Prepares the object to provide information about the specified time
+    /// @return whether information is available for the specified time
+    virtual bool Update(lariov::IOVTimeStamp const& ts) = 0;
     
   }; // class ChannelFilterBaseInterface
   
