@@ -24,9 +24,9 @@
 
 // LArSoft libraries
 #include "Filters/ChannelFilterServiceInterface.h"
+#include "Filters/ChannelFilterBaseInterface.h"
 
 
-///////////////////////////////////////////////////////
 filter::ChannelFilter::ChannelFilter() {
   
   if (!&*(art::ServiceHandle<filter::ChannelFilterServiceInterface>())) {
@@ -43,24 +43,36 @@ filter::ChannelFilter::ChannelFilter() {
 ///////////////////////////////////////////////////////
 bool filter::ChannelFilter::BadChannel(uint32_t channel) const {
   return art::ServiceHandle<filter::ChannelFilterServiceInterface>()
-    ->BadChannel(channel);
+    ->GetFilter().isBad(channel);
 }
 
 ///////////////////////////////////////////////////////
 bool filter::ChannelFilter::NoisyChannel(uint32_t channel) const{
   return art::ServiceHandle<filter::ChannelFilterServiceInterface>()
-    ->NoisyChannel(channel);
+    ->GetFilter().isNoisy(channel);
 }
 
 ///////////////////////////////////////////////////////
 std::set<uint32_t> filter::ChannelFilter::SetOfBadChannels() const {
   return art::ServiceHandle<filter::ChannelFilterServiceInterface>()
-    ->SetOfBadChannels();
+    ->GetFilter().BadChannels();
 }
 
 ///////////////////////////////////////////////////////
 std::set<uint32_t> filter::ChannelFilter::SetOfNoisyChannels() const {
   return art::ServiceHandle<filter::ChannelFilterServiceInterface>()
-    ->SetOfNoisyChannels();
+    ->GetFilter().NoisyChannels();
 }
 
+///////////////////////////////////////////////////////
+filter::ChannelFilter::ChannelStatus filter::ChannelFilter::GetChannelStatus(uint32_t channel) const
+{
+  
+  ChannelFilterBaseInterface const& filter
+    = art::ServiceHandle<filter::ChannelFilterServiceInterface>()->GetFilter();
+  
+  if (!filter.isPresent(channel)) return NOTPHYSICAL;
+  if (filter.isBad(channel)) return DEAD;
+  if (filter.isNoisy(channel)) return NOISY;
+  return GOOD;
+}

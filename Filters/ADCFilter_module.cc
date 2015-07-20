@@ -93,7 +93,7 @@ namespace filter {
       {
          //get ADC values after decompressing
          std::vector<short> rawadc(digit->Samples());
-         raw::Uncompress(digit->fADC,rawadc,digit->Compression());
+         raw::Uncompress(digit->ADCs(),rawadc,digit->Compression());
          short max = *std::max_element(rawadc.begin(),rawadc.end()) - digit->GetPedestal();
          if(max>=fMinADC) return true;//found one ADC value above threshold, pass filter  
       }

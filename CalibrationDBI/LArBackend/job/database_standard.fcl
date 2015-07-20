@@ -1,0 +1,28 @@
+BEGIN_PROLOG
+
+standard_databaseretrievalalg:
+{
+  AlgName: "DatabaseRetrievalAlg"
+  DBFolderName:  ""
+  DBUrl: ""
+  DBTag: ""
+}
+
+standard_pedestalretrievalalg:
+{
+    AlgName:            "DetPedestalRetrievalAlg"
+    DatabaseRetrievalAlg: @local::standard_databaseretrievalalg
+    
+    UseDB: false
+    UseTable: false
+    UseDefault: true
+    
+    DefaultCollMean: 400.0
+    DefaultCollRms:  0.3
+    DefaultIndMean:  2048.0
+    DefaultIndRms:   0.3
+    DefaultMeanErr:  0.0
+    DefaultRmsErr:   0.0
+}
+
+END_PROLOG
