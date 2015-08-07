@@ -1,9 +1,9 @@
-#ifndef CALGAUSHFLBNE35T_H
-#define CALGAUSHFLBNE35T_H
+#ifndef CALGAUSHFDUNE35T_H
+#define CALGAUSHFDUNE35T_H
 
 ////////////////////////////////////////////////////////////////////////
 //
-// CalGausHFLBNE35t class
+// CalGausHFDUNE35t class
 //
 // jti3@fnal.gov
 //
@@ -38,7 +38,7 @@ extern "C" {
 #include "cetlib/exception.h"
 #include "cetlib/search_path.h"
 
-#include "Utilities/SignalShapingServiceLBNE35t.h"
+#include "Utilities/SignalShapingServiceDUNE35t.h"
 #include "Geometry/Geometry.h"
 #include "Geometry/CryostatGeo.h"
 #include "Geometry/TPCGeo.h"
@@ -69,7 +69,7 @@ namespace{
   void vector_to_hist(const std::vector<double>& v, TH1D* h)
   {
     if (!h) {
-      throw cet::exception("CalGausHFLBNE35t")
+      throw cet::exception("CalGausHFDUNE35t")
         << "vector_to_hist() got a null histogram\n";
     }
     int nvec = v.size();
@@ -92,14 +92,14 @@ namespace{
 ///creation of calibrated signals on wires
 namespace calgaushf {
 
-  class CalGausHFLBNE35t : public art::EDProducer {
+  class CalGausHFDUNE35t : public art::EDProducer {
 
   public:
     
     // create calibrated signals on wires. this class runs 
     // an fft to remove the electronics shaping.     
-    explicit CalGausHFLBNE35t(fhicl::ParameterSet const& pset); 
-    virtual ~CalGausHFLBNE35t();
+    explicit CalGausHFDUNE35t(fhicl::ParameterSet const& pset); 
+    virtual ~CalGausHFDUNE35t();
     
     void produce(art::Event& evt); 
     void beginJob(); 
@@ -148,13 +148,13 @@ namespace calgaushf {
   protected: 
     //double      expfitf(double *x,double *par);
     
-  }; // class CalGausHFLBNE35t
+  }; // class CalGausHFDUNE35t
 
-  DEFINE_ART_MODULE(CalGausHFLBNE35t)
+  DEFINE_ART_MODULE(CalGausHFDUNE35t)
   
 
   //-------------------------------------------------
-  CalGausHFLBNE35t::CalGausHFLBNE35t(fhicl::ParameterSet const& pset)
+  CalGausHFDUNE35t::CalGausHFDUNE35t(fhicl::ParameterSet const& pset)
   {
     fSpillName="";
     this->reconfigure(pset);
@@ -166,12 +166,12 @@ namespace calgaushf {
   }
   
   //-------------------------------------------------
-  CalGausHFLBNE35t::~CalGausHFLBNE35t()
+  CalGausHFDUNE35t::~CalGausHFDUNE35t()
   {
   }
 
   //////////////////////////////////////////////////////
-  void CalGausHFLBNE35t::reconfigure(fhicl::ParameterSet const& p)
+  void CalGausHFDUNE35t::reconfigure(fhicl::ParameterSet const& p)
   {
     fDigitModuleLabel = p.get< std::string >("DigitModuleLabel", "daq");
     fPostsample       = p.get< int >        ("PostsampleBins");
@@ -202,7 +202,7 @@ namespace calgaushf {
   }
 
   //-------------------------------------------------
-  void CalGausHFLBNE35t::beginJob()
+  void CalGausHFDUNE35t::beginJob()
   { 
     collectioncount = 0;
     inductioncount = 0;
@@ -210,12 +210,12 @@ namespace calgaushf {
   }
 
   //////////////////////////////////////////////////////
-  void CalGausHFLBNE35t::endJob()
+  void CalGausHFDUNE35t::endJob()
   {  
   }
   
 //   //////////////////////////////////////////////////////
-//   double CalGausHFLBNE35t::expfitf(double *x,double *par)
+//   double CalGausHFDUNE35t::expfitf(double *x,double *par)
 //   {
 //     double arg1 = 0;
 //     double arg2 = 0;
@@ -227,7 +227,7 @@ namespace calgaushf {
 //   }
 
   //////////////////////////////////////////////////////
-  void CalGausHFLBNE35t::produce(art::Event& evt)
+  void CalGausHFDUNE35t::produce(art::Event& evt)
   {      
 
 
@@ -237,7 +237,7 @@ namespace calgaushf {
 
 
     // Get signal shaping service.
-    art::ServiceHandle<util::SignalShapingServiceLBNE35t> sss;
+    art::ServiceHandle<util::SignalShapingServiceDUNE35t> sss;
 
 
     //Gaussian hit finder initializations etc.
@@ -287,7 +287,7 @@ namespace calgaushf {
     else evt.getByLabel(fDigitModuleLabel, digitVecHandle);
 
     if (!digitVecHandle->size())  return;
-    mf::LogInfo("CalGausHFLBNE35t") << "CalGausHFLBNE35t:: digitVecHandle size is " << digitVecHandle->size();
+    mf::LogInfo("CalGausHFDUNE35t") << "CalGausHFDUNE35t:: digitVecHandle size is " << digitVecHandle->size();
 
     // Use the handle to get a particular (0th) element of collection.
     art::Ptr<raw::RawDigit> digitVec0(digitVecHandle, 0);
@@ -715,7 +715,7 @@ namespace calgaushf {
 // 	    char outputfilename[100];
 // 	    if(size>0){
 // 	      if(sigType == geo::kInduction && inductioncount < 100){
-// 		sprintf(outputfilename,"/lbne/data/users/jti3/fits/induction_calgaus_fit_%d.eps",inductioncount);
+// 		sprintf(outputfilename,"/dune/data/users/jti3/fits/induction_calgaus_fit_%d.eps",inductioncount);
 // 		TCanvas *c1 = new TCanvas("c1","plot");
 // 		c1->SetFillColor(0);
 // 		gStyle->SetOptFit(1);
@@ -728,7 +728,7 @@ namespace calgaushf {
 		
 // 	      }
 // 	      else if(sigType == geo::kCollection && collectioncount < 100){
-// 		sprintf(outputfilename,"/lbne/data/users/jti3/fits/collection_calgaus_fit_%d.eps",collectioncount);
+// 		sprintf(outputfilename,"/dune/data/users/jti3/fits/collection_calgaus_fit_%d.eps",collectioncount);
 // 		TCanvas *c1 = new TCanvas("c1","plot");
 // 		c1->SetFillColor(0);
 // 		gStyle->SetOptFit(1);
@@ -819,4 +819,4 @@ namespace calgaushf {
 } // end namespace calgaushf
 
 
-#endif // CALGAUSHFLBNE35T_H
+#endif // CALGAUSHFDUNE35T_H

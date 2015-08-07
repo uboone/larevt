@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////
 //
-// CalWireLBNE10kt class
+// CalWireDUNE35t class
 //
 // brebel@fnal.gov
 //
@@ -31,7 +31,7 @@ extern "C" {
 #include "cetlib/exception.h"
 #include "cetlib/search_path.h"
 
-#include "Utilities/SignalShapingServiceLBNE10kt.h"
+#include "Utilities/SignalShapingServiceDUNE35t.h"
 #include "Geometry/Geometry.h"
 #include "Filters/ChannelFilter.h"
 #include "RawData/RawDigit.h"
@@ -47,14 +47,14 @@ extern "C" {
 ///creation of calibrated signals on wires
 namespace caldata {
 
-  class CalWireLBNE10kt : public art::EDProducer {
+  class CalWireDUNE35t : public art::EDProducer {
 
   public:
     
     // create calibrated signals on wires. this class runs 
     // an fft to remove the electronics shaping.     
-    explicit CalWireLBNE10kt(fhicl::ParameterSet const& pset); 
-    virtual ~CalWireLBNE10kt();
+    explicit CalWireDUNE35t(fhicl::ParameterSet const& pset); 
+    virtual ~CalWireDUNE35t();
     
     void produce(art::Event& evt); 
     void beginJob(); 
@@ -73,12 +73,12 @@ namespace caldata {
 
   protected: 
     
-  }; // class CalWireLBNE10kt
+  }; // class CalWireDUNE35t
 
-  DEFINE_ART_MODULE(CalWireLBNE10kt)
+  DEFINE_ART_MODULE(CalWireDUNE35t)
   
   //-------------------------------------------------
-  CalWireLBNE10kt::CalWireLBNE10kt(fhicl::ParameterSet const& pset)
+  CalWireDUNE35t::CalWireDUNE35t(fhicl::ParameterSet const& pset)
   {
     fSpillName="";
     this->reconfigure(pset);
@@ -88,12 +88,12 @@ namespace caldata {
   }
   
   //-------------------------------------------------
-  CalWireLBNE10kt::~CalWireLBNE10kt()
+  CalWireDUNE35t::~CalWireDUNE35t()
   {
   }
 
   //////////////////////////////////////////////////////
-  void CalWireLBNE10kt::reconfigure(fhicl::ParameterSet const& p)
+  void CalWireDUNE35t::reconfigure(fhicl::ParameterSet const& p)
   {
     fDigitModuleLabel = p.get< std::string >("DigitModuleLabel", "daq");
     fPostsample       = p.get< int >        ("PostsampleBins");
@@ -109,17 +109,17 @@ namespace caldata {
   }
 
   //-------------------------------------------------
-  void CalWireLBNE10kt::beginJob()
+  void CalWireDUNE35t::beginJob()
   {  
   }
 
   //////////////////////////////////////////////////////
-  void CalWireLBNE10kt::endJob()
+  void CalWireDUNE35t::endJob()
   {  
   }
   
   //////////////////////////////////////////////////////
-  void CalWireLBNE10kt::produce(art::Event& evt)
+  void CalWireDUNE35t::produce(art::Event& evt)
   {      
     // get the geometry
     art::ServiceHandle<geo::Geometry> geom;
@@ -129,7 +129,7 @@ namespace caldata {
     int transformSize = fFFT->FFTSize();
 
     // Get signal shaping service.
-    art::ServiceHandle<util::SignalShapingServiceLBNE10kt> sss;
+    art::ServiceHandle<util::SignalShapingServiceDUNE35t> sss;
 
     // make a collection of Wires
     std::unique_ptr<std::vector<recob::Wire> > wirecol(new std::vector<recob::Wire>);
@@ -140,7 +140,7 @@ namespace caldata {
     else evt.getByLabel(fDigitModuleLabel, digitVecHandle);
 
     if (!digitVecHandle->size())  return;
-    mf::LogInfo("CalWireLBNE10kt") << "CalWireLBNE10kt:: digitVecHandle size is " << digitVecHandle->size();
+    mf::LogInfo("CalWireDUNE35t") << "CalWireDUNE35t:: digitVecHandle size is " << digitVecHandle->size();
 
     // Use the handle to get a particular (0th) element of collection.
     art::Ptr<raw::RawDigit> digitVec0(digitVecHandle, 0);
@@ -193,7 +193,7 @@ namespace caldata {
     }
     
     if(wirecol->size() == 0)
-      mf::LogWarning("CalWireLBNE10kt") << "No wires made for this event.";
+      mf::LogWarning("CalWireDUNE35t") << "No wires made for this event.";
 
     if(fSpillName.size()>0)
       evt.put(std::move(wirecol), fSpillName);

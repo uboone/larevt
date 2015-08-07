@@ -1,9 +1,9 @@
-#ifndef DECONVGAUSHFLBNE10KT_H
-#define DECONVGAUSHFLBNE10KT_H
+#ifndef CALGAUSHFDUNE10KT_H
+#define CALGAUSHFDUNE10KT_H
 
 ////////////////////////////////////////////////////////////////////////
 //
-// DeconvGausHFLBNE10kt class
+// CalGausHFDUNE10kt class
 //
 // jti3@fnal.gov
 //
@@ -38,7 +38,7 @@ extern "C" {
 #include "cetlib/exception.h"
 #include "cetlib/search_path.h"
 
-#include "Utilities/SignalShapingServiceLBNE10kt.h"
+#include "Utilities/SignalShapingServiceDUNE10kt.h"
 #include "Geometry/Geometry.h"
 #include "Geometry/CryostatGeo.h"
 #include "Geometry/TPCGeo.h"
@@ -67,7 +67,7 @@ namespace{
   void vector_to_hist(const std::vector<double>& v, TH1D* h)
   {
     if (!h) {
-      throw cet::exception("DeconvGausHFLBNE10kt")
+      throw cet::exception("CalGausHFDUNE10kt")
         << "vector_to_hist() got a null histogram\n";
     }
     int nvec = v.size();
@@ -88,16 +88,16 @@ namespace{
 }
 
 ///creation of calibrated signals on wires
-namespace deconvgaushf {
+namespace calgaushf {
 
-  class DeconvGausHFLBNE10kt : public art::EDProducer {
+  class CalGausHFDUNE10kt : public art::EDProducer {
 
   public:
     
     // create calibrated signals on wires. this class runs 
     // an fft to remove the electronics shaping.     
-    explicit DeconvGausHFLBNE10kt(fhicl::ParameterSet const& pset); 
-    virtual ~DeconvGausHFLBNE10kt();
+    explicit CalGausHFDUNE10kt(fhicl::ParameterSet const& pset); 
+    virtual ~CalGausHFDUNE10kt();
     
     void produce(art::Event& evt); 
     void beginJob(); 
@@ -142,12 +142,12 @@ namespace deconvgaushf {
 
   protected: 
     
-  }; // class DeconvGausHFLBNE10kt
+  }; // class CalGausHFDUNE10kt
 
-  DEFINE_ART_MODULE(DeconvGausHFLBNE10kt)
+  DEFINE_ART_MODULE(CalGausHFDUNE10kt)
   
   //-------------------------------------------------
-  DeconvGausHFLBNE10kt::DeconvGausHFLBNE10kt(fhicl::ParameterSet const& pset)
+  CalGausHFDUNE10kt::CalGausHFDUNE10kt(fhicl::ParameterSet const& pset)
   {
     fSpillName="";
     this->reconfigure(pset);
@@ -159,12 +159,12 @@ namespace deconvgaushf {
   }
   
   //-------------------------------------------------
-  DeconvGausHFLBNE10kt::~DeconvGausHFLBNE10kt()
+  CalGausHFDUNE10kt::~CalGausHFDUNE10kt()
   {
   }
 
   //////////////////////////////////////////////////////
-  void DeconvGausHFLBNE10kt::reconfigure(fhicl::ParameterSet const& p)
+  void CalGausHFDUNE10kt::reconfigure(fhicl::ParameterSet const& p)
   {
     fDigitModuleLabel = p.get< std::string >("DigitModuleLabel", "daq");
     fPostsample       = p.get< int >        ("PostsampleBins");
@@ -195,36 +195,24 @@ namespace deconvgaushf {
   }
 
   //-------------------------------------------------
-  void DeconvGausHFLBNE10kt::beginJob()
+  void CalGausHFDUNE10kt::beginJob()
   {  
   }
 
   //////////////////////////////////////////////////////
-  void DeconvGausHFLBNE10kt::endJob()
+  void CalGausHFDUNE10kt::endJob()
   {  
   }
   
   //////////////////////////////////////////////////////
-  void DeconvGausHFLBNE10kt::produce(art::Event& evt)
+  void CalGausHFDUNE10kt::produce(art::Event& evt)
   {      
     // get the geometry
     art::ServiceHandle<geo::Geometry> geom;
 
-    // get the FFT service to have access to the FFT size
-    art::ServiceHandle<util::LArFFT> fFFT;
-    int transformSize = fFFT->FFTSize();
-
     // Get signal shaping service.
-    art::ServiceHandle<util::SignalShapingServiceLBNE10kt> sss;
+    art::ServiceHandle<util::SignalShapingServiceDUNE10kt> sss;
 
-    // Make file for induction and collection plane histograms.
-    art::ServiceHandle<art::TFileService> tfs;
-    art::TFileDirectory dirc = tfs->mkdir("DeconvolutionKernels", "DeconvolutionKernels");
-    
- 
-    // don't make a collection of Wires
-    //std::unique_ptr<std::vector<recob::Wire> > wirecol(new std::vector<recob::Wire>);
-    
 
     //Gaussian hit finder initializations etc.
     TH1::AddDirectory(kFALSE);
@@ -273,22 +261,19 @@ namespace deconvgaushf {
     else evt.getByLabel(fDigitModuleLabel, digitVecHandle);
 
     if (!digitVecHandle->size())  return;
-    mf::LogInfo("DeconvGausHFLBNE10kt") << "DeconvGausHFLBNE10kt:: digitVecHandle size is " << digitVecHandle->size();
+    mf::LogInfo("CalGausHFDUNE10kt") << "CalGausHFDUNE10kt:: digitVecHandle size is " << digitVecHandle->size();
 
     // Use the handle to get a particular (0th) element of collection.
     art::Ptr<raw::RawDigit> digitVec0(digitVecHandle, 0);
-        
-    unsigned int dataSize = digitVec0->Samples(); //size of raw data vectors
-    
+            
     uint32_t     channel(0); // channel number
     unsigned int bin(0);     // time bin loop variable
     
     filter::ChannelFilter *chanFilt = new filter::ChannelFilter();  
 
     std::vector<float> holder;                // holds signal data
-    std::vector<short> rawadc(transformSize);  // vector holding uncompressed adc values
-    std::vector<TComplex> freqHolder(transformSize+1); // temporary frequency data
-    
+    std::vector<float> rawadc_conv;           // holds signal data before time domain deconvolution
+    std::vector<short> rawadc;  // vector holding uncompressed adc values
 
     // loop over all wires    
     for(size_t rdIter = 0; rdIter < digitVecHandle->size(); ++rdIter){ // ++ move
@@ -300,49 +285,58 @@ namespace deconvgaushf {
 
       // skip bad channels
       if(!chanFilt->BadChannel(channel)) {
-	holder.resize(transformSize);
-	
-	// uncompress the data
-	raw::Uncompress(digitVec->fADC, rawadc, digitVec->Compression());
-	
-	// loop over all adc values and subtract the pedestal
-	for(bin = 0; bin < dataSize; ++bin) 
-	  holder[bin]=(rawadc[bin]-digitVec->GetPedestal());
-
-	// Do deconvolution.
-	sss->Deconvolute(channel, holder);
-
-	//} // end if not a bad channel 
-      
-      holder.resize(dataSize,1e-5);
 
 
-      //This restores the DC component to signal removed by the deconvolution.
-      if(fPostsample) {
-        double average=0.0;
-	for(bin=0; bin < (unsigned int)fPostsample; ++bin) 
-	  average+=holder[holder.size()-1-bin]/(double)fPostsample;
-        for(bin = 0; bin < holder.size(); ++bin) holder[bin]-=average;
-      }  
+ 	const int numberofblocks = digitVec->fADC[1];
 
-      
-      //wirecol->push_back(recob::Wire(holder,digitVec));
-      
-      //if(wirecol->size() == 0)
-      //mf::LogWarning("DeconvGausHFLBNE10kt") << "No wires made for this event.";
-      
-      // Don't save wire collection in event ROOT file
-      //if(fSpillName.size()>0)
-      //evt.put(std::move(wirecol), fSpillName);
-      //else evt.put(std::move(wirecol));
-      
-      //Beginning of Gaussian hit finder loop over signal blocks
-      
-      
-      //##############################
-      //### Looping over the wires ###
-      //############################## 
-      
+ 	int zerosuppressedindex = numberofblocks*2 + 2;
+
+ 	//loop over all nonzero blocks
+	for(int i=0; i<numberofblocks; i++){
+
+	  const int lengthofblock = digitVec->fADC[2+numberofblocks+i];
+	  rawadc.resize(lengthofblock);
+	  holder.resize(lengthofblock);
+	  rawadc_conv.resize(lengthofblock);
+
+	  for (int j=0;j<lengthofblock;j++)
+	    {
+	      rawadc[j] = digitVec->fADC[zerosuppressedindex];
+	      zerosuppressedindex++;
+	    }
+    	  
+	  
+	  
+	  // loop over all adc values and subtract the pedestal
+	  for(bin = 0; bin < rawadc.size(); ++bin) 
+	    rawadc_conv[bin]=(rawadc[bin]-digitVec->GetPedestal());
+
+
+	  sigType = geom->SignalType(channel);
+	  view = geom->View(channel);
+
+	  if(sigType == geo::kCollection){
+
+	    //Leave collection plane signals as is
+	    for(bin = 0; bin < rawadc_conv.size(); ++bin)
+	      holder[bin] = rawadc_conv[bin];
+	  }
+	  else if(sigType == geo::kInduction){
+
+	    //Integrate over signal in induction planes
+	    for(bin = 0;  bin < rawadc_conv.size(); ++bin) 
+	      holder[bin] = (bin>0) ? rawadc_conv[bin] + holder[bin-1] : rawadc_conv[bin];
+	  }
+
+
+	  
+	  //Beginning of Gaussian hit finder loop over signal blocks
+
+
+	  //##############################
+	  //### Looping over the wires ###
+	  //############################## 
+	  
 	  //for(size_t wireIter = 0; wireIter < wirecol->size(); wireIter++){
 	  
 	  //art::Ptr<recob::Wire> wire(wirecol, wireIter);
@@ -351,8 +345,7 @@ namespace deconvgaushf {
 	  //for(wire=wirecol->begin(); wire != wirecol->end(); wire++){
 	  // --- Setting Channel Number and Wire Number as well as signal type ---
 	  //channel = wire->RawDigit()->Channel();
-	  sigType = geom->SignalType(channel);
-	  view = geom->View(channel);
+	  
 	  
 	  // -----------------------------------------------------------
 	  // -- Clearing variables at the start of looping over wires --
@@ -608,9 +601,10 @@ namespace deconvgaushf {
 	    // ### PERFORMING THE TOTAL GAUSSIAN FIT OF THE HIT ###
 	    // ####################################################
 	    hitSignal.Sumw2();
-	    
+
 	    hitSignal.Fit(&Gaus,"QNRW","", startT, endT);
 	    //hitSignal.Fit(&Gaus,"QR0LLi","", startT, endT);
+
 	    
 	    for(int hitNumber = 0; hitNumber < numHits; ++hitNumber){
 	      totSig = 0;	
@@ -738,11 +732,15 @@ namespace deconvgaushf {
 	    hitIndex+=numHits;
 	  }//<---End while hitIndex < startTimes.size()
 	  
-	 	  
-	  //}//<---End looping over wireIter
-	  	 
 	  
-	  //} // end loop over nonzero blocks
+	  
+	  //}//<---End looping over wireIter
+	  
+	  
+	  //std::cout << "Test1" << std::endl;
+	 
+	  
+	} // end loop over nonzero blocks
 	
 	
       } // end if not a bad channel 
@@ -758,7 +756,7 @@ namespace deconvgaushf {
     return;
   }
   
-} // end namespace deconvgaushf
+} // end namespace calgaushf
 
 
-#endif // DECONVGAUSHFLBNE10KT_H
+#endif // CALGAUSHFDUNE10KT_H
