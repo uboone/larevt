@@ -24,15 +24,7 @@ namespace lariov{
       ~SIOVDetPedestalService(){}
       
       void PreProcessEvent(const art::Event& evt) {
-        // This is a temporary kludge to allow microboone to analyze early data 
-	// which did not have a proper timestamp in the daq header.
-	// NOTE: it would be nice if there was a way to check that the art::Event
-	// is microboone or not so that this kludge does not affect other experiments
-        if (evt.isRealData() && evt.run() < 183) {
-	  std::uint64_t kludge_stamp = 1430000000000000000; //yes, there really needs to be 16 zeroes
-	  fProvider.Update(kludge_stamp);
-        }
-	else fProvider.Update(evt.time().value());
+        fProvider.Update(evt.time().value());
       }
      
     private:
