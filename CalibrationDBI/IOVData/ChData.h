@@ -31,6 +31,7 @@ namespace lariov {
       virtual ~ChData(){}
 
       unsigned int Channel() const  { return fChannel; }
+      void SetChannel(unsigned int ch) { fChannel = ch; }
 
       inline bool operator<(unsigned int rhs) const
       { return fChannel < rhs;}
