@@ -128,6 +128,8 @@ namespace lariov {
 	}
 	else throw e;
 	
+	tmp_ped.SetChannel(ch); //because fDefaultColl/Ind channels are 0
+	
 	fData.AddOrReplaceRow(tmp_ped);
 	return fData.GetRow(ch);
       }
