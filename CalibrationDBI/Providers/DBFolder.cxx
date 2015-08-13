@@ -4,6 +4,7 @@
 #include "DBFolder.h"
 #include "WebDBIConstants.h"
 #include "CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "CalibrationDBI/IOVData/TimeStampDecoder.h"
 #include "WebError.h"
 #include <sstream>
 #include <limits>
@@ -38,7 +39,7 @@ namespace lariov {
   }
 
 
-  int DBFolder::GetNamedChannelData(unsigned long channel, const std::string& name, long& data) {
+  int DBFolder::GetNamedChannelData(std::uint64_t channel, const std::string& name, long& data) {
 
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
@@ -48,7 +49,7 @@ namespace lariov {
     return err;
   }
 
-  int DBFolder::GetNamedChannelData(unsigned long channel, const std::string& name, double& data) {
+  int DBFolder::GetNamedChannelData(std::uint64_t channel, const std::string& name, double& data) {
 
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
@@ -58,7 +59,7 @@ namespace lariov {
     return err;
   }
 
-  int DBFolder::GetNamedChannelData(unsigned long channel, const std::string& name, std::string& data) {
+  int DBFolder::GetNamedChannelData(std::uint64_t channel, const std::string& name, std::string& data) {
 
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
@@ -70,7 +71,7 @@ namespace lariov {
     return err;
   }
   
-  int DBFolder::GetChannelList( std::vector<unsigned int>& channels ) const {
+  int DBFolder::GetChannelList( std::vector<std::uint64_t>& channels ) const {
     
     channels.clear();
     if (!fCachedDataset) return 1;
@@ -79,21 +80,21 @@ namespace lariov {
     int err=0;
     for ( int row = 0; row != fNRows; ++row) {
       tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS);
-      channels.push_back( (unsigned int)getLongValue(tup,0,&err) );
+      channels.push_back( (std::uint64_t)getLongValue(tup,0,&err) );
       releaseTuple(tup);
     }  
     return err;
   }
 
 
-  size_t DBFolder::GetTupleColumn(unsigned long channel, const std::string& name, Tuple& tup ) {
+  size_t DBFolder::GetTupleColumn(std::uint64_t channel, const std::string& name, Tuple& tup ) {
 
     //check if cached row is still valid
     int err;
     int row = -1;
     if (fCachedRow != -1 && fCachedChannel == channel) {
       tup = getTuple(fCachedDataset, fCachedRow + kNUMBER_HEADER_ROWS);
-      if ( channel == (unsigned long)getLongValue(tup,0,&err) ) {
+      if ( channel == (std::uint64_t)getLongValue(tup,0,&err) ) {
 	row = fCachedRow;
       }
       else releaseTuple(tup);
@@ -103,7 +104,7 @@ namespace lariov {
     if (row == -1) {   
 //std::cout<<"Channel "<<channel<<" not cached"<<std::endl;
       //binary search for channel
-      unsigned long val;
+      std::uint64_t val;
       int l = 0, h = fNRows - 1;
       row = (l + h )/2;
       while ( l <= h ) {
@@ -122,7 +123,7 @@ namespace lariov {
       
       //get the tuple to be returned, check that the found row matches the requested channel
       tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS); 
-      if ( channel != (unsigned long)getLongValue(tup, 0, &err) ) {
+      if ( channel != (std::uint64_t)getLongValue(tup, 0, &err) ) {
         releaseTuple(tup);
 	std::string msg = "Channel " + std::to_string(channel) + " is not found in database!";
 	throw WebError(msg);
@@ -145,10 +146,14 @@ namespace lariov {
     return 0;
   }
 
-  int DBFolder::UpdateData( const IOVTimeStamp& ts) {
+  //returns true if an Update is performed, false if not
+  bool DBFolder::UpdateData( std::uint64_t raw_time) {
+  
+    //convert to IOVTimeStamp
+    IOVTimeStamp ts = TimeStampDecoder::DecodeTimeStamp(raw_time);
 
     //check if cache is updated
-    if (this->IsValid(ts)) return 0;
+    if (this->IsValid(ts)) return false;
 
     int err=0;
 
@@ -226,7 +231,7 @@ namespace lariov {
     }
     releaseTuple(tup);
 
-    return err;
+    return true;
   }
 
 }//end namespace lariov

@@ -10,6 +10,9 @@ namespace lariov {
   
   const unsigned short kMAX_SUBSTAMP_LENGTH = 6;
   const unsigned int   kMAX_SUBSTAMP_VALUE  = ((unsigned int)pow(10,kMAX_SUBSTAMP_LENGTH)) - 1;
-  
+ 
+  namespace DataSource {
+    enum ds {Database, File, Default};
+  } 
 }
 #endif
