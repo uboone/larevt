@@ -14,8 +14,7 @@ standard_pedestalretrievalalg:
     DatabaseRetrievalAlg: @local::standard_databaseretrievalalg
     
     UseDB: false
-    UseTable: false
-    UseDefault: true
+    UseFile: false
     
     DefaultCollMean: 400.0
     DefaultCollRms:  0.3
@@ -23,6 +22,12 @@ standard_pedestalretrievalalg:
     DefaultIndRms:   0.3
     DefaultMeanErr:  0.0
     DefaultRmsErr:   0.0
+}
+
+standard_siov_detpedestal_service:
+{
+  service_provider: SIOVDetPedestalService
+  DetPedestalRetrievalAlg: @local::standard_pedestalretrievalalg
 }
 
 END_PROLOG

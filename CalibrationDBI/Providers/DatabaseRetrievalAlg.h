@@ -27,7 +27,7 @@ namespace lariov {
      User defined class DatabaseRetrievalAlg ... these comments are used to generate
      doxygen documentation!
   */
-  class DatabaseRetrievalAlg{
+  class DatabaseRetrievalAlg {
 
     public:
       
@@ -46,9 +46,8 @@ namespace lariov {
       virtual void Reconfigure(fhicl::ParameterSet const& p);
 	    
       /// Return true if fFolder is successfully updated
-      virtual bool Update(const IOVTimeStamp& ts) {
-        if (!fFolder->UpdateData(ts)) return true;
-        return false;
+      bool UpdateFolder(std::uint64_t ts) {
+        return fFolder->UpdateData(ts);
       }       
       
       /// Get connection information
