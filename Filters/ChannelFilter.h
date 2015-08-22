@@ -25,10 +25,12 @@ namespace filter {
 
   public:
       
-    enum ChannelStatus { GOOD        = 0,
-                         NOISY       = 1,
-                         DEAD        = 2,
-                         NOTPHYSICAL = 3
+    enum ChannelStatus { GOOD         = 0,
+                         INTERMITTENT = 1,
+                         NOISY        = 2,
+                         LOWNOISE     = 3,
+                         DEAD         = 4,
+                         NOTPHYSICAL  = 5
                        };
 
     ChannelFilter();
