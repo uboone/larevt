@@ -173,7 +173,7 @@ filter::ChannelFilter::ChannelFilter()
       
       // In addition to the above list, we know that channels 864-911 and 1536-1583 are not connected
       for(size_t channel =  864; channel <  912; channel++) fChannelStatusMap[channel] = DEAD;
-      for(size_t channel = 1536; channel < 1584; channel++) fChannelStatusMap[channel] = DEAD;
+      for(size_t channel = 3936; channel < 3984; channel++) fChannelStatusMap[channel] = DEAD;
       
       // Now make backward compatible
       for(const auto& chanItr : fChannelStatusMap)
