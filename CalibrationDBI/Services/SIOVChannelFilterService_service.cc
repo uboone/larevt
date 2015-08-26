@@ -46,7 +46,7 @@ DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelFilterService, lariov::ICh
 namespace lariov{
 
   SIOVChannelFilterService::SIOVChannelFilterService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg) 
-  : fProvider(pset.get<fhicl::ParameterSet>("ChannelFilterRetrievalAlg"))
+  : fProvider(pset.get<fhicl::ParameterSet>("ChannelFilterProvider"))
   {
     
     fFindNoisyChannels = pset.get<bool>("FindNoisyChannels",false);
