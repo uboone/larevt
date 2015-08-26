@@ -64,7 +64,7 @@ namespace lariov {
     
       DataSource::ds fDataSource;
           
-      mutable Snapshot<DetPedestal> fData; //I hate making this mutable
+      Snapshot<DetPedestal> fData;
       DetPedestal fDefaultColl;
       DetPedestal fDefaultInd;
   };
