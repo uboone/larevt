@@ -53,24 +53,38 @@ namespace lariov {
     else              fDataSource = DataSource::Default;
 
     if (fDataSource == DataSource::Default) {
-      float default_mean     = p.get<float>("DefaultCollMean", 400.0);
-      float default_rms      = p.get<float>("DefaultCollRms", 0.3);
-      float default_mean_err = p.get<float>("DefaultMeanErr", 0.0);
-      float default_rms_err  = p.get<float>("DefaultRmsErr", 0.0);
-
-      fDefaultColl.SetPedMean(default_mean);
+      float default_collmean     = p.get<float>("DefaultCollMean", 400.0);
+      float default_collrms      = p.get<float>("DefaultCollRms", 0.3);
+      float default_mean_err     = p.get<float>("DefaultMeanErr", 0.0);
+      float default_rms_err      = p.get<float>("DefaultRmsErr", 0.0);
+      float default_indmean      = p.get<float>("DefaultIndMean", 2048.0);
+      float default_indrms       = p.get<float>("DefaultIndRms", 0.3);
+      
+      fDefaultColl.SetPedMean(default_collmean);
       fDefaultColl.SetPedMeanErr(default_mean_err);
-      fDefaultColl.SetPedRms(default_rms);
+      fDefaultColl.SetPedRms(default_collrms);
       fDefaultColl.SetPedRmsErr(default_rms_err);
       
-      default_mean     = p.get<float>("DefaultIndMean", 2048.0);
-      default_rms      = p.get<float>("DefaultIndRms", 0.3);
-      
-      fDefaultInd.SetPedMean(default_mean);
+      fDefaultInd.SetPedMean(default_indmean);
       fDefaultInd.SetPedMeanErr(default_mean_err);
-      fDefaultInd.SetPedRms(default_rms);
+      fDefaultInd.SetPedRms(default_indrms);
       fDefaultInd.SetPedRmsErr(default_rms_err);
-
+      
+      art::ServiceHandle<geo::Geometry> geo;
+      geo::wire_id_iterator itW = geo->begin_wire_id();
+      for ( ; itW != geo->end_wire_id(); ++itW) {
+        DBChannelID_t ch = geo->PlaneWireToChannel(*itW);
+      
+        if (geo->SignalType(ch) == geo::kCollection) {
+	  fDefaultColl.SetChannel(ch);
+	  fData.AddOrReplaceRow(fDefaultColl);
+	}
+	else if (geo->SignalType(ch) == geo::kInduction) {
+	  fDefaultInd.SetChannel(ch);
+	  fData.AddOrReplaceRow(fDefaultInd);
+	}
+	else throw IOVDataError("Wire type is not collection or induction!");
+      }
     }
     else if (fDataSource == DataSource::File) {
       //need to implement
@@ -78,7 +92,7 @@ namespace lariov {
   }
 
 
-  bool DetPedestalRetrievalAlg::Update(std::uint64_t ts) {
+  bool DetPedestalRetrievalAlg::Update(DBTimeStamp_t ts) {
     
     if (fDataSource != DataSource::Database) return false;
       
@@ -88,7 +102,7 @@ namespace lariov {
     fData.Clear();
     fData.SetIoV(this->Begin(), this->End());
 
-    std::vector<std::uint64_t> channels;
+    std::vector<DBChannelID_t> channels;
     fFolder->GetChannelList(channels);
     for (auto it = channels.begin(); it != channels.end(); ++it) {
 
@@ -111,45 +125,23 @@ namespace lariov {
 
   }
   
-  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(std::uint64_t ch) const {  
-    try {
-      return fData.GetRow(ch);
-    }
-    catch(IOVDataError& e) {
-      if (fDataSource == DataSource::Default) {
-        art::ServiceHandle<geo::Geometry> geo;
-      
-        DetPedestal tmp_ped(ch);
-	if (geo->SignalType(ch) == geo::kCollection) {
-	  tmp_ped = fDefaultColl;
-	}
-	else if (geo->SignalType(ch) == geo::kInduction) {
-	  tmp_ped = fDefaultInd;
-	}
-	else throw e;
-	
-	tmp_ped.SetChannel(ch); //because fDefaultColl/Ind channels are 0
-	
-	fData.AddOrReplaceRow(tmp_ped);
-	return fData.GetRow(ch);
-      }
-      else throw e;
-    }
+  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBChannelID_t ch) const {     
+    return fData.GetRow(ch);
   }
       
-  float DetPedestalRetrievalAlg::PedMean(std::uint64_t ch) const {
+  float DetPedestalRetrievalAlg::PedMean(DBChannelID_t ch) const {
     return this->Pedestal(ch).PedMean();
   }
   
-  float DetPedestalRetrievalAlg::PedRms(std::uint64_t ch) const {
+  float DetPedestalRetrievalAlg::PedRms(DBChannelID_t ch) const {
     return this->Pedestal(ch).PedRms();
   }
   
-  float DetPedestalRetrievalAlg::PedMeanErr(std::uint64_t ch) const {
+  float DetPedestalRetrievalAlg::PedMeanErr(DBChannelID_t ch) const {
     return this->Pedestal(ch).PedMeanErr();
   }
   
-  float DetPedestalRetrievalAlg::PedRmsErr(std::uint64_t ch) const {
+  float DetPedestalRetrievalAlg::PedRmsErr(DBChannelID_t ch) const {
     return this->Pedestal(ch).PedRmsErr();
   }
 

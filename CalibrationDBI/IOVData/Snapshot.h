@@ -48,6 +48,8 @@ namespace lariov {
       bool  IsValid(const IOVTimeStamp& ts) const;
       
       size_t NChannels() const {return fData.size();}
+      
+      const std::vector<T>& Data() const {return fData;}
 
       
       /// Only included with class if T has base class ChData

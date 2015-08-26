@@ -46,14 +46,14 @@ namespace lariov {
       ~DetPedestalRetrievalAlg() {}
       
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-      bool Update(std::uint64_t ts) override;
+      bool Update(DBTimeStamp_t ts) override;
       
       /// Retrieve pedestal information
-      const DetPedestal& Pedestal(std::uint64_t ch) const;      
-      float PedMean(std::uint64_t ch) const override;
-      float PedRms(std::uint64_t ch) const override;
-      float PedMeanErr(std::uint64_t ch) const override;
-      float PedRmsErr(std::uint64_t ch) const override;
+      const DetPedestal& Pedestal(DBChannelID_t ch) const;      
+      float PedMean(DBChannelID_t ch) const override;
+      float PedRms(DBChannelID_t ch) const override;
+      float PedMeanErr(DBChannelID_t ch) const override;
+      float PedRmsErr(DBChannelID_t ch) const override;
            
       //hardcoded information about database folder - useful for debugging cross checks
       const unsigned int NCOLUMNS = 5;    
