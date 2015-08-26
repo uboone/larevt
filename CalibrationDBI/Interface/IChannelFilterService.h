@@ -140,7 +140,7 @@ namespace filter {
     std::vector<const raw::RawDigit*> GoodDigits;
     
     const filter::IChannelFilterProvider* pFilter =
-      art::ServiceHandle<filter::ChannelFilterServiceInterface>()->GetFilter();
+      art::ServiceHandle<lariov::IChannelFilterService>()->GetFilter();
     
     for (const auto& pDigit: digits) {
       if (!pFilter->BadChannel(pDigit->Channel()))

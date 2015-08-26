@@ -8,6 +8,8 @@ standard_databaseretrievalalg:
   DBTag: ""
 }
 
+
+
 standard_pedestalretrievalalg:
 {
     AlgName:            "DetPedestalRetrievalAlg"
@@ -28,6 +30,24 @@ standard_siov_detpedestal_service:
 {
   service_provider: SIOVDetPedestalService
   DetPedestalRetrievalAlg: @local::standard_pedestalretrievalalg
+}
+
+
+
+standard_siov_channelfilter_provider:
+{
+  AlgName:       "SIOVChannelFilterProvider"
+  DatabaseRetrievalAlg: @local::standard_databaseretrievalalg
+  
+  UseDB: false
+  UseFile: false
+}
+
+standard_siov_channelfilter_service:
+{
+  service_provider: SIOVChannelFilterService
+  ChannelFilterProvider: @local::standard_siov_channelfilter_provider 
+  FindNoisyChannels: false
 }
 
 END_PROLOG

@@ -46,7 +46,7 @@ namespace lariov {
       // non-interface methods
       //
       /// Returns Channel Status
-      const ChannelStatus& Status(DBChannelID_t channel) const;
+      const ChannelStatus& GetChannelStatus(DBChannelID_t channel) const;
 
       //
       // interface methods
@@ -56,24 +56,28 @@ namespace lariov {
       /// @{
       /// Returns whether the specified channel is physical and connected to wire
       bool IsPresent(DBChannelID_t channel) const override {
-        return this->Status(channel).IsPresent();
+        return this->GetChannelStatus(channel).IsPresent();
       }
 
       /// Returns whether the specified channel is bad in the current run
       bool IsBad(DBChannelID_t channel) const override {
-        return this->Status(channel).IsBad();
+        return this->GetChannelStatus(channel).IsBad();
       }
 
       /// Returns whether the specified channel is noisy in the current run
       bool IsNoisy(DBChannelID_t channel) const override {
-        return this->Status(channel).IsNoisy();
+        return this->GetChannelStatus(channel).IsNoisy();
       }
       
       /// Returns whether the specified channel is physical and good
       bool IsGood(DBChannelID_t channel) const override {
-	return this->Status(channel).IsGood(); 
+	return this->GetChannelStatus(channel).IsGood(); 
       }
       /// @}
+      
+      unsigned short Status(DBChannelID_t channel) const override {
+        return (unsigned short)this->GetChannelStatus(channel).Status();
+      }
 
 
       /// @name Global channel queries

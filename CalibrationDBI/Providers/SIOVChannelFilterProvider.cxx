@@ -67,15 +67,17 @@ namespace lariov {
       
       switch(status)
       {
-        case 0 : cs.SetStatus(kDISCONNECTED);
-	         break;
-	case 1 : cs.SetStatus(kBAD);
-	         break;
-	case 2 : cs.SetStatus(kNOISY);
-	         break;
-	case 3 : cs.SetStatus(kGOOD);
-	         break;
-	default : cs.SetStatus(kUNKNOWN);
+        case kDISCONNECTED : cs.SetStatus(kDISCONNECTED);
+	                     break;
+	case kBAD          : cs.SetStatus(kBAD);
+	                     break;
+	case kLOWNOISE     : cs.SetStatus(kLOWNOISE);
+	                     break;
+	case kNOISY        : cs.SetStatus(kNOISY);
+	                     break;
+	case kGOOD         : cs.SetStatus(kGOOD);
+	                     break;
+	default            : cs.SetStatus(kUNKNOWN);
       }
 
       fData.AddOrReplaceRow(cs);
@@ -84,7 +86,7 @@ namespace lariov {
     return true;
   }   
   
-  const ChannelStatus& SIOVChannelFilterProvider::Status(DBChannelID_t ch) const {
+  const ChannelStatus& SIOVChannelFilterProvider::GetChannelStatus(DBChannelID_t ch) const {
     
     if (fDataSource == DataSource::Default) {
       return fDefault;

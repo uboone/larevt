@@ -18,7 +18,7 @@
 
 namespace lariov {
   
-  enum chStatus {kDISCONNECTED, kBAD, kNOISY, kGOOD, kUNKNOWN};
+  enum chStatus {kDISCONNECTED=0, kBAD=1, kLOWNOISE=2, kNOISY=3, kGOOD=4, kUNKNOWN=5};
   
   /**
      \class ChannelStatus
@@ -34,6 +34,7 @@ namespace lariov {
       ~ChannelStatus() = default;
             
       bool IsBad()       const { return fStatus == kBAD          ? true : false; }
+      bool IsLowNoise()  const { return fStatus == kLOWNOISE     ? true : false; }
       bool IsNoisy()     const { return fStatus == kNOISY        ? true : false; }
       bool IsPresent()   const { return fStatus == kDISCONNECTED ? false : true; }
       bool IsGood()      const { return fStatus == kGOOD         ? true : false; }
