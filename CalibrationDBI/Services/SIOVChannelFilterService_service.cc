@@ -7,6 +7,8 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "CalibrationDBI/Interface/IChannelFilterService.h"
 #include "CalibrationDBI/Providers/SIOVChannelFilterProvider.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h" 
+#include "Geometry/Geometry.h"
 
 #include "RawData/RawDigit.h"
 #include "RawData/raw.h"
@@ -88,6 +90,7 @@ namespace lariov{
     // Require a valid handle
     if (!digitVecHandle.isValid()) return;
 
+    art::ServiceHandle<geo::Geometry > geo;
     art::ServiceHandle<util::DetectorProperties> detectorProperties;
     unsigned int maxTimeSamples = detectorProperties->NumberTimeSamples();
 
@@ -203,7 +206,7 @@ namespace lariov{
       }
 
       rmsVal = std::sqrt(std::max(0.,rmsVal / double(rmsBinCnt)));
-      if (rmsVal >= fRmsCut[view]) {
+      if (rmsVal >= fRmsCut[geo->View(channel)]) {
 	fProvider.AddNoisyChannel(channel);
       }
 
