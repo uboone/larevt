@@ -137,9 +137,12 @@ namespace lariov {
  }
  
  void SIOVChannelFilterProvider::AddNoisyChannel(DBChannelID_t ch) {  
-   ChannelStatus cs(ch);
-   cs.SetStatus(kNOISY);
-   fData.AddOrReplaceRow(cs);
+   
+   if (!this->IsBad(ch) && this->IsPresent(ch)) {
+     ChannelStatus cs(ch);
+     cs.SetStatus(kNOISY);
+     fData.AddOrReplaceRow(cs);
+   }
  }
   
   
