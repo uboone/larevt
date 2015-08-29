@@ -28,8 +28,8 @@
 //Larsoft Includes
 #include "RawData/raw.h"
 #include "RawData/RawDigit.h"
-#include "Filters/ChannelFilterBaseInterface.h"
-#include "Filters/ChannelFilterServiceInterface.h"
+#include "CalibrationDBI/Interface/IChannelFilterProvider.h"
+#include "CalibrationDBI/Interface/IChannelFilterService.h"
 
 
 namespace filter {
@@ -88,14 +88,14 @@ namespace filter {
       
       if(!rawdigitView.size()) return false;
       
-      ChannelFilterBaseInterface const& channelFilter
-        = art::ServiceHandle<ChannelFilterServiceInterface>()->GetFilter();
+      lariov::IChannelFilterProvider const& channelFilter
+        = art::ServiceHandle<lariov::IChannelFilterService>()->GetFilter();
 
       // look through the good channels
 //      for(const raw::RawDigit* digit: filter::SelectGoodChannels(rawdigitView))
       for(const raw::RawDigit* digit: rawdigitView)
       {
-         if (!channelFilter.isGood(digit->Channel())) continue;
+         if (!channelFilter.IsGood(digit->Channel())) continue;
          //get ADC values after decompressing
          std::vector<short> rawadc(digit->Samples());
          raw::Uncompress(digit->ADCs(),rawadc,digit->Compression());

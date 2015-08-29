@@ -18,14 +18,9 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-// C/C++ standard libraries
-#include <vector>
-#include <algorithm> // std::copy()
-#include <iterator> // std::inserter()
 
 
-
-namespace filter {
+namespace lariov {
 
   //----------------------------------------------------------------------------
   SimpleChannelFilterService::SimpleChannelFilterService
@@ -38,19 +33,19 @@ namespace filter {
     
     simple_filter->Setup(MaxChannel);
     
-    SetFilter(simple_filter);
+    fFilter.reset(simple_filter);
     
     mf::LogInfo("SimpleChannelFilterService") << "Loaded from configuration:"
       << "\n  - " << GetFilter().BadChannels().size() << " bad channels"
       << "\n  - " << GetFilter().NoisyChannels().size() << " noisy channels"
-      << "\n  - largest channel ID: " << simple_filter->MaxChannel()
-        << ", largest present: " << simple_filter->MaxChannelPresent()
+      << "\n  - largest channel ID: " << fFilter->MaxChannel()
+        << ", largest present: " << fFilter->MaxChannelPresent()
       ;
     
   } // SimpleChannelFilterService::SimpleChannelFilterService()
   
   
   //----------------------------------------------------------------------------
-  DEFINE_ART_SERVICE_INTERFACE_IMPL(filter::SimpleChannelFilterService, filter::ChannelFilterServiceInterface)
+  DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SimpleChannelFilterService, lariov::IChannelFilterService)
   
 } // namespace filter

@@ -68,7 +68,7 @@ services: {
 
   Geometry:                      @local::standard_geo             # from geometry.fcl
   ExptGeoHelperInterface:        @local::standard_geometry_helper # from geometry.fcl
-  ChannelFilterServiceInterface: @local::channel_filter
+  IChannelFilterService:         @local::channel_filter
 
 } # services
 
