@@ -22,6 +22,7 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "art/Utilities/Exception.h"
 
+<<<<<<< HEAD
 // LArSoft libraries
 #include "Filters/ChannelFilterServiceInterface.h"
 #include "Filters/ChannelFilterBaseInterface.h"
@@ -33,6 +34,7 @@ filter::ChannelFilter::ChannelFilter() {
     throw art::Exception(art::errors::Configuration)
       << "Failed to obtain an instance of ChannelFilterServiceInterface service"
       ;
+
   }
   LOG_ERROR("ChannelFilter") << "ChannelFilter is now deprecated."
     " Replace it with ChannelFilterServiceInterface";
