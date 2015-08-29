@@ -18,14 +18,15 @@
 #include "art/Framework/Principal/Run.h"
 
 // LArSoft includes
-#include "Filters/ChannelFilterServiceInterface.h"
+#include "CalibrationDBI/Interface/IChannelFilterService.h"
+#include "CalibrationDBI/Interface/IChannelFilterProvider.h"
 
 
 
 namespace art { class Event; } // art::Event declaration
 
 ///tracking algorithms
-namespace filter {
+namespace lariov {
   /**
    * @brief Tests an instanciation of the ChannelFilterService
    * 
@@ -64,7 +65,7 @@ namespace filter {
 //------------------------------------------------------------------------------
 
 
-namespace filter {
+namespace lariov {
   
   const std::vector<unsigned int> SimpleChannelFilterTest::EmptyVect;
   
@@ -115,26 +116,26 @@ namespace filter {
     //---
     mf::LogVerbatim("SimpleChannelFilterTest")
       << "\nTesting service interface...";
-    art::ServiceHandle<filter::ChannelFilterServiceInterface> FilterSrvHandle;
+    art::ServiceHandle<lariov::IChannelFilterService> FilterSrvHandle;
   /* // since the service does not share the interface of the provider,
      // this test can't be
-    const filter::ChannelFilterServiceInterface* pFilterSrv = &*FilterSrvHandle;
+    const lariov::IChannelFilterService* pFilterSrv = &*FilterSrvHandle;
     nErrors = testObject(pFilterSrv);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
-        << nErrors << " errors while testing ChannelFilterServiceInterface!";
+        << nErrors << " errors while testing IChannelFilterService!";
     } // if errors
   */
     
     //---
     mf::LogVerbatim("SimpleChannelFilterTest")
       << "\nTesting base interface...";
-    filter::ChannelFilterBaseInterface const* pFilter
+    lariov::IChannelFilterProvider const* pFilter
       = FilterSrvHandle->GetFilterPtr();
     nErrors = testObject(pFilter);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
-        << nErrors << " errors while testing ChannelFilterBaseInterface!";
+        << nErrors << " errors while testing IChannelFilterProvider!";
     } // if errors
     
   } // SimpleChannelFilterTest::beginRun()
@@ -171,7 +172,7 @@ namespace filter {
     // 2. test the channels as in the configuration
     unsigned int nErrors = 0;
     for (const auto chId: KnownBadChannels) {
-      if (!pFilter->isBad(chId)) {
+      if (!pFilter->IsBad(chId)) {
         mf::LogError("SimpleChannelFilterTest")
           << "channel #" << chId << " is not bad as it should";
         ++nErrors;
@@ -179,7 +180,7 @@ namespace filter {
     } // for knwon bad channels
     
     for (const auto chId: KnownNoisyChannels) {
-      if (!pFilter->isNoisy(chId)) {
+      if (!pFilter->IsNoisy(chId)) {
         mf::LogError("SimpleChannelFilterTest")
           << "channel #" << chId << " is not noisy as it should";
         ++nErrors;
@@ -187,12 +188,12 @@ namespace filter {
     } // for knwon noisy channels
     
     for (const auto chId: KnownGoodChannels) {
-      if (pFilter->isBad(chId)) {
+      if (pFilter->IsBad(chId)) {
         mf::LogError("SimpleChannelFilterTest")
           << "channel #" << chId << " is bad, while it should not";
         ++nErrors;
       }
-      if (pFilter->isNoisy(chId)) {
+      if (pFilter->IsNoisy(chId)) {
         mf::LogError("SimpleChannelFilterTest")
           << "channel #" << chId << " is noisy, while it should not";
         ++nErrors;

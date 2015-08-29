@@ -3,7 +3,7 @@
 // ChannelFilter class:
 // 
 // This class has been obsoleted and is now a deprecated interface for
-// ChannelFilterServiceInterface.
+// IChannelFilterService.
 // 
 // Please update your code to use the service directly.
 // 

@@ -71,14 +71,14 @@ namespace std {
 //------------------------------------------------------------------------------
 class FilterConfiguration {
     public:
-  const raw::ChannelID_t fMaxChannel;
-  const raw::ChannelID_t fMaxPresentChannel;
+  const lariov::DBChannelID_t fMaxChannel;
+  const lariov::DBChannelID_t fMaxPresentChannel;
   const std::set<unsigned int> fBadChannels;
   const std::set<unsigned int> fNoisyChannels;
   
   FilterConfiguration(
-    const raw::ChannelID_t MaxChannel,
-    const raw::ChannelID_t MaxPresentChannel,
+    const lariov::DBChannelID_t MaxChannel,
+    const lariov::DBChannelID_t MaxPresentChannel,
     const std::set<unsigned int> BadChannels,
     const std::set<unsigned int> NoisyChannels
     )
@@ -88,7 +88,7 @@ class FilterConfiguration {
     , fNoisyChannels(NoisyChannels)
     {}
   
-  std::unique_ptr<filter::SimpleChannelFilter> operator() () const
+  std::unique_ptr<lariov::SimpleChannelFilter> operator() () const
     { return CreateFilter(); }
   
   
@@ -103,11 +103,11 @@ class FilterConfiguration {
   } // CreateConfiguration()
   
   
-  std::unique_ptr<filter::SimpleChannelFilter> CreateFilter() const {
+  std::unique_ptr<lariov::SimpleChannelFilter> CreateFilter() const {
     fhicl::ParameterSet config = CreateConfiguration();
     
-    filter::SimpleChannelFilter* pFilter
-      = new filter::SimpleChannelFilter(config);
+    lariov::SimpleChannelFilter* pFilter
+      = new lariov::SimpleChannelFilter(config);
     pFilter->Setup(fMaxChannel, fMaxPresentChannel);
     
     std::cout
@@ -120,7 +120,7 @@ class FilterConfiguration {
         << ", largest present: " << pFilter->MaxChannelPresent()
       << std::endl;
     
-    return std::unique_ptr<filter::SimpleChannelFilter>(pFilter);
+    return std::unique_ptr<lariov::SimpleChannelFilter>(pFilter);
   } // CreateFilter()
   
   
@@ -137,13 +137,13 @@ void test_simple_filter() {
     );
   
   BOOST_TEST_CHECKPOINT("Creating simple filter");
-  std::unique_ptr<filter::SimpleChannelFilter> FilterOwner
+  std::unique_ptr<lariov::SimpleChannelFilter> FilterOwner
     = filterCreator.CreateFilter();
   
   // Update() is always true, no matter what time is specified in
-  BOOST_CHECK(FilterOwner->Update(lariov::IOVTimeStamp(0, 0)));
+  BOOST_CHECK(FilterOwner->Update(0));
   
-  filter::SimpleChannelFilter const* pSimpleFilter = FilterOwner.get();
+  lariov::SimpleChannelFilter const* pSimpleFilter = FilterOwner.get();
   
   // check the values of the extremes
   BOOST_CHECK_EQUAL(pSimpleFilter->MaxChannel(), filterCreator.fMaxChannel);
@@ -151,19 +151,19 @@ void test_simple_filter() {
     (pSimpleFilter->MaxChannelPresent(), filterCreator.fMaxPresentChannel);
   
   // downcast to the interface to test interface stuff
-  filter::ChannelFilterBaseInterface const* pFilter = pSimpleFilter;
+  lariov::IChannelFilterProvider const* pFilter = pSimpleFilter;
   
   /**
    *
    * Public interface:
    * 
-   * bool isPresent(raw::ChannelID_t channel) const
+   * bool isPresent(lariov::DBChannelID_t channel) const
    * 
-   * bool isGood(raw::ChannelID_t channel) const
+   * bool isGood(lariov::DBChannelID_t channel) const
    * 
-   * bool isBad(raw::ChannelID_t channel) const
+   * bool isBad(lariov::DBChannelID_t channel) const
    * 
-   * bool isNoisy(raw::ChannelID_t channel) const
+   * bool isNoisy(lariov::DBChannelID_t channel) const
    * 
    * ChannelSet_t GoodChannels() const
    * 
@@ -171,25 +171,25 @@ void test_simple_filter() {
    * 
    * ChannelSet_t NoisyChannels() const
    * 
-   * bool Update(lariov::IOVTimeStamp const& ts)
+   * bool Update(std::uint64_t ts)
    *   ("checked" above)
    */
   
   // ChannelFilterBaseInterface::BadChannels()
-  std::set<raw::ChannelID_t> FilterBadChannels = pFilter->BadChannels();
+  std::set<lariov::DBChannelID_t> FilterBadChannels = pFilter->BadChannels();
   BOOST_CHECK_EQUAL
     (FilterBadChannels.size(), filterCreator.fBadChannels.size());
   BOOST_CHECK_EQUAL(FilterBadChannels, filterCreator.fBadChannels);
   
   // ChannelFilterBaseInterface::NoisyChannels()
-  std::set<raw::ChannelID_t> FilterNoisyChannels = pFilter->NoisyChannels();
+  std::set<lariov::DBChannelID_t> FilterNoisyChannels = pFilter->NoisyChannels();
   BOOST_CHECK_EQUAL
     (FilterNoisyChannels.size(), filterCreator.fNoisyChannels.size());
   BOOST_CHECK_EQUAL(FilterNoisyChannels, filterCreator.fNoisyChannels);
   
-  std::set<raw::ChannelID_t> GoodChannels;
+  std::set<lariov::DBChannelID_t> GoodChannels;
   
-  for (raw::ChannelID_t channel = 0; channel <= filterCreator.fMaxChannel;
+  for (lariov::DBChannelID_t channel = 0; channel <= filterCreator.fMaxChannel;
     ++channel
   ) {
     
@@ -201,16 +201,16 @@ void test_simple_filter() {
     
     if (bGood) GoodChannels.insert(channel);
     
-    BOOST_CHECK_EQUAL(pFilter->isPresent(channel), bPresent);
-    BOOST_CHECK_EQUAL(pFilter->isBad(channel), bBad);
-    BOOST_CHECK_EQUAL(pFilter->isNoisy(channel), bNoisy);
+    BOOST_CHECK_EQUAL(pFilter->IsPresent(channel), bPresent);
+    BOOST_CHECK_EQUAL(pFilter->IsBad(channel), bBad);
+    BOOST_CHECK_EQUAL(pFilter->IsNoisy(channel), bNoisy);
     
-    BOOST_CHECK_EQUAL(pFilter->isGood(channel), bGood);
+    BOOST_CHECK_EQUAL(pFilter->IsGood(channel), bGood);
     
   } // for channel
   
   // ChannelFilterBaseInterface::GoodChannels()
-  std::set<raw::ChannelID_t> FilterGoodChannels = pFilter->GoodChannels();
+  std::set<lariov::DBChannelID_t> FilterGoodChannels = pFilter->GoodChannels();
   BOOST_CHECK_EQUAL(FilterGoodChannels.size(), GoodChannels.size());
   BOOST_CHECK_EQUAL(FilterGoodChannels, GoodChannels);
   

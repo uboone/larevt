@@ -23,7 +23,7 @@
 #include <utility> // std::pair<>
 
 
-namespace filter {
+namespace lariov {
   
   
   //----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ namespace filter {
     , fMaxPresentChannel(raw::InvalidChannelID)
   {
     
-    using chan_vect_t = std::vector<raw::ChannelID_t>;
+    using chan_vect_t = std::vector<DBChannelID_t>;
     
     // Read the bad channels as a vector, then convert it into a set
     chan_vect_t BadChannels
@@ -55,7 +55,7 @@ namespace filter {
   
   //----------------------------------------------------------------------------
   void SimpleChannelFilter::Setup
-    (raw::ChannelID_t MaxChannel, raw::ChannelID_t MaxGoodChannel)
+    (DBChannelID_t MaxChannel, DBChannelID_t MaxGoodChannel)
   {
     
     fMaxChannel = MaxChannel;
@@ -68,7 +68,7 @@ namespace filter {
   
   
   //----------------------------------------------------------------------------
-  bool SimpleChannelFilter::isPresent(raw::ChannelID_t channel) const {
+  bool SimpleChannelFilter::IsPresent(DBChannelID_t channel) const {
     return raw::isValidChannelID(fMaxPresentChannel)
       ? raw::isValidChannelID(channel) && (channel <= fMaxPresentChannel)
       : true;
@@ -76,7 +76,7 @@ namespace filter {
   
   
   //----------------------------------------------------------------------------
-  SimpleChannelFilter::ChannelSet_t SimpleChannelFilter::GoodChannels() const {
+  DBChannelSet_t const SimpleChannelFilter::GoodChannels() const {
     
     if (!fGoodChannels) FillGoodChannels();
     return *fGoodChannels;
@@ -87,24 +87,24 @@ namespace filter {
   //----------------------------------------------------------------------------
   void SimpleChannelFilter::FillGoodChannels() const {
     
-    if (!fGoodChannels) fGoodChannels.reset(new ChannelSet_t);
+    if (!fGoodChannels) fGoodChannels.reset(new DBChannelSet_t);
     
-    ChannelSet_t& GoodChannels = *fGoodChannels;
+    DBChannelSet_t& GoodChannels = *fGoodChannels;
     GoodChannels.clear();
     
     std::vector
-      <std::pair<ChannelSet_t::const_iterator, ChannelSet_t::const_iterator>>
+      <std::pair<DBChannelSet_t::const_iterator, DBChannelSet_t::const_iterator>>
       VetoedIDs;
     
     VetoedIDs.emplace_back(fBadChannels.cbegin(), fBadChannels.cend());
     VetoedIDs.emplace_back(fNoisyChannels.cbegin(), fNoisyChannels.cend());
     
     // go for the first (lowest) channel ID...
-    raw::ChannelID_t channel = 0;
+    DBChannelID_t channel = 0;
     while (!raw::isValidChannelID(channel)) ++channel;
     
     // ... to the last present one
-    raw::ChannelID_t last_channel = fMaxChannel;
+    DBChannelID_t last_channel = fMaxChannel;
     if (raw::isValidChannelID(fMaxPresentChannel)
       && (fMaxPresentChannel < last_channel))
       last_channel = fMaxPresentChannel;
