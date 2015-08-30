@@ -68,6 +68,7 @@ namespace lariov{
     //register callback to update local database cache before each event is processed
     //reg.sPreProcessEvent.watch(&SIOVChannelFilterService::PreProcessEvent, *this);
     reg.sPreProcessEvent.watch(this, &SIOVChannelFilterService::PreProcessEvent);
+    
   }
   
   

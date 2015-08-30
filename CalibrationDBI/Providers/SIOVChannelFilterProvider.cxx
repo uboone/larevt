@@ -47,7 +47,6 @@ namespace lariov {
   }
   
   bool SIOVChannelFilterProvider::Update(DBTimeStamp_t ts) {
-    
     if (fDataSource != DataSource::Database) return false;
     
     if (!this->UpdateFolder(ts)) return false;
@@ -69,7 +68,7 @@ namespace lariov {
       {
         case kDISCONNECTED : cs.SetStatus(kDISCONNECTED);
 	                     break;
-	case kBAD          : cs.SetStatus(kBAD);
+	case kDEAD         : cs.SetStatus(kDEAD);
 	                     break;
 	case kLOWNOISE     : cs.SetStatus(kLOWNOISE);
 	                     break;
@@ -82,7 +81,6 @@ namespace lariov {
 
       fData.AddOrReplaceRow(cs);
     }
-
     return true;
   }   
   
@@ -129,7 +127,10 @@ namespace lariov {
  }
  
  const DBChannelSet_t SIOVChannelFilterProvider::BadChannels() const {
-   return GetChannelsWithStatus(kBAD);
+   DBChannelSet_t dead = GetChannelsWithStatus(kDEAD);
+   DBChannelSet_t ln = GetChannelsWithStatus(kLOWNOISE);
+   dead.insert(ln.begin(),ln.end());
+   return dead;
  }
  
  const DBChannelSet_t SIOVChannelFilterProvider::NoisyChannels() const {

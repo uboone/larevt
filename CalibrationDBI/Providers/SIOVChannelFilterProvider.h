@@ -61,7 +61,7 @@ namespace lariov {
 
       /// Returns whether the specified channel is bad in the current run
       bool IsBad(DBChannelID_t channel) const override {
-        return this->GetChannelStatus(channel).IsBad();
+        return this->GetChannelStatus(channel).IsDead() || this->GetChannelStatus(channel).IsLowNoise();
       }
 
       /// Returns whether the specified channel is noisy in the current run

@@ -22,10 +22,11 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "art/Utilities/Exception.h"
 
-<<<<<<< HEAD
 // LArSoft libraries
 #include "CalibrationDBI/Interface/IChannelFilterService.h"
 #include "CalibrationDBI/Interface/IChannelFilterProvider.h"
+
+#include <iostream>
 
 
 filter::ChannelFilter::ChannelFilter() {
@@ -72,9 +73,10 @@ filter::ChannelFilter::ChannelStatus filter::ChannelFilter::GetChannelStatus(uin
   
   lariov::IChannelFilterProvider const& filter
     = art::ServiceHandle<lariov::IChannelFilterService>()->GetFilter();
-  
-  if (!filter.IsPresent(channel)) return NOTPHYSICAL;
-  if (filter.IsBad(channel)) return DEAD;
-  if (filter.IsNoisy(channel)) return NOISY;
-  return GOOD;
+
+  if (filter.IsGood(channel))          return GOOD;
+  else if (!filter.IsPresent(channel)) return NOTPHYSICAL;
+  else if (filter.IsBad(channel))      return DEAD;
+  else if (filter.IsNoisy(channel))    return NOISY;
+  else return DEAD; //assume all other status are equivalent to DEAD
 }

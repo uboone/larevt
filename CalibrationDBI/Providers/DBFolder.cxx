@@ -171,7 +171,7 @@ namespace lariov {
     int tries = 0;
     long int delay;
     srandom(getpid() * getppid());
-    while (status != 200 && tries < 7) { 
+    while (status != 200 && tries < 2) { 
       fCachedDataset = getData(fullurl.str().c_str(), NULL, &err);
       status = getHTTPstatus(fCachedDataset);
       if ( status != 200) {
@@ -182,7 +182,7 @@ namespace lariov {
     }
 
     if (status != 200) {
-      std::string msg = "HTTP error: status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(fCachedDataset));
+      std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(fCachedDataset));
       throw WebError(msg);
     }
 
