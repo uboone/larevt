@@ -47,7 +47,6 @@ standard_siov_channelfilter_service:
 {
   service_provider: SIOVChannelFilterService
   ChannelFilterProvider: @local::standard_siov_channelfilter_provider 
-  FindNoisyChannels: false
 }
 
 END_PROLOG
