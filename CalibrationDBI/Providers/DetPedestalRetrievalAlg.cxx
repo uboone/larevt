@@ -8,6 +8,7 @@
 // art/LArSoft libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "Geometry/Geometry.h"
+#include "cetlib/exception.h"
 
 namespace lariov {
 
@@ -16,9 +17,7 @@ namespace lariov {
       			      			   const std::string& url, 
 			      			   const std::string& tag /*=""*/) : 
     DatabaseRetrievalAlg(foldername, url, tag),
-    fDataSource(DataSource::Database),
-    fDefaultColl(0),
-    fDefaultInd(0) {
+    fDataSource(DataSource::Database) {
     
     fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
@@ -28,9 +27,7 @@ namespace lariov {
 	
       
   DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(fhicl::ParameterSet const& p) :
-    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
-    fDefaultColl(0),
-    fDefaultInd(0) {	
+    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")) {	
     
     this->Reconfigure(p);
   }
@@ -60,15 +57,18 @@ namespace lariov {
       float default_indmean      = p.get<float>("DefaultIndMean", 2048.0);
       float default_indrms       = p.get<float>("DefaultIndRms", 0.3);
       
-      fDefaultColl.SetPedMean(default_collmean);
-      fDefaultColl.SetPedMeanErr(default_mean_err);
-      fDefaultColl.SetPedRms(default_collrms);
-      fDefaultColl.SetPedRmsErr(default_rms_err);
+      DetPedestal DefaultColl(0);
+      DetPedestal DefaultInd(0);
       
-      fDefaultInd.SetPedMean(default_indmean);
-      fDefaultInd.SetPedMeanErr(default_mean_err);
-      fDefaultInd.SetPedRms(default_indrms);
-      fDefaultInd.SetPedRmsErr(default_rms_err);
+      DefaultColl.SetPedMean(default_collmean);
+      DefaultColl.SetPedMeanErr(default_mean_err);
+      DefaultColl.SetPedRms(default_collrms);
+      DefaultColl.SetPedRmsErr(default_rms_err);
+      
+      DefaultInd.SetPedMean(default_indmean);
+      DefaultInd.SetPedMeanErr(default_mean_err);
+      DefaultInd.SetPedRms(default_indrms);
+      DefaultInd.SetPedRmsErr(default_rms_err);
       
       art::ServiceHandle<geo::Geometry> geo;
       geo::wire_id_iterator itW = geo->begin_wire_id();
@@ -76,17 +76,19 @@ namespace lariov {
         DBChannelID_t ch = geo->PlaneWireToChannel(*itW);
       
         if (geo->SignalType(ch) == geo::kCollection) {
-	  fDefaultColl.SetChannel(ch);
-	  fData.AddOrReplaceRow(fDefaultColl);
+	  DefaultColl.SetChannel(ch);
+	  fData.AddOrReplaceRow(DefaultColl);
 	}
 	else if (geo->SignalType(ch) == geo::kInduction) {
-	  fDefaultInd.SetChannel(ch);
-	  fData.AddOrReplaceRow(fDefaultInd);
+	  DefaultInd.SetChannel(ch);
+	  fData.AddOrReplaceRow(DefaultInd);
 	}
 	else throw IOVDataError("Wire type is not collection or induction!");
       }
     }
     else if (fDataSource == DataSource::File) {
+      throw cet::exception("DetPedestalRetrievalAlg")
+        << "DetPedestalRetrievalAlg: input from file not implemented yet\n";
       //need to implement
     }
   }

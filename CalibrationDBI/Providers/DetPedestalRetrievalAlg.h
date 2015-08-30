@@ -24,10 +24,29 @@
 namespace lariov {
 
   /**
-     \class DetPedestalRetrievalAlg
-     User defined class DetPedestalRetrievalAlg ... these comments are used to generate
-     doxygen documentation!
-  */
+   * @brief Retrieves channel information: pedestal and RMS
+   * 
+   * Configuration parameters
+   * =========================
+   * 
+   * - *DatabaseRetrievalAlg* (parameter set, mandatory): configuration for the
+   *   database; see lariov::DatabaseRetrievalAlg
+   * - *UseDB* (boolean, default: false): retrieve information from the database
+   * - *UseFile* (boolean, default: false): retrieve information from a file;
+   *   not implemented yet
+   * - *DefaultCollMean* (real, default: 400.0): pedestal value returned for
+   *   collection plane channels when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultIndMean* (real, default: 2048.0): pedestal value returned for
+   *   induction plane channels when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultCollRms* (real, default: 0.3): pedestal RMS value returned for
+   *   collection plane channels when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultIndRms* (real, default: 0.3): pedestal RMS value returned for
+   *   induction plane channels when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultMeanErr* (real, default: 0.0): error on the pedestal value
+   *   for all channels returned when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultRmsErr* (real, default: 0.0): error on the RMS value
+   *   for all channels returned when /UseDB/ and /UseFile/ parameters are false
+   */
   class DetPedestalRetrievalAlg : public DatabaseRetrievalAlg, public IDetPedestalProvider {
   
     public:
@@ -65,8 +84,6 @@ namespace lariov {
       DataSource::ds fDataSource;
           
       Snapshot<DetPedestal> fData;
-      DetPedestal fDefaultColl;
-      DetPedestal fDefaultInd;
   };
 }//end namespace lariov
 
