@@ -1,8 +1,8 @@
 /**
  * @file   SIOVChannelFilterProvider.cxx
  * @brief  Channel quality provider with information from configuration file
- * @author Gianluca Petrillo (petrillo@fnal.gov) Brandon Eberly (eberly@fnal.gov)
- * @date   November 25th, 2014
+ * @author Brandon Eberly (eberly@fnal.gov)
+ * @date   August 24, 2015
  * @see    SIOVChannelFilterProvider.h
  */
 
@@ -13,8 +13,8 @@
 #include "SIOVChannelFilterProvider.h"
 
 // LArSoft libraries
+#include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "Geometry/Geometry.h"
-#include "Geometry/GeometryCore.h"
 #include "WebError.h"
 #include "CalibrationDBI/IOVData/IOVDataConstants.h"
 
@@ -43,7 +43,18 @@ namespace lariov {
     else if (UseFile) fDataSource = DataSource::File;
     else              fDataSource = DataSource::Default;
     
-    fDefault.SetStatus(kGOOD);   
+    if (fDataSource == DataSource::Default) {
+      ChannelStatus cs(0);
+      cs.SetStatus(kGOOD);
+      
+      art::ServiceHandle<geo::Geometry> geo;
+      geo::wire_id_iterator itW = geo->begin_wire_id();
+      for ( ; itW != geo->end_wire_id(); ++itW) {
+        DBChannelID_t ch = geo->PlaneWireToChannel(*itW);
+	cs.SetChannel(ch);
+	fData.AddOrReplaceRow(cs);
+      }
+    } 
   }
   
   bool SIOVChannelFilterProvider::Update(DBTimeStamp_t ts) {
@@ -84,14 +95,10 @@ namespace lariov {
     return true;
   }   
   
+  
+  //----------------------------------------------------------------------------
   const ChannelStatus& SIOVChannelFilterProvider::GetChannelStatus(DBChannelID_t ch) const {
-    
-    if (fDataSource == DataSource::Default) {
-      return fDefault;
-    }
-    else {
-      return fData.GetRow(ch);
-    }
+    return fData.GetRow(ch);
   } 
   
   
@@ -122,29 +129,37 @@ namespace lariov {
     return retSet;  
   }
   
- const DBChannelSet_t SIOVChannelFilterProvider::GoodChannels() const {
-   return GetChannelsWithStatus(kGOOD);
- }
- 
- const DBChannelSet_t SIOVChannelFilterProvider::BadChannels() const {
-   DBChannelSet_t dead = GetChannelsWithStatus(kDEAD);
-   DBChannelSet_t ln = GetChannelsWithStatus(kLOWNOISE);
-   dead.insert(ln.begin(),ln.end());
-   return dead;
- }
- 
- const DBChannelSet_t SIOVChannelFilterProvider::NoisyChannels() const {
-   return GetChannelsWithStatus(kNOISY); 
- }
- 
- void SIOVChannelFilterProvider::AddNoisyChannel(DBChannelID_t ch) {  
-   
-   if (!this->IsBad(ch) && this->IsPresent(ch)) {
-     ChannelStatus cs(ch);
-     cs.SetStatus(kNOISY);
-     fData.AddOrReplaceRow(cs);
-   }
- }
+  
+  //----------------------------------------------------------------------------
+  const DBChannelSet_t SIOVChannelFilterProvider::GoodChannels() const {
+    return GetChannelsWithStatus(kGOOD);
+  }
+
+  
+  //----------------------------------------------------------------------------
+  const DBChannelSet_t SIOVChannelFilterProvider::BadChannels() const {
+    DBChannelSet_t dead = GetChannelsWithStatus(kDEAD);
+    DBChannelSet_t ln = GetChannelsWithStatus(kLOWNOISE);
+    dead.insert(ln.begin(),ln.end());
+    return dead;
+  }
+
+  
+  //----------------------------------------------------------------------------
+  const DBChannelSet_t SIOVChannelFilterProvider::NoisyChannels() const {
+    return GetChannelsWithStatus(kNOISY); 
+  }
+
+  
+  //----------------------------------------------------------------------------
+  void SIOVChannelFilterProvider::AddNoisyChannel(DBChannelID_t ch) {  
+
+    if (!this->IsBad(ch) && this->IsPresent(ch)) {
+      ChannelStatus cs(ch);
+      cs.SetStatus(kNOISY);
+      fData.AddOrReplaceRow(cs);
+    }
+  }
   
   
   //----------------------------------------------------------------------------

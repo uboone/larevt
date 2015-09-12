@@ -1,8 +1,8 @@
 /**
  * @file   SIOVChannelFilterProvider.h
  * @brief  Channel quality provider with information from configuration file
- * @author Gianluca Petrillo (petrillo@fnal.gov), Brandon Eberly (eberly@fnal.gov)
- * @date   November 25th, 2014
+ * @author Brandon Eberly (eberly@fnal.gov)
+ * @date   August 24, 2015
  * @see    IChannelFilterService.h SIOVChannelFilterProvider.cpp
  */
 
@@ -61,7 +61,7 @@ namespace lariov {
 
       /// Returns whether the specified channel is bad in the current run
       bool IsBad(DBChannelID_t channel) const override {
-        return this->GetChannelStatus(channel).IsDead() || this->GetChannelStatus(channel).IsLowNoise();
+        return this->GetChannelStatus(channel).IsDead() || this->GetChannelStatus(channel).IsLowNoise() || !this->IsPresent(channel);
       }
 
       /// Returns whether the specified channel is noisy in the current run
