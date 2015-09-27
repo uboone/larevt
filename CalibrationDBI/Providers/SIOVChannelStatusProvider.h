@@ -1,17 +1,17 @@
 /**
- * @file   SIOVChannelFilterProvider.h
+ * @file   SIOVChannelStatusProvider.h
  * @brief  Channel quality provider with information from configuration file
  * @author Brandon Eberly (eberly@fnal.gov)
  * @date   August 24, 2015
- * @see    IChannelFilterService.h SIOVChannelFilterProvider.cpp
+ * @see    IChannelStatusService.h SIOVChannelStatusProvider.cpp
  */
 
 
-#ifndef SIOVCHANNELFILTERPROVIDER_H
-#define SIOVCHANNELFILTERPROVIDER_H 1
+#ifndef SIOVCHANNELSTATUSPROVIDER_H
+#define SIOVCHANNELSTATUSPROVIDER_H 1
 
 // LArSoft libraries
-#include "CalibrationDBI/Interface/IChannelFilterProvider.h"
+#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
 #include "DatabaseRetrievalAlg.h"
 #include "CalibrationDBI/IOVData/ChannelStatus.h"
 #include "CalibrationDBI/IOVData/Snapshot.h"
@@ -30,17 +30,17 @@ namespace lariov {
    * This class serves information read from a FHiCL configuration file and/or a database.
    * 
    * LArSoft interface to this class is through the service
-   * SIOVChannelFilterService.
+   * SIOVChannelStatusService.
    */
-  class SIOVChannelFilterProvider: public DatabaseRetrievalAlg, public IChannelFilterProvider {
+  class SIOVChannelStatusProvider: public DatabaseRetrievalAlg, public IChannelStatusProvider {
     
     public:
     
       /// Constructor
-      SIOVChannelFilterProvider(fhicl::ParameterSet const& pset);
+      SIOVChannelStatusProvider(fhicl::ParameterSet const& pset);
     
       ///Default destructor
-      ~SIOVChannelFilterProvider() = default;
+      ~SIOVChannelStatusProvider() = default;
 
       //
       // non-interface methods
@@ -97,9 +97,10 @@ namespace lariov {
       /// @{
       /// Prepares the object to provide information about the specified time
       bool Update(DBTimeStamp_t) override;
-      
+
       /// Allows a service to add to the list of noisy channels
       void AddNoisyChannel(DBChannelID_t ch);
+
       ///@}
     
     private:
@@ -110,10 +111,10 @@ namespace lariov {
       
       const DBChannelSet_t GetChannelsWithStatus(chStatus status) const;
     
-  }; // class SIOVChannelFilterProvider
+  }; // class SIOVChannelStatusProvider
   
   
 } // namespace lariov
 
 
-#endif // SIOVCHANNELFILTERPROVIDER_H
+#endif // SIOVCHANNELSTATUSPROVIDER_H

@@ -151,7 +151,7 @@ void test_simple_filter() {
     (pSimpleFilter->MaxChannelPresent(), filterCreator.fMaxPresentChannel);
   
   // downcast to the interface to test interface stuff
-  lariov::IChannelFilterProvider const* pFilter = pSimpleFilter;
+  lariov::IChannelStatusProvider const* pFilter = pSimpleFilter;
   
   /**
    *

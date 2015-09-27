@@ -3,7 +3,7 @@
 // ChannelFilter Class
 // 
 // This class has been obsoleted and is now a deprecated interface for
-// IChannelFilterService.
+// IChannelStatusService.
 // 
 // Please update your code to use the service directly.
 // 
@@ -23,47 +23,47 @@
 #include "art/Utilities/Exception.h"
 
 // LArSoft libraries
-#include "CalibrationDBI/Interface/IChannelFilterService.h"
-#include "CalibrationDBI/Interface/IChannelFilterProvider.h"
+#include "CalibrationDBI/Interface/IChannelStatusService.h"
+#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
 
 #include <iostream>
 
 
 filter::ChannelFilter::ChannelFilter() {
   
-  if (!&*(art::ServiceHandle<lariov::IChannelFilterService>())) {
+  if (!&*(art::ServiceHandle<lariov::IChannelStatusService>())) {
     throw art::Exception(art::errors::Configuration)
-      << "Failed to obtain an instance of IChannelFilterService service"
+      << "Failed to obtain an instance of IChannelStatusService service"
       ;
 
   }
   LOG_ERROR("ChannelFilter") << "ChannelFilter is now deprecated."
-    " Replace it with IChannelFilterService";
+    " Replace it with IChannelStatusService";
   
 } // filter::ChannelFilter::ChannelFilter()
 
 
 ///////////////////////////////////////////////////////
 bool filter::ChannelFilter::BadChannel(uint32_t channel) const {
-  return art::ServiceHandle<lariov::IChannelFilterService>()
+  return art::ServiceHandle<lariov::IChannelStatusService>()
     ->GetFilter().IsBad(channel);
 }
 
 ///////////////////////////////////////////////////////
 bool filter::ChannelFilter::NoisyChannel(uint32_t channel) const{
-  return art::ServiceHandle<lariov::IChannelFilterService>()
+  return art::ServiceHandle<lariov::IChannelStatusService>()
     ->GetFilter().IsNoisy(channel);
 }
 
 ///////////////////////////////////////////////////////
 std::set<uint32_t> filter::ChannelFilter::SetOfBadChannels() const {
-  return art::ServiceHandle<lariov::IChannelFilterService>()
+  return art::ServiceHandle<lariov::IChannelStatusService>()
     ->GetFilter().BadChannels();
 }
 
 ///////////////////////////////////////////////////////
 std::set<uint32_t> filter::ChannelFilter::SetOfNoisyChannels() const {
-  return art::ServiceHandle<lariov::IChannelFilterService>()
+  return art::ServiceHandle<lariov::IChannelStatusService>()
     ->GetFilter().NoisyChannels();
 }
 
@@ -71,8 +71,8 @@ std::set<uint32_t> filter::ChannelFilter::SetOfNoisyChannels() const {
 filter::ChannelFilter::ChannelStatus filter::ChannelFilter::GetChannelStatus(uint32_t channel) const
 {
   
-  lariov::IChannelFilterProvider const& filter
-    = art::ServiceHandle<lariov::IChannelFilterService>()->GetFilter();
+  lariov::IChannelStatusProvider const& filter
+    = art::ServiceHandle<lariov::IChannelStatusService>()->GetFilter();
 
   if (filter.IsGood(channel))          return GOOD;
   else if (!filter.IsPresent(channel)) return NOTPHYSICAL;

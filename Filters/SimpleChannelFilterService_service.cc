@@ -46,6 +46,6 @@ namespace lariov {
   
   
   //----------------------------------------------------------------------------
-  DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SimpleChannelFilterService, lariov::IChannelFilterService)
+  DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SimpleChannelFilterService, lariov::IChannelStatusService)
   
 } // namespace filter

@@ -3,7 +3,7 @@
  * @brief  Channel quality provider with information from configuration file
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 25th, 2014
- * @see    IChannelFilterService.h SimpleChannelFilter.cpp
+ * @see    IChannelStatusService.h SimpleChannelFilter.cpp
  */
 
 
@@ -11,7 +11,7 @@
 #define SIMPLECHANNELFILTER_H 1
 
 // LArSoft libraries
-#include "CalibrationDBI/Interface/IChannelFilterProvider.h"
+#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
 
 // Utility libraries
 #include "fhiclcpp/ParameterSet.h"
@@ -45,7 +45,7 @@ namespace lariov {
    *   channels
    * 
    */
-  class SimpleChannelFilter: public lariov::IChannelFilterProvider {
+  class SimpleChannelFilter: public lariov::IChannelStatusProvider {
       public:
     using ChannelSet_t = lariov::DBChannelSet_t;
     

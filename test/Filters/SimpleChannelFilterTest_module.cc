@@ -18,8 +18,8 @@
 #include "art/Framework/Principal/Run.h"
 
 // LArSoft includes
-#include "CalibrationDBI/Interface/IChannelFilterService.h"
-#include "CalibrationDBI/Interface/IChannelFilterProvider.h"
+#include "CalibrationDBI/Interface/IChannelStatusService.h"
+#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
 
 
 
@@ -116,26 +116,26 @@ namespace lariov {
     //---
     mf::LogVerbatim("SimpleChannelFilterTest")
       << "\nTesting service interface...";
-    art::ServiceHandle<lariov::IChannelFilterService> FilterSrvHandle;
+    art::ServiceHandle<lariov::IChannelStatusService> FilterSrvHandle;
   /* // since the service does not share the interface of the provider,
      // this test can't be
-    const lariov::IChannelFilterService* pFilterSrv = &*FilterSrvHandle;
+    const lariov::IChannelStatusService* pFilterSrv = &*FilterSrvHandle;
     nErrors = testObject(pFilterSrv);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
-        << nErrors << " errors while testing IChannelFilterService!";
+        << nErrors << " errors while testing IChannelStatusService!";
     } // if errors
   */
     
     //---
     mf::LogVerbatim("SimpleChannelFilterTest")
       << "\nTesting base interface...";
-    lariov::IChannelFilterProvider const* pFilter
+    lariov::IChannelStatusProvider const* pFilter
       = FilterSrvHandle->GetFilterPtr();
     nErrors = testObject(pFilter);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
-        << nErrors << " errors while testing IChannelFilterProvider!";
+        << nErrors << " errors while testing IChannelStatusProvider!";
     } // if errors
     
   } // SimpleChannelFilterTest::beginRun()

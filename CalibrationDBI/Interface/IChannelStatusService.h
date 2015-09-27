@@ -1,5 +1,5 @@
 /**
- * @file   IChannelFilterService.h
+ * @file   IChannelStatusService.h
  * @brief  Interface for experiment-specific service for channel quality info
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 24th, 2014
@@ -9,8 +9,8 @@
  * The service is meant to be directly used.
  */
 
-#ifndef ICHANNELFILTERSERVICE_H
-#define ICHANNELFILTERSERVICE_H
+#ifndef ICHANNELSTATUSSERVICE_H
+#define ICHANNELSTATUSSERVICE_H
 
 // LArSoft libraries
 #include "CalibrationDBIFwd.h"
@@ -20,7 +20,7 @@
 
 //forward declarations
 namespace lariov {
-  class IChannelFilterProvider;
+  class IChannelStatusProvider;
 }
 
 namespace lariov {
@@ -46,27 +46,27 @@ namespace lariov {
    *      
    * to
    *      
-   *      art::ServiceHandle<lariov::IChannelFilterService> chanFilt;
+   *      art::ServiceHandle<lariov::IChannelStatusService> chanFilt;
    *      
-   * (include files CalibrationDBI/Interface/IChannelFilterService.h instead of
+   * (include files CalibrationDBI/Interface/IChannelStatusService.h instead of
    * Filters/ChannelFilter.h) or
    *      
-   *      lariov::IChannelFilterProvider const& chanFilt
-   *        = art::ServiceHandle<lariov::IChannelFilterService>()
+   *      lariov::IChannelStatusProvider const& chanFilt
+   *        = art::ServiceHandle<lariov::IChannelStatusService>()
    *          ->GetFilter();
    *      
-   * (include files CalibrationDBI/Interface/IChannelFilterService.h and
-   * CalibrationDBI/Interface/IChannelFilterProvider.h instead of Filters/ChannelFilter.h).
+   * (include files CalibrationDBI/Interface/IChannelStatusService.h and
+   * CalibrationDBI/Interface/IChannelStatusProvider.h instead of Filters/ChannelFilter.h).
    * The latter object can in principle be passed to algorithms that are not
    * art-aware.
    * 
    */
-  class IChannelFilterService {
+  class IChannelStatusService {
       
     public:
    
       /// Destructor
-      virtual ~IChannelFilterService() = default;
+      virtual ~IChannelStatusService() = default;
 
       //
       // Actual interface here
@@ -74,13 +74,13 @@ namespace lariov {
 
       //@{
       /// Returns a reference to the service provider
-      IChannelFilterProvider const& GetFilter() const
+      IChannelStatusProvider const& GetFilter() const
 	{ return DoGetFilter(); }
       //@}
 
       //@{
       /// Returns a pointer to the service provider
-      IChannelFilterProvider const* GetFilterPtr() const
+      IChannelStatusProvider const* GetFilterPtr() const
 	{ return DoGetFilterPtr(); }
       //@}
 
@@ -91,18 +91,18 @@ namespace lariov {
     private:
     
       /// Returns a pointer to the service provider 
-      virtual IChannelFilterProvider const* DoGetFilterPtr() const = 0;
+      virtual IChannelStatusProvider const* DoGetFilterPtr() const = 0;
 
       /// Returns a reference to the service provider
-      virtual IChannelFilterProvider const& DoGetFilter() const = 0;
+      virtual IChannelStatusProvider const& DoGetFilter() const = 0;
     
     
     
-  }; // class IChannelFilterService
+  }; // class IChannelStatusService
 } // namespace lariov
 
 
-DECLARE_ART_SERVICE_INTERFACE(lariov::IChannelFilterService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(lariov::IChannelStatusService, LEGACY)
 
 
 
@@ -139,8 +139,8 @@ namespace filter {
     
     std::vector<const raw::RawDigit*> GoodDigits;
     
-    const filter::IChannelFilterProvider* pFilter =
-      art::ServiceHandle<lariov::IChannelFilterService>()->GetFilter();
+    const filter::IChannelStatusProvider* pFilter =
+      art::ServiceHandle<lariov::IChannelStatusService>()->GetFilter();
     
     for (const auto& pDigit: digits) {
       if (!pFilter->BadChannel(pDigit->Channel()))
@@ -155,4 +155,4 @@ namespace filter {
 
 
 
-#endif // ICHANNELFILTERSERVICE_H
+#endif // ICHANNELSTATUSSERVICE_H

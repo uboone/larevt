@@ -1,16 +1,16 @@
 /**
- * @file   SIOVChannelFilterProvider.cxx
+ * @file   SIOVChannelStatusProvider.cxx
  * @brief  Channel quality provider with information from configuration file
  * @author Brandon Eberly (eberly@fnal.gov)
  * @date   August 24, 2015
- * @see    SIOVChannelFilterProvider.h
+ * @see    SIOVChannelStatusProvider.h
  */
 
-#ifndef SIOVCHANNELFILTERPROVIDER_CXX
-#define SIOVCHANNELFILTERPROVIDER_CXX 1
+#ifndef SIOVCHANNELSTATUSPROVIDER_CXX
+#define SIOVCHANNELSTATUSPROVIDER_CXX 1
 
 // Our header
-#include "SIOVChannelFilterProvider.h"
+#include "SIOVChannelStatusProvider.h"
 
 // LArSoft libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h"
@@ -29,7 +29,7 @@ namespace lariov {
   
   
   //----------------------------------------------------------------------------
-  SIOVChannelFilterProvider::SIOVChannelFilterProvider(fhicl::ParameterSet const& pset)
+  SIOVChannelStatusProvider::SIOVChannelStatusProvider(fhicl::ParameterSet const& pset)
     : DatabaseRetrievalAlg(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
     , fDefault(0)
   {
@@ -57,7 +57,7 @@ namespace lariov {
     } 
   }
   
-  bool SIOVChannelFilterProvider::Update(DBTimeStamp_t ts) {
+  bool SIOVChannelStatusProvider::Update(DBTimeStamp_t ts) {
     if (fDataSource != DataSource::Database) return false;
     
     if (!this->UpdateFolder(ts)) return false;
@@ -97,13 +97,13 @@ namespace lariov {
   
   
   //----------------------------------------------------------------------------
-  const ChannelStatus& SIOVChannelFilterProvider::GetChannelStatus(DBChannelID_t ch) const {
+  const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(DBChannelID_t ch) const {
     return fData.GetRow(ch);
   } 
   
   
   //----------------------------------------------------------------------------
-  const DBChannelSet_t SIOVChannelFilterProvider::GetChannelsWithStatus(chStatus status) const {
+  const DBChannelSet_t SIOVChannelStatusProvider::GetChannelsWithStatus(chStatus status) const {
     
     DBChannelSet_t retSet;
     retSet.clear();
@@ -131,13 +131,13 @@ namespace lariov {
   
   
   //----------------------------------------------------------------------------
-  const DBChannelSet_t SIOVChannelFilterProvider::GoodChannels() const {
+  const DBChannelSet_t SIOVChannelStatusProvider::GoodChannels() const {
     return GetChannelsWithStatus(kGOOD);
   }
 
   
   //----------------------------------------------------------------------------
-  const DBChannelSet_t SIOVChannelFilterProvider::BadChannels() const {
+  const DBChannelSet_t SIOVChannelStatusProvider::BadChannels() const {
     DBChannelSet_t dead = GetChannelsWithStatus(kDEAD);
     DBChannelSet_t ln = GetChannelsWithStatus(kLOWNOISE);
     dead.insert(ln.begin(),ln.end());
@@ -146,13 +146,13 @@ namespace lariov {
 
   
   //----------------------------------------------------------------------------
-  const DBChannelSet_t SIOVChannelFilterProvider::NoisyChannels() const {
+  const DBChannelSet_t SIOVChannelStatusProvider::NoisyChannels() const {
     return GetChannelsWithStatus(kNOISY); 
   }
-
+  
   
   //----------------------------------------------------------------------------
-  void SIOVChannelFilterProvider::AddNoisyChannel(DBChannelID_t ch) {  
+  void SIOVChannelStatusProvider::AddNoisyChannel(DBChannelID_t ch) {  
 
     if (!this->IsBad(ch) && this->IsPresent(ch)) {
       ChannelStatus cs(ch);
@@ -160,6 +160,7 @@ namespace lariov {
       fData.AddOrReplaceRow(cs);
     }
   }
+
   
   
   //----------------------------------------------------------------------------

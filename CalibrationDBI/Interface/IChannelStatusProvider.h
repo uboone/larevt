@@ -1,20 +1,20 @@
 /**
- * @file   IChannelFilterProvider.h
+ * @file   IChannelStatusProvider.h
  * @brief  Interface for experiment-specific channel quality info provider
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 24th, 2014
- * @see    IChannelFilterService.h
+ * @see    IChannelStatusService.h
  *
- * This is the interface of ChannelFilter core object.
- * A ChannelFilter object (with the interface of ChannelFilter core object)
+ * This is the interface of ChannelStatus core object.
+ * A ChannelStatus object (with the interface of ChannelStatus core object)
  * provides the actual information about channels.
- * It can be instanciated by a art service (IChannelFilterService)
+ * It can be instanciated by a art service (IChannelStatusService)
  * or from whatever system needs it.
  */
 
 
-#ifndef ICHANNELFILTERPROVIDER_H
-#define ICHANNELFILTERPROVIDER_H 1
+#ifndef ICHANNELSTATUSPROVIDER_H
+#define ICHANNELSTATUSPROVIDER_H 1
 
 #include "CalibrationDBIFwd.h"
 
@@ -40,11 +40,11 @@ namespace lariov {
    * interested in.
    * 
    */
-  class IChannelFilterProvider {
+  class IChannelStatusProvider {
     
     public:
         
-    virtual ~IChannelFilterProvider() = default;
+    virtual ~IChannelStatusProvider() = default;
     
       /// Returns whether the specified channel is physical and connected to wire
       virtual bool IsPresent(DBChannelID_t channel) const = 0;
@@ -77,9 +77,9 @@ namespace lariov {
       /// @return whether information is available for the specified time
       virtual bool Update(DBTimeStamp_t ts) = 0;
     
-  }; // class IChannelFilterProvider
+  }; // class IChannelStatusProvider
   
 } // namespace lariov
 
 
-#endif // ICHANNELFILTERPROVIDER_H
+#endif // ICHANNELSTATUSPROVIDER_H
