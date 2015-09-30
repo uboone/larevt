@@ -58,8 +58,9 @@ namespace lariov {
   }
   
   bool SIOVChannelStatusProvider::Update(DBTimeStamp_t ts) {
-    if (fDataSource != DataSource::Database) return false;
     
+    fNewNoisy.Clear();
+    if (fDataSource != DataSource::Database) return false;
     if (!this->UpdateFolder(ts)) return false;
     
     //DBFolder was updated, so now update the Snapshot
@@ -98,7 +99,12 @@ namespace lariov {
   
   //----------------------------------------------------------------------------
   const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(DBChannelID_t ch) const {
-    return fData.GetRow(ch);
+    try {
+      return fNewNoisy.GetRow(ch);
+    }
+    catch (IOVDataError& e) {
+      return fData.GetRow(ch);
+    }
   } 
   
   
@@ -107,10 +113,10 @@ namespace lariov {
     
     DBChannelSet_t retSet;
     retSet.clear();
+    DBChannelID_t maxChannel = art::ServiceHandle<geo::Geometry>()->Nchannels() - 1;
     if (fDataSource == DataSource::Default) {
       if (fDefault.Status() == status) {
 	std::vector<DBChannelID_t> chs;
-	DBChannelID_t maxChannel = art::ServiceHandle<geo::Geometry>()->Nchannels() - 1;
 	for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
 	  chs.push_back(ch);
 	}
@@ -118,10 +124,9 @@ namespace lariov {
       }
     }
     else {
-      const std::vector<ChannelStatus>& snapshot_data = fData.Data();
       std::vector<DBChannelID_t> chs;
-      for (auto itC = snapshot_data.begin(); itC != snapshot_data.end(); ++itC) {
-	if (itC->Status() == status) chs.push_back(itC->Channel());
+      for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
+	if (this->GetChannelStatus(ch).Status() == status) chs.push_back(ch);
       }
 
       retSet.insert(chs.begin(), chs.end());
@@ -157,7 +162,7 @@ namespace lariov {
     if (!this->IsBad(ch) && this->IsPresent(ch)) {
       ChannelStatus cs(ch);
       cs.SetStatus(kNOISY);
-      fData.AddOrReplaceRow(cs);
+      fNewNoisy.AddOrReplaceRow(cs);
     }
   }
 

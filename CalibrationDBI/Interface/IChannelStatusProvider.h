@@ -56,7 +56,9 @@ namespace lariov {
       virtual bool IsNoisy(DBChannelID_t channel) const = 0;
       
       /// Returns whether the specified channel is physical and good
-      virtual bool IsGood(DBChannelID_t channel) const = 0;
+      virtual bool IsGood(DBChannelID_t channel) const {
+        return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel);
+      }
 
       /// Returns a status integer 
       virtual unsigned short Status(DBChannelID_t channel) const

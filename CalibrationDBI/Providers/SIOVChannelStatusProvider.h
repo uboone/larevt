@@ -107,6 +107,7 @@ namespace lariov {
     
       DataSource::ds fDataSource;
       Snapshot<ChannelStatus> fData;
+      Snapshot<ChannelStatus> fNewNoisy;
       ChannelStatus fDefault;
       
       const DBChannelSet_t GetChannelsWithStatus(chStatus status) const;
