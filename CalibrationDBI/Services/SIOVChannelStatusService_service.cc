@@ -21,17 +21,16 @@ namespace lariov{
     public:
     
       SIOVChannelStatusService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
-      ~SIOVChannelStatusService(){}
       
       void PreProcessEvent(const art::Event& evt); 
      
     private:
     
-      const IChannelStatusProvider& DoGetFilter() const override {
+      const IChannelStatusProvider& DoGetProvider() const override {
         return fProvider;
       }    
       
-      const IChannelStatusProvider* DoGetFilterPtr() const override {
+      const IChannelStatusProvider* DoGetProviderPtr() const override {
         return &fProvider;
       }
     

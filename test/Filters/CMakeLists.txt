@@ -1,8 +1,7 @@
 cet_enable_asserts()
 
-simple_plugin ( SimpleChannelFilterTest "module"
+simple_plugin ( SimpleChannelStatusTest "module"
                     Filters
-#                     ChannelFilterServiceInterface_service
                     ${MF_MESSAGELOGGER}
                     ${MF_UTILITIES}
                     ${FHICLCPP}
@@ -11,14 +10,14 @@ simple_plugin ( SimpleChannelFilterTest "module"
                 BASENAME_ONLY
               )
 
-cet_test(ChannelFilterServiceTest HANDBUILT
-  DATAFILES test_channel_filter.fcl
+cet_test(ChannelStatusServiceTest HANDBUILT
+  DATAFILES test_channel_status.fcl
   TEST_EXEC lar
-  TEST_ARGS --rethrow-all --config ./test_channel_filter.fcl
+  TEST_ARGS --rethrow-all --config ./test_channel_status.fcl
 )
 
-cet_test(SimpleChannelFilter_test
-  SOURCES SimpleChannelFilter_test.cxx
+cet_test(SimpleChannelStatus_test
+  SOURCES SimpleChannelStatus_test.cxx
   LIBRARIES Filters
             CalibrationDBI_IOVData
             ${FHICLCPP}

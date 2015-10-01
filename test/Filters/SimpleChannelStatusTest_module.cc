@@ -1,6 +1,6 @@
 /**
- * @file   SimpleChannelFilterTest_module.cc
- * @brief  Integration test for SimpleChannelFilterService
+ * @file   SimpleChannelStatusTest_module.cc
+ * @brief  Integration test for SimpleChannelStatusService
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 25th, 2014
  */
@@ -28,7 +28,7 @@ namespace art { class Event; } // art::Event declaration
 ///tracking algorithms
 namespace lariov {
   /**
-   * @brief Tests an instanciation of the ChannelFilterService
+   * @brief Tests an instanciation of the IChannelStatusService
    * 
    * Configuration parameters
    * =========================
@@ -40,9 +40,9 @@ namespace lariov {
    * - **TestNoisyChannels** (list of integers, default: empty): test singularly
    *   these channels and verify they are noisy
    */
-  class SimpleChannelFilterTest: public art::EDAnalyzer {
+  class SimpleChannelStatusTest: public art::EDAnalyzer {
       public:
-    explicit SimpleChannelFilterTest(fhicl::ParameterSet const& pset);
+    explicit SimpleChannelStatusTest(fhicl::ParameterSet const& pset);
 
     virtual void analyze(art::Event const&) override {}
     virtual void beginRun(art::Run const& run) override;
@@ -53,13 +53,13 @@ namespace lariov {
     std::vector<unsigned int> KnownBadChannels;
     
     template <typename Obj>
-    unsigned int testObject(Obj const* pFilter) const;
+    unsigned int testObject(Obj const* pChStatus) const;
     
     
     static const std::vector<unsigned int> EmptyVect; ///< for initializations
-  }; // class SimpleChannelFilterTest
+  }; // class SimpleChannelStatusTest
   
-} // namespace filter
+} // namespace lariov
 
 
 //------------------------------------------------------------------------------
@@ -67,10 +67,10 @@ namespace lariov {
 
 namespace lariov {
   
-  const std::vector<unsigned int> SimpleChannelFilterTest::EmptyVect;
+  const std::vector<unsigned int> SimpleChannelStatusTest::EmptyVect;
   
   //......................................................................
-  SimpleChannelFilterTest::SimpleChannelFilterTest
+  SimpleChannelStatusTest::SimpleChannelStatusTest
     (fhicl::ParameterSet const& pset) 
     : EDAnalyzer(pset)
     , KnownGoodChannels
@@ -80,7 +80,7 @@ namespace lariov {
     , KnownBadChannels
         (pset.get<std::vector<unsigned int>>("TestBadChannels", EmptyVect))
   {
-    mf::LogInfo log("SimpleChannelFilterTest");
+    mf::LogInfo log("SimpleChannelStatusTest");
     
     log << "Channels known as good:  " << KnownGoodChannels.size();
     if (!KnownGoodChannels.empty()) {
@@ -103,24 +103,24 @@ namespace lariov {
       log << ")";
     } // if known bad channels
     
-  } // SimpleChannelFilterTest::SimpleChannelFilterTest()
+  } // SimpleChannelStatusTest::SimpleChannelStatusTest()
   
   
   //......................................................................
-  void SimpleChannelFilterTest::beginRun(art::Run const& run) {
+  void SimpleChannelStatusTest::beginRun(art::Run const& run) {
     
-    mf::LogInfo("SimpleChannelFilterTest") << "New run: " << run.run();
+    mf::LogInfo("SimpleChannelStatusTest") << "New run: " << run.run();
     
     unsigned int nErrors = 0;
     
     //---
-    mf::LogVerbatim("SimpleChannelFilterTest")
+    mf::LogVerbatim("SimpleChannelStatusTest")
       << "\nTesting service interface...";
-    art::ServiceHandle<lariov::IChannelStatusService> FilterSrvHandle;
+    art::ServiceHandle<lariov::IChannelStatusService> StatusSrvHandle;
   /* // since the service does not share the interface of the provider,
      // this test can't be
-    const lariov::IChannelStatusService* pFilterSrv = &*FilterSrvHandle;
-    nErrors = testObject(pFilterSrv);
+    const lariov::IChannelStatusService* pStatusSrv = &*StatusSrvHandle;
+    nErrors = testObject(pStatusSrv);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
         << nErrors << " errors while testing IChannelStatusService!";
@@ -128,31 +128,31 @@ namespace lariov {
   */
     
     //---
-    mf::LogVerbatim("SimpleChannelFilterTest")
+    mf::LogVerbatim("SimpleChannelStatusTest")
       << "\nTesting base interface...";
-    lariov::IChannelStatusProvider const* pFilter
-      = FilterSrvHandle->GetFilterPtr();
-    nErrors = testObject(pFilter);
+    lariov::IChannelStatusProvider const* pChStatus
+      = StatusSrvHandle->GetProviderPtr();
+    nErrors = testObject(pChStatus);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
         << nErrors << " errors while testing IChannelStatusProvider!";
     } // if errors
     
-  } // SimpleChannelFilterTest::beginRun()
+  } // SimpleChannelStatusTest::beginRun()
   
   
   //......................................................................
   template <typename Obj>
-  unsigned int SimpleChannelFilterTest::testObject(Obj const* pFilter) const
+  unsigned int SimpleChannelStatusTest::testObject(Obj const* pChStatus) const
   {
     // 1. print all the channels marked non-good
     {
-      mf::LogInfo log("SimpleChannelFilterTest");
+      mf::LogInfo log("SimpleChannelStatusTest");
       
       
       // this is a copy of the list;
       // to avoid creating temporary objects, check channels one by one
-      auto BadChannels = pFilter->BadChannels();
+      auto BadChannels = pChStatus->BadChannels();
       log << "\nChannels marked as bad:   " << BadChannels.size();
       if (!BadChannels.empty()) {
         log << " (";
@@ -160,7 +160,7 @@ namespace lariov {
         log << ")";
       } // if bad channels
       
-      auto NoisyChannels = pFilter->NoisyChannels();
+      auto NoisyChannels = pChStatus->NoisyChannels();
       log << "\nChannels marked as noisy: " << NoisyChannels.size();
       if (!NoisyChannels.empty()) {
         log << " (";
@@ -172,38 +172,38 @@ namespace lariov {
     // 2. test the channels as in the configuration
     unsigned int nErrors = 0;
     for (const auto chId: KnownBadChannels) {
-      if (!pFilter->IsBad(chId)) {
-        mf::LogError("SimpleChannelFilterTest")
+      if (!pChStatus->IsBad(chId)) {
+        mf::LogError("SimpleChannelStatusTest")
           << "channel #" << chId << " is not bad as it should";
         ++nErrors;
       }
     } // for knwon bad channels
     
     for (const auto chId: KnownNoisyChannels) {
-      if (!pFilter->IsNoisy(chId)) {
-        mf::LogError("SimpleChannelFilterTest")
+      if (!pChStatus->IsNoisy(chId)) {
+        mf::LogError("SimpleChannelStatusTest")
           << "channel #" << chId << " is not noisy as it should";
         ++nErrors;
       }
     } // for knwon noisy channels
     
     for (const auto chId: KnownGoodChannels) {
-      if (pFilter->IsBad(chId)) {
-        mf::LogError("SimpleChannelFilterTest")
+      if (pChStatus->IsBad(chId)) {
+        mf::LogError("SimpleChannelStatusTest")
           << "channel #" << chId << " is bad, while it should not";
         ++nErrors;
       }
-      if (pFilter->IsNoisy(chId)) {
-        mf::LogError("SimpleChannelFilterTest")
+      if (pChStatus->IsNoisy(chId)) {
+        mf::LogError("SimpleChannelStatusTest")
           << "channel #" << chId << " is noisy, while it should not";
         ++nErrors;
       }
     } // for knwon good channels
     
     return nErrors;
-  } // SimpleChannelFilterTest::testObject()
+  } // SimpleChannelStatusTest::testObject()
   
   
-  DEFINE_ART_MODULE(SimpleChannelFilterTest)
+  DEFINE_ART_MODULE(SimpleChannelStatusTest)
   
-} // namespace filter
+} // namespace lariov

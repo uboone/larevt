@@ -5,18 +5,23 @@
  * @date   November 24th, 2014
  * @see    IChannelStatusService.h
  *
- * This is the interface of ChannelStatus core object.
- * A ChannelStatus object (with the interface of ChannelStatus core object)
- * provides the actual information about channels.
- * It can be instanciated by a art service (IChannelStatusService)
- * or from whatever system needs it.
+ * This is the interface of ChannelStatus service provider core object.
+ * A ChannelStatus service provider object (with the interface of ChannelStatus
+ * service provider core object) provides the actual information about channels.
+ * It can be instanciated by a art service (an implementation of
+ * IChannelStatusService) or from whatever system needs it.
  */
 
 
 #ifndef ICHANNELSTATUSPROVIDER_H
 #define ICHANNELSTATUSPROVIDER_H 1
 
-#include "CalibrationDBIFwd.h"
+// C/C++ standard libraries
+#include <set>
+#include <limits> // std::numeric_limits<>
+
+// LArSoft libraries
+#include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 
 
 /// Filters for channels, events, etc
@@ -43,42 +48,54 @@ namespace lariov {
   class IChannelStatusProvider {
     
     public:
-        
-    virtual ~IChannelStatusProvider() = default;
-    
+      
+      using Status_t = unsigned short; ///< type representing channel status
+      
+      /// Type of set of channel IDs
+      using ChannelSet_t = std::set<raw::ChannelID_t>;
+      
+      /// Value or invalid status
+      static constexpr Status_t InvalidStatus
+        = std::numeric_limits<Status_t>::max();
+      
+      
+      /// Virtual destructor; destructs nothing
+      virtual ~IChannelStatusProvider() = default;
+      
       /// Returns whether the specified channel is physical and connected to wire
-      virtual bool IsPresent(DBChannelID_t channel) const = 0;
-
+      virtual bool IsPresent(raw::ChannelID_t channel) const = 0;
+      
       /// Returns whether the specified channel is bad in the current run
-      virtual bool IsBad(DBChannelID_t channel) const = 0;
-
+      virtual bool IsBad(raw::ChannelID_t channel) const = 0;
+      
       /// Returns whether the specified channel is noisy in the current run
-      virtual bool IsNoisy(DBChannelID_t channel) const = 0;
+      virtual bool IsNoisy(raw::ChannelID_t channel) const = 0;
       
       /// Returns whether the specified channel is physical and good
-      virtual bool IsGood(DBChannelID_t channel) const {
+      virtual bool IsGood(raw::ChannelID_t channel) const {
         return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel);
       }
-
-      /// Returns a status integer 
-      virtual unsigned short Status(DBChannelID_t channel) const
-        { return 99;}
-
-
-      /// Returns a copy of set of good channel IDs for the current run
-      virtual DBChannelSet_t const GoodChannels() const = 0;
-
-      /// Returns a copy of set of bad channel IDs for the current run
-      virtual DBChannelSet_t const BadChannels() const = 0;
-
-      /// Returns a copy of set of noisy channel IDs for the current run
-      virtual DBChannelSet_t const NoisyChannels() const = 0;
-
       
+      /// Returns a status integer 
+      virtual Status_t Status(raw::ChannelID_t channel) const
+        { return InvalidStatus;}
+      
+      
+      /// Returns a copy of set of good channel IDs for the current run
+      virtual ChannelSet_t GoodChannels() const = 0;
+      
+      /// Returns a copy of set of bad channel IDs for the current run
+      virtual ChannelSet_t BadChannels() const = 0;
+      
+      /// Returns a copy of set of noisy channel IDs for the current run
+      virtual ChannelSet_t NoisyChannels() const = 0;
+      
+      
+      /* TODO DELME
       /// Prepares the object to provide information about the specified time
       /// @return whether information is available for the specified time
       virtual bool Update(DBTimeStamp_t ts) = 0;
-    
+      */
   }; // class IChannelStatusProvider
   
 } // namespace lariov
