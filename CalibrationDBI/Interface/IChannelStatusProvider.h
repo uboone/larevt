@@ -76,9 +76,13 @@ namespace lariov {
         return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel);
       }
       
-      /// Returns a status integer 
+      /// Returns a status integer with arbitrary meaning
       virtual Status_t Status(raw::ChannelID_t channel) const
-        { return InvalidStatus;}
+        { return InvalidStatus; }
+      
+      /// Returns whether the specified status is a valid one
+      virtual bool HasStatus(raw::ChannelID_t channel) const
+        { return IsValidStatus(Status(channel)); }
       
       
       /// Returns a copy of set of good channel IDs for the current run
@@ -96,6 +100,11 @@ namespace lariov {
       /// @return whether information is available for the specified time
       virtual bool Update(DBTimeStamp_t ts) = 0;
       */
+      
+      /// Returns whether the specified status is a valid one
+      static bool IsValidStatus(Status_t status)
+        { return status != InvalidStatus; }
+      
   }; // class IChannelStatusProvider
   
 } // namespace lariov
