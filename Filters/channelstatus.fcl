@@ -1,0 +1,21 @@
+#
+# File:    channelstatus.fcl
+# Purpose: Provides a default configuration for IChannelStatusService service
+# Author:  Gianluca Petrillo (petrillo@fnal.gov)
+# Date:    October 2nd, 2015
+# 
+# The default configuration implements no bad nor noisy channels.
+# Everything is perfect here.
+#
+
+BEGIN_PROLOG
+
+standard_channelstatus: {
+  # implements IChannelStatusService interface:
+  
+  service_provider: SimpleChannelFilterService
+  
+} # standard_channelstatus
+
+END_PROLOG
+
