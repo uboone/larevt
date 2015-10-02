@@ -1,0 +1,27 @@
+#
+# File:    channelstatus_bo.fcl
+# Purpose: Provides Bo's configuration for IChannelStatusService service
+# Author:  Gianluca Petrillo (petrillo@fnal.gov)
+# Date:    October 2nd, 2015
+# 
+# The configuration implements no bad nor noisy channels, 
+# as from larevt/Filter/ChannelFilter.cxx commit 6474c44.
+#
+
+BEGIN_PROLOG
+
+bo_channelstatus: {
+  # implements IChannelStatusService interface:
+  
+  service_provider: SimpleChannelStatusService
+  
+  # list of bad channels:
+  BadChannels:   [ 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79 ]
+  
+  # no noisy channels:
+  NoisyChannels: [  ]
+  
+} # bo_channelstatus
+
+END_PROLOG
+
