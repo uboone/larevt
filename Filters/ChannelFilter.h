@@ -24,7 +24,7 @@
 
 namespace filter {
 
-  class ChannelFilter {
+  class /* [[deprecated]] */ ChannelFilter {
 
   public:
     

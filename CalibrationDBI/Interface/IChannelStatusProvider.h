@@ -34,7 +34,7 @@ namespace lariov {
    * Experiments need to implement and configure their own class implementing
    * this interface.
    * The simplest implementation is provided in LArSoft:
-   * SimpleChannelFilter.
+   * SimpleChannelStatus.
    * 
    * Currently, the class provides interface for the following information:
    * - goodness of the channel: good or bad (dead or unusable)

@@ -77,12 +77,17 @@ namespace lariov {
       /// Returns a reference to the service provider
       IChannelStatusProvider const& GetProvider() const
         { return DoGetProvider(); }
+      // will be deprecated:
+      IChannelStatusProvider const& GetFilter() const { return GetProvider(); }
       //@}
 
       //@{
       /// Returns a pointer to the service provider
       IChannelStatusProvider const* GetProviderPtr() const
         { return DoGetProviderPtr(); }
+      // will be deprecated:
+      IChannelStatusProvider const* GetFilterPtr() const
+        { return GetProviderPtr(); }
       //@}
 
       //
