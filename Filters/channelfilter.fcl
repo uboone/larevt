@@ -5,7 +5,7 @@
 BEGIN_PROLOG
 
 standard_channel_filter: {
-  service_provider: SimpleChannelFilterService
+  service_provider: SimpleChannelStatusService
   
   # list here the bad channels:
   BadChannels:   []
