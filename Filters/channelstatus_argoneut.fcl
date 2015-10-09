@@ -4,7 +4,7 @@
 #
 BEGIN_PROLOG
 
-channel_filter_argoneut: {
+argoneut_channelstatus: {
   # implements IChannelStatusService
 
   service_provider: SimpleChannelStatusService
