@@ -39,7 +39,7 @@ namespace lariov {
   }
 
 
-  int DBFolder::GetNamedChannelData(std::uint64_t channel, const std::string& name, long& data) {
+  int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, long& data) {
 
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
@@ -49,7 +49,7 @@ namespace lariov {
     return err;
   }
 
-  int DBFolder::GetNamedChannelData(std::uint64_t channel, const std::string& name, double& data) {
+  int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, double& data) {
 
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
@@ -59,7 +59,7 @@ namespace lariov {
     return err;
   }
 
-  int DBFolder::GetNamedChannelData(std::uint64_t channel, const std::string& name, std::string& data) {
+  int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::string& data) {
 
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
@@ -71,7 +71,7 @@ namespace lariov {
     return err;
   }
   
-  int DBFolder::GetChannelList( std::vector<std::uint64_t>& channels ) const {
+  int DBFolder::GetChannelList( std::vector<DBChannelID_t>& channels ) const {
     
     channels.clear();
     if (!fCachedDataset) return 1;
@@ -80,21 +80,21 @@ namespace lariov {
     int err=0;
     for ( int row = 0; row != fNRows; ++row) {
       tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS);
-      channels.push_back( (std::uint64_t)getLongValue(tup,0,&err) );
+      channels.push_back( (DBChannelID_t)getLongValue(tup,0,&err) );
       releaseTuple(tup);
     }  
     return err;
   }
 
 
-  size_t DBFolder::GetTupleColumn(std::uint64_t channel, const std::string& name, Tuple& tup ) {
+  size_t DBFolder::GetTupleColumn(DBChannelID_t channel, const std::string& name, Tuple& tup ) {
 
     //check if cached row is still valid
     int err;
     int row = -1;
     if (fCachedRow != -1 && fCachedChannel == channel) {
       tup = getTuple(fCachedDataset, fCachedRow + kNUMBER_HEADER_ROWS);
-      if ( channel == (std::uint64_t)getLongValue(tup,0,&err) ) {
+      if ( channel == (DBChannelID_t)getLongValue(tup,0,&err) ) {
 	row = fCachedRow;
       }
       else releaseTuple(tup);
@@ -104,7 +104,7 @@ namespace lariov {
     if (row == -1) {   
 //std::cout<<"Channel "<<channel<<" not cached"<<std::endl;
       //binary search for channel
-      std::uint64_t val;
+      DBChannelID_t val;
       int l = 0, h = fNRows - 1;
       row = (l + h )/2;
       while ( l <= h ) {
@@ -123,7 +123,7 @@ namespace lariov {
       
       //get the tuple to be returned, check that the found row matches the requested channel
       tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS); 
-      if ( channel != (std::uint64_t)getLongValue(tup, 0, &err) ) {
+      if ( channel != (DBChannelID_t)getLongValue(tup, 0, &err) ) {
         releaseTuple(tup);
 	std::string msg = "Channel " + std::to_string(channel) + " is not found in database!";
 	throw WebError(msg);
@@ -147,7 +147,7 @@ namespace lariov {
   }
 
   //returns true if an Update is performed, false if not
-  bool DBFolder::UpdateData( std::uint64_t raw_time) {
+  bool DBFolder::UpdateData( DBTimeStamp_t raw_time) {
   
     //convert to IOVTimeStamp
     IOVTimeStamp ts = TimeStampDecoder::DecodeTimeStamp(raw_time);
@@ -171,7 +171,7 @@ namespace lariov {
     int tries = 0;
     long int delay;
     srandom(getpid() * getppid());
-    while (status != 200 && tries < 7) { 
+    while (status != 200 && tries < 2) { 
       fCachedDataset = getData(fullurl.str().c_str(), NULL, &err);
       status = getHTTPstatus(fCachedDataset);
       if ( status != 200) {
@@ -182,7 +182,7 @@ namespace lariov {
     }
 
     if (status != 200) {
-      std::string msg = "HTTP error: status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(fCachedDataset));
+      std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(fCachedDataset));
       throw WebError(msg);
     }
 

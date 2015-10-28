@@ -29,7 +29,8 @@
 #include "Geometry/PlaneGeo.h"
 #include "RawData/RawDigit.h"
 #include "RecoBase/Wire.h"
-#include "Filters/ChannelFilter.h"
+#include "CalibrationDBI/Interface/IChannelStatusService.h"
+#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
 #include "Utilities/LArFFT.h"
 
 // ROOT includes
@@ -158,7 +159,8 @@ namespace caldata{
 
     // loop over the raw digits and get the adc vector for each, then compress it and uncompress it
 
-    filter::ChannelFilter * fil = new  filter::ChannelFilter();
+    lariov::IChannelStatusProvider const& channelStatus
+      = art::ServiceHandle<lariov::IChannelStatusService>()->GetProvider();
     art::Handle< std::vector<raw::RawDigit> > rdHandle;
     evt.getByLabel(fDetSimModuleLabel,rdHandle);
     art::Handle< std::vector<recob::Wire> > wHandle;
@@ -223,7 +225,7 @@ namespace caldata{
       }
       //get the last one for the adc vector
       adc[rdvec[rd]->Samples()-1] = rdvec[rd]->ADC(rdvec[rd]->Samples()-1);
-      if(!fil->BadChannel(rdvec[rd]->Channel()) && 
+      if(!channelStatus.IsBad(rdvec[rd]->Channel()) && 
 	 (*max_element(adc.begin(),adc.end()) < pedestal+threshold && 
 	  *min_element(adc.begin(),adc.end()) >pedestal -threshold)) {
 	double sum=0;

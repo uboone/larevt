@@ -34,6 +34,7 @@ cet_cmake_env()
 cet_set_compiler_flags(DIAGS CAUTIOUS
   WERROR
   NO_UNDEFINED
+  ALLOW_DEPRECATIONS
   EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs
 )
 
@@ -65,7 +66,7 @@ add_subdirectory(Filters)
 add_subdirectory(CalibrationDBI)
 add_subdirectory(SpaceCharge)
 # tests
-# add_subdirectory(test)
+add_subdirectory(test)
 
 # ups - table and config files
 add_subdirectory(ups)

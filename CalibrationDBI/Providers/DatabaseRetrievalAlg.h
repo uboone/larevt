@@ -46,7 +46,7 @@ namespace lariov {
       virtual void Reconfigure(fhicl::ParameterSet const& p);
 	    
       /// Return true if fFolder is successfully updated
-      bool UpdateFolder(std::uint64_t ts) {
+      bool UpdateFolder(DBTimeStamp_t ts) {
         return fFolder->UpdateData(ts);
       }       
       

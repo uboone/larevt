@@ -10,30 +10,27 @@
 #ifndef ADCFILTER_H
 #define ADCFILTER_H
 
-#include <math.h>
 #include <algorithm>
-#include <iostream>
-#include <fstream>
 #include <vector>
 #include <stdint.h>
 
 //Framework Includes
+#include "fhiclcpp/ParameterSet.h" 
+#include "messagefacility/MessageLogger/MessageLogger.h"
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h" 
-#include "fhiclcpp/ParameterSet.h" 
 #include "art/Framework/Principal/Handle.h" 
-#include "art/Persistency/Common/Ptr.h" 
-#include "art/Persistency/Common/PtrVector.h" 
+#include "art/Framework/Principal/View.h" 
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Framework/Services/Optional/TFileService.h" 
-#include "art/Framework/Services/Optional/TFileDirectory.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "art/Persistency/Common/Ptr.h" 
 
 //Larsoft Includes
 #include "RawData/raw.h"
 #include "RawData/RawDigit.h"
-#include "Filters/ChannelFilter.h"
+#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "CalibrationDBI/Interface/IChannelStatusService.h"
+
 
 namespace filter {
 
@@ -86,19 +83,19 @@ namespace filter {
    bool ADCFilter::filter(art::Event &evt)
    { 
       //Read in raw data
-      art::Handle< std::vector<raw::RawDigit> > rawdigitHandle;
-      evt.getByLabel(fDigitModuleLabel,rawdigitHandle);
+      art::View<raw::RawDigit> rawdigitView;
+      evt.getView(fDigitModuleLabel, rawdigitView);
+      
+      if(!rawdigitView.size()) return false;
+      
+      lariov::IChannelStatusProvider const& channelFilter
+        = art::ServiceHandle<lariov::IChannelStatusService>()->GetProvider();
 
-      //Make a ChannelFilter
-      filter::ChannelFilter *chanFilt = new filter::ChannelFilter();
-
-      if(!rawdigitHandle->size()) return false;
-
-      for(unsigned int i = 0; i<rawdigitHandle->size(); ++i){
-         art::Ptr<raw::RawDigit> digit(rawdigitHandle,i);
-         uint32_t channel = digit->Channel();
-         if(chanFilt->BadChannel(channel)) continue;
-         
+      // look through the good channels
+//      for(const raw::RawDigit* digit: filter::SelectGoodChannels(rawdigitView))
+      for(const raw::RawDigit* digit: rawdigitView)
+      {
+         if (!channelFilter.IsGood(digit->Channel())) continue;
          //get ADC values after decompressing
          std::vector<short> rawadc(digit->Samples());
          raw::Uncompress(digit->ADCs(),rawadc,digit->Compression());
@@ -112,6 +109,6 @@ namespace filter {
 
    DEFINE_ART_MODULE(ADCFilter)
 
-} //namespace filt
+} //namespace filter
 
 #endif // ADCFILTER_H

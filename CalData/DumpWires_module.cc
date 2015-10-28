@@ -26,7 +26,8 @@
 #include "SimpleTypesAndConstants/geo_types.h"
 // #include "RawData/RawDigit.h"
 #include "RecoBase/Wire.h"
-#include "Filters/ChannelFilter.h"
+#include "CalibrationDBI/Interface/IChannelStatusService.h"
+#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
 
 namespace {
 	
@@ -162,10 +163,9 @@ namespace caldata {
       = evt.getValidHandle<std::vector<recob::Wire>>(fCalWireModuleLabel);
     
     // channel filter: create one only if requested
-    std::unique_ptr<filter::ChannelFilter> filter;
-    if (!bIgnoreFilters) {
-      filter.reset(new filter::ChannelFilter);
-    }
+    lariov::IChannelStatusProvider const* channelStatus = bIgnoreFilters
+      ? nullptr
+      : art::ServiceHandle<lariov::IChannelStatusService>()->GetProviderPtr();
     
     mf::LogInfo(fOutputCategory) << "The event contains " << Wires->size() << " wires";
     
@@ -180,7 +180,7 @@ namespace caldata {
       { // limit the scope of out:
         mf::LogVerbatim out(fOutputCategory);
         out << "  #" << wire.Channel() << ":";
-        if (filter && filter->BadChannel(wire.Channel())) {
+        if (channelStatus && channelStatus->IsBad(wire.Channel())) {
           out << " bad channel";
           continue;
         }
