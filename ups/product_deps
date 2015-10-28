@@ -9,7 +9,7 @@ product         version
 lardata		v04_13_00
 gcc		v4_9_2
 libwda          v2_21_1
-cetbuildtools	v4_12_06	-	only_for_build
+cetbuildtools	v4_13_00	-	only_for_build
 end_product_list
 
   
