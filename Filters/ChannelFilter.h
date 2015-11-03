@@ -1,55 +1,44 @@
 ////////////////////////////////////////////////////////////////////////
 //
 // ChannelFilter class:
-//
-// This class provides methods for returning the condition of
-// a wire, as to whether it is bad and is to be ignored or perhaps
-// if it has some known problem.  This allows the removal of detector
-// specific code from a few places in LArSoft.  Right now is is only 
-// implemented for Argoneut.
-//  
-//
-// pagebri3@msu.edu
-//
+// 
+// This class has been obsoleted and is now a deprecated interface for
+// IChannelStatusService.
+// 
+// Please update your code to use the service directly.
+// 
+// 
+// Original class: pagebri3@msu.edu
+// 
 ////////////////////////////////////////////////////////////////////////
 #ifndef CHANNELFILTER_H
 #define CHANNELFILTER_H
 
+// C/C++ standard libraries
 #include <set>
 #include <stdint.h>
 
-///filters for channels, events, etc
+
 namespace filter {
 
   class ChannelFilter {
 
   public:
-      
-    enum ChannelStatus { GOOD         = 0,
-                         INTERMITTENT = 1,
-                         NOISY        = 2,
-                         LOWNOISE     = 3,
-                         DEAD         = 4,
-                         NOTPHYSICAL  = 5
+    
+    enum ChannelStatus { GOOD        = 0,
+                         NOISY       = 1,
+                         DEAD        = 2,
+                         NOTPHYSICAL = 3
                        };
 
     ChannelFilter();
-    ~ChannelFilter();
-
-    bool BadChannel(uint32_t channel);
-    bool NoisyChannel(uint32_t channel);
+    
+    bool BadChannel(uint32_t channel) const;
+    bool NoisyChannel(uint32_t channel) const;
+    std::set<uint32_t> SetOfBadChannels() const;
+    std::set<uint32_t> SetOfNoisyChannels() const;
     ChannelStatus GetChannelStatus(uint32_t channel) const;
-    std::set<uint32_t> SetOfBadChannels()   const { return fBadChannels;   }
-    std::set<uint32_t> SetOfNoisyChannels() const { return fNoisyChannels; }
-  private:
-
-    std::set<uint32_t> fBadChannels;   ///< list of bad channels
-    std::set<uint32_t> fNoisyChannels; ///< list of bad channels
-      
-    std::map<uint32_t, ChannelStatus> fChannelStatusMap;
-
+    
   }; //class ChannelFilter
 }
 #endif // CHANNELFILTER_H
-
-

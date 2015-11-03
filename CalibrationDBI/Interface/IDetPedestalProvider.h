@@ -9,6 +9,8 @@
 #ifndef IDETPEDESTALPROVIDER_H
 #define IDETPEDESTALPROVIDER_H
 
+#include "CalibrationDBIFwd.h"
+
 namespace lariov {
 
   /**
@@ -20,15 +22,17 @@ namespace lariov {
   class IDetPedestalProvider {
   
     public:
+    
+      virtual ~IDetPedestalProvider() = default;
        
       /// Retrieve pedestal information     
-      virtual float PedMean(std::uint64_t ch) const = 0;
-      virtual float PedRms(std::uint64_t ch) const = 0;
-      virtual float PedMeanErr(std::uint64_t ch) const = 0;
-      virtual float PedRmsErr(std::uint64_t ch) const = 0;
+      virtual float PedMean(DBChannelID_t ch) const = 0;
+      virtual float PedRms(DBChannelID_t ch) const = 0;
+      virtual float PedMeanErr(DBChannelID_t ch) const = 0;
+      virtual float PedRmsErr(DBChannelID_t ch) const = 0;
       
       /// Update local state of implementation
-      virtual bool Update(std::uint64_t ts) = 0;
+      virtual bool Update(DBTimeStamp_t ts) = 0;
   };
 }//end namespace lariov
 

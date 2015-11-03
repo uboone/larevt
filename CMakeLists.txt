@@ -65,7 +65,7 @@ add_subdirectory(Filters)
 add_subdirectory(CalibrationDBI)
 add_subdirectory(SpaceCharge)
 # tests
-# add_subdirectory(test)
+add_subdirectory(test)
 
 # ups - table and config files
 add_subdirectory(ups)

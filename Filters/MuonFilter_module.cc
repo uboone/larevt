@@ -44,8 +44,8 @@ extern "C" {
 #include "Geometry/Geometry.h"
 #include "Geometry/PlaneGeo.h"
 #include "Geometry/WireGeo.h"
-#include "Utilities/LArPropertiesService.h"
-#include "Utilities/DetectorPropertiesService.h"
+#include "Utilities/ILArPropertiesService.h"
+#include "Utilities/IDetectorPropertiesService.h"
 #include "Utilities/AssociationUtil.h"
  
 
@@ -121,8 +121,8 @@ namespace filter {
     art::ServiceHandle<geo::Geometry> geom;
     //    art::ServiceHandle<util::LArPropertiesService> larprop_s;
     //    art::ServiceHandle<util::DetectorPropertiesService> detprop_s;
-    const dataprov::LArProperties* larprop = art::ServiceHandle<util::LArPropertiesService>()->getLArProperties();
-    const dataprov::DetectorProperties* detprop = art::ServiceHandle<util::DetectorPropertiesService>()->getDetectorProperties();
+    auto const * larprop = lar::providerFrom<util::ILArPropertiesService>();
+    auto const * detprop = lar::providerFrom<util::IDetectorPropertiesService>();
     
     //Drift Velocity in cm/us Sampling rate in ns
     double drift = detprop->DriftVelocity(detprop->Efield(), larprop->Temperature())*detprop->SamplingRate()/1000.0; 

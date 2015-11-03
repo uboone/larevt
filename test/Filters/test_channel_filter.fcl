@@ -1,0 +1,100 @@
+#
+# File:    test_channel_filter.fcl
+# Purpose: runs a module testing the channel filter service
+# Date:    November 25th, 2014
+# Author:  petrillo@fnal.gov
+# Version: 1.0
+# 
+# The module is run on a custom configuration using SimpleChannelFilterService
+# with some hard-coded channels (actually taken from ArgoNeuT configuration).
+#
+
+#include "geometry.fcl"
+
+################################################################################
+BEGIN_PROLOG
+#
+# Channel filter service configuration (from ArgoNeuT)
+#
+channel_filter: {
+  service_provider: SimpleChannelFilterService
+  
+  # list of bad channels:
+  BadChannels:   [ 22, 65, 237, 307, 308, 309, 310, 311, 410, 412, 438, 439, 448 ]
+  
+  # list of bad noisy channels:
+  NoisyChannels: [ 31, 41, 108, 120, 121, 124, 392, 399 ]
+  
+} # channel_filter
+
+END_PROLOG
+################################################################################
+
+
+process_name: testChannelFilter
+
+services: {
+  message: {
+    destinations: {
+    #  LogDebugFile: { 
+    #    type:       "file"
+    #    filename:   "channelfilter.txt"
+    #    append:     false
+    #    threshold:  "INFO"
+    #    categories:{
+    #      default:                 { limit: 0 }
+    #      SimpleChannelFilterTest: { limit: -1 }
+    #    }
+    #  } # LogDebugFile
+      LogStandardOut: {
+        type:       "cout"
+        threshold:  "INFO"
+        categories:{
+          default:{ limit: -1 }
+          RecoBaseDefaultCtor: { limit: 0 }
+          AnaBaseDefaultCtor:  { limit: 0 }
+          GeometryBadInputPoint: { limit: 5 timespan: 1000}
+        }
+      } # LogStandardOut
+      LogStandardError: {
+        type:       "cerr"
+        threshold:  "ERROR"
+        categories:{
+          default:{ }
+        }
+      } # LogStandardError
+    } # destinations
+  } # message
+
+  Geometry:                      @local::standard_geo             # from geometry.fcl
+  ExptGeoHelperInterface:        @local::standard_geometry_helper # from geometry.fcl
+  IChannelStatusService:         @local::channel_filter
+
+} # services
+
+source: {
+  module_type: EmptyEvent
+  maxEvents:   1       # Number of events to create
+} # source
+
+outputs: { }
+
+physics: {
+
+  analyzers: {
+    channelfiltertest: {
+      module_type: "SimpleChannelFilterTest"
+      
+      # list here some channels with known status
+      TestGoodChannels: [ 5, 10, 20, 500000 ]
+      TestBadChannels: [ 22, 308, 448 ]
+      TestNoisyChannels: [ 31, 120, 399 ]
+      
+    } # channelfiltertest
+  } # analyzers
+
+  ana:           [ channelfiltertest ]
+
+  trigger_paths: [ ]
+  end_paths:     [ ana ]
+} # physics

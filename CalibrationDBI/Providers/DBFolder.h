@@ -2,6 +2,7 @@
 #define DBFOLDER_H
 
 #include "CalibrationDBI/IOVData/IOVTimeStamp.h"
+#include "CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -17,9 +18,9 @@ namespace lariov {
       DBFolder(const std::string& name, const std::string& url, const std::string& tag = "");
       virtual ~DBFolder();
       
-      int GetNamedChannelData(std::uint64_t channel, const std::string& name, long& data);
-      int GetNamedChannelData(std::uint64_t channel, const std::string& name, double& data);
-      int GetNamedChannelData(std::uint64_t channel, const std::string& name, std::string& data);
+      int GetNamedChannelData(DBChannelID_t channel, const std::string& name, long& data);
+      int GetNamedChannelData(DBChannelID_t channel, const std::string& name, double& data);
+      int GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::string& data);
  
       const std::string& URL() const {return fURL;}
       const std::string& FolderName() const {return fFolderName;}
@@ -28,12 +29,12 @@ namespace lariov {
       const IOVTimeStamp& CachedStart() const {return fCachedStart;}
       const IOVTimeStamp& CachedEnd() const   {return fCachedEnd;}
       
-      bool UpdateData(std::uint64_t raw_time);
+      bool UpdateData(DBTimeStamp_t raw_time);
       
-      int GetChannelList( std::vector<std::uint64_t>& channels ) const;
+      int GetChannelList( std::vector<DBChannelID_t>& channels ) const;
      
     private:  
-      size_t GetTupleColumn( std::uint64_t channel, const std::string& name, Tuple& tup );
+      size_t GetTupleColumn( DBChannelID_t channel, const std::string& name, Tuple& tup );
       
       bool IsValid(const IOVTimeStamp& time) const {
         if (time >= fCachedStart && time < fCachedEnd) return true;
@@ -52,7 +53,7 @@ namespace lariov {
       std::vector<std::string> fColumns;       //Column names
       std::vector<std::string> fTypes;         //Column types
       int                      fCachedRow;     //Cache most recently retrieved row and channel numbers
-      std::uint64_t            fCachedChannel;      
+      DBChannelID_t            fCachedChannel;      
   };
 }
 

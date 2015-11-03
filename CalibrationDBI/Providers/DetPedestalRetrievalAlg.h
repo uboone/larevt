@@ -24,10 +24,29 @@
 namespace lariov {
 
   /**
-     \class DetPedestalRetrievalAlg
-     User defined class DetPedestalRetrievalAlg ... these comments are used to generate
-     doxygen documentation!
-  */
+   * @brief Retrieves channel information: pedestal and RMS
+   * 
+   * Configuration parameters
+   * =========================
+   * 
+   * - *DatabaseRetrievalAlg* (parameter set, mandatory): configuration for the
+   *   database; see lariov::DatabaseRetrievalAlg
+   * - *UseDB* (boolean, default: false): retrieve information from the database
+   * - *UseFile* (boolean, default: false): retrieve information from a file;
+   *   not implemented yet
+   * - *DefaultCollMean* (real, default: 400.0): pedestal value returned for
+   *   collection plane channels when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultIndMean* (real, default: 2048.0): pedestal value returned for
+   *   induction plane channels when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultCollRms* (real, default: 0.3): pedestal RMS value returned for
+   *   collection plane channels when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultIndRms* (real, default: 0.3): pedestal RMS value returned for
+   *   induction plane channels when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultMeanErr* (real, default: 0.0): error on the pedestal value
+   *   for all channels returned when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultRmsErr* (real, default: 0.0): error on the RMS value
+   *   for all channels returned when /UseDB/ and /UseFile/ parameters are false
+   */
   class DetPedestalRetrievalAlg : public DatabaseRetrievalAlg, public IDetPedestalProvider {
   
     public:
@@ -46,14 +65,14 @@ namespace lariov {
       ~DetPedestalRetrievalAlg() {}
       
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-      bool Update(std::uint64_t ts) override;
+      bool Update(DBTimeStamp_t ts) override;
       
       /// Retrieve pedestal information
-      const DetPedestal& Pedestal(std::uint64_t ch) const;      
-      float PedMean(std::uint64_t ch) const override;
-      float PedRms(std::uint64_t ch) const override;
-      float PedMeanErr(std::uint64_t ch) const override;
-      float PedRmsErr(std::uint64_t ch) const override;
+      const DetPedestal& Pedestal(DBChannelID_t ch) const;      
+      float PedMean(DBChannelID_t ch) const override;
+      float PedRms(DBChannelID_t ch) const override;
+      float PedMeanErr(DBChannelID_t ch) const override;
+      float PedRmsErr(DBChannelID_t ch) const override;
            
       //hardcoded information about database folder - useful for debugging cross checks
       const unsigned int NCOLUMNS = 5;    
@@ -64,9 +83,7 @@ namespace lariov {
     
       DataSource::ds fDataSource;
           
-      mutable Snapshot<DetPedestal> fData; //I hate making this mutable
-      DetPedestal fDefaultColl;
-      DetPedestal fDefaultInd;
+      Snapshot<DetPedestal> fData;
   };
 }//end namespace lariov
 

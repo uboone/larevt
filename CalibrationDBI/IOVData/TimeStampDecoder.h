@@ -2,6 +2,7 @@
 #define TIMESTAMPDECODER_H
 
 #include "IOVTimeStamp.h"
+#include "CalibrationDBI/Interface/CalibrationDBIFwd.h"
 
 namespace lariov {
 
@@ -12,7 +13,7 @@ namespace lariov {
       TimeStampDecoder() {}
       virtual ~TimeStampDecoder();
       
-      static IOVTimeStamp DecodeTimeStamp(std::uint64_t ts);
+      static IOVTimeStamp DecodeTimeStamp(DBTimeStamp_t ts);
   };
 }
 
