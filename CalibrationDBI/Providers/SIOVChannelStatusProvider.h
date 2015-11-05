@@ -12,7 +12,7 @@
 
 // LArSoft libraries
 #include "CalibrationDBI/Interface/IChannelStatusProvider.h"
-#include "DatabaseRetrievalAlg.h"
+#include "CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 #include "CalibrationDBI/IOVData/ChannelStatus.h"
 #include "CalibrationDBI/IOVData/Snapshot.h"
 
@@ -40,13 +40,13 @@ namespace lariov {
       SIOVChannelStatusProvider(fhicl::ParameterSet const& pset);
     
       ///Default destructor
-      ~SIOVChannelStatusProvider() = default;
+      virtual ~SIOVChannelStatusProvider() = default;
 
       //
       // non-interface methods
       //
       /// Returns Channel Status
-      const ChannelStatus& GetChannelStatus(DBChannelID_t channel) const;
+      const ChannelStatus& GetChannelStatus(raw::ChannelID_t channel) const;
 
       //
       // interface methods
@@ -55,54 +55,58 @@ namespace lariov {
       /// @name Single channel queries
       /// @{
       /// Returns whether the specified channel is physical and connected to wire
-      bool IsPresent(DBChannelID_t channel) const override {
-        return this->GetChannelStatus(channel).IsPresent();
+      bool IsPresent(raw::ChannelID_t channel) const override {
+        return GetChannelStatus(channel).IsPresent();
       }
 
       /// Returns whether the specified channel is bad in the current run
-      bool IsBad(DBChannelID_t channel) const override {
-        return this->GetChannelStatus(channel).IsDead() || this->GetChannelStatus(channel).IsLowNoise() || !this->IsPresent(channel);
+      bool IsBad(raw::ChannelID_t channel) const override {
+        return GetChannelStatus(channel).IsDead() || GetChannelStatus(channel).IsLowNoise() || !IsPresent(channel);
       }
 
       /// Returns whether the specified channel is noisy in the current run
-      bool IsNoisy(DBChannelID_t channel) const override {
-        return this->GetChannelStatus(channel).IsNoisy();
+      bool IsNoisy(raw::ChannelID_t channel) const override {
+        return GetChannelStatus(channel).IsNoisy();
       }
       
       /// Returns whether the specified channel is physical and good
-      bool IsGood(DBChannelID_t channel) const override {
-	return this->GetChannelStatus(channel).IsGood(); 
+      bool IsGood(raw::ChannelID_t channel) const override {
+        return GetChannelStatus(channel).IsGood(); 
       }
       /// @}
       
-      unsigned short Status(DBChannelID_t channel) const override {
-        return (unsigned short)this->GetChannelStatus(channel).Status();
+      Status_t Status(raw::ChannelID_t channel) const override {
+        return (Status_t) this->GetChannelStatus(channel).Status();
       }
-
 
       /// @name Global channel queries
       /// @{
       /// Returns a copy of set of good channel IDs for the current run
-      const DBChannelSet_t GoodChannels() const override;
+      ChannelSet_t GoodChannels() const override;
 
       /// Returns a copy of set of bad channel IDs for the current run
-      const DBChannelSet_t BadChannels() const override;
+      ChannelSet_t BadChannels() const override;
 
       /// Returns a copy of set of noisy channel IDs for the current run
-      const DBChannelSet_t NoisyChannels() const override;
+      ChannelSet_t NoisyChannels() const override;
       /// @}
 
 
       /// @name Configuration functions
       /// @{
       /// Prepares the object to provide information about the specified time
-      bool Update(DBTimeStamp_t) override;
+      bool Update(DBTimeStamp_t);
 
       /// Allows a service to add to the list of noisy channels
-      void AddNoisyChannel(DBChannelID_t ch);
+      void AddNoisyChannel(raw::ChannelID_t ch);
 
       ///@}
-    
+      
+      
+      /// Converts LArSoft channel ID in the one proper for the DB
+      static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel)
+        { return DBChannelID_t(channel); }
+      
     private:
     
       DataSource::ds fDataSource;
@@ -110,7 +114,7 @@ namespace lariov {
       Snapshot<ChannelStatus> fNewNoisy;
       ChannelStatus fDefault;
       
-      const DBChannelSet_t GetChannelsWithStatus(chStatus status) const;
+      ChannelSet_t GetChannelsWithStatus(chStatus status) const;
     
   }; // class SIOVChannelStatusProvider
   

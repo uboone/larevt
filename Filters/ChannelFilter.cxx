@@ -29,54 +29,66 @@
 #include <iostream>
 
 
-filter::ChannelFilter::ChannelFilter() {
+//
+// The following construct is rarely used:
+// I have a C++ reference as a member class, that needs to be constructed in
+// the initialization list. The construction could throw an exception,
+// and I want to do some special handling if that happens.
+// The way to do that is to use a special syntax commonly called
+// "function try block".
+//
+// Note that the "special handling" is not that special as it ends rethrowing
+// the exception. The purpose here is just to provide a bit of additional
+// information about why the failure could have occurred, since art messages
+// often don't have enough.
+//
+filter::ChannelFilter::ChannelFilter() try:
+  provider(art::ServiceHandle<lariov::IChannelStatusService>()->GetProvider())
+{
   
-  if (!&*(art::ServiceHandle<lariov::IChannelStatusService>())) {
-    throw art::Exception(art::errors::Configuration)
-      << "Failed to obtain an instance of IChannelStatusService service"
-      ;
-
-  }
   LOG_ERROR("ChannelFilter") << "ChannelFilter is now deprecated."
     " Replace it with IChannelStatusService";
   
-} // filter::ChannelFilter::ChannelFilter()
+} // function try
+catch (art::Exception& e) { // automatic rethrow happens at end of block
+  if (e.categoryCode() == art::errors::ServiceNotFound) {
+    LOG_SYSTEM("ChannelFilter") <<
+      "Failed to obtain an instance of IChannelStatusService service;"
+      " you should update your configuration, *and* update the code using"
+      " ChannelFilter, that is deprecated."
+      " An example are in ChannelFilter class documentation"
+      ;
+  }
+} // filter::ChannelFilter::ChannelFilter() (function catch)
 
 
 ///////////////////////////////////////////////////////
 bool filter::ChannelFilter::BadChannel(uint32_t channel) const {
-  return art::ServiceHandle<lariov::IChannelStatusService>()
-    ->GetFilter().IsBad(channel);
+  return provider.IsBad(channel);
 }
 
 ///////////////////////////////////////////////////////
 bool filter::ChannelFilter::NoisyChannel(uint32_t channel) const{
-  return art::ServiceHandle<lariov::IChannelStatusService>()
-    ->GetFilter().IsNoisy(channel);
+  return provider.IsNoisy(channel);
 }
 
 ///////////////////////////////////////////////////////
 std::set<uint32_t> filter::ChannelFilter::SetOfBadChannels() const {
-  return art::ServiceHandle<lariov::IChannelStatusService>()
-    ->GetFilter().BadChannels();
+  return provider.BadChannels();
 }
 
 ///////////////////////////////////////////////////////
 std::set<uint32_t> filter::ChannelFilter::SetOfNoisyChannels() const {
-  return art::ServiceHandle<lariov::IChannelStatusService>()
-    ->GetFilter().NoisyChannels();
+  return provider.NoisyChannels();
 }
 
 ///////////////////////////////////////////////////////
 filter::ChannelFilter::ChannelStatus filter::ChannelFilter::GetChannelStatus(uint32_t channel) const
 {
   
-  lariov::IChannelStatusProvider const& filter
-    = art::ServiceHandle<lariov::IChannelStatusService>()->GetFilter();
-
-  if (filter.IsGood(channel))          return GOOD;
-  else if (!filter.IsPresent(channel)) return NOTPHYSICAL;
-  else if (filter.IsBad(channel))      return DEAD;
-  else if (filter.IsNoisy(channel))    return NOISY;
+  if (provider.IsGood(channel))          return GOOD;
+  else if (!provider.IsPresent(channel)) return NOTPHYSICAL;
+  else if (provider.IsBad(channel))      return DEAD;
+  else if (provider.IsNoisy(channel))    return NOISY;
   else return DEAD; //assume all other status are equivalent to DEAD
 }

@@ -1,11 +1,11 @@
 /**
- * @file   SimpleChannelFilterService.h
+ * @file   SimpleChannelStatusService.h
  * @brief  Service for channel quality info
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 24th, 2014
- * @see    IChannelStatusService.h SimpleChannelFilter.h
+ * @see    IChannelStatusService.h SimpleChannelStatus.h
  *
- * Service serving a SimpleChannelFilter.
+ * Service serving a SimpleChannelStatus.
  */
 
 
@@ -13,11 +13,11 @@
 #define SIMPLECHANNELFILTERSERVICE_H
 
 // LArSoft libraries
-#include "Filters/SimpleChannelFilter.h"
+#include "Filters/SimpleChannelStatus.h"
 #include "CalibrationDBI/Interface/IChannelStatusService.h"
 
 // C/C++ standard libraries
-#include <memory> //std::unique_ptr
+#include <memory> //std::unique_ptr<>
 
 namespace art {
   class ActivityRegistry;
@@ -34,39 +34,40 @@ namespace lariov {
    * Channel lists are passed by FHiCL configuration.
    * Note that there is no support for conditions varying with time.
    * 
+   * @note This implementation requires Geometry service
+   * 
    * Configuration parameters
    * =========================
    * 
-   * In addition to the parameters supported by filter::SimpleChannelFilter,
+   * In addition to the parameters supported by filter::SimpleChannelStatus,
    * this service supports:
    * 
-   * - *service_type* (string): must be set to "SimpleChannelFilterService"
+   * - *service_type* (string): must be set to "SimpleChannelStatusService"
    * 
    */
-  class SimpleChannelFilterService: public IChannelStatusService {
+  class SimpleChannelStatusService: public IChannelStatusService {
       public:
     
     /// Constructor: reads the channel IDs from the configuration
-    SimpleChannelFilterService
+    SimpleChannelStatusService
       (fhicl::ParameterSet const& pset, art::ActivityRegistry&);
     
     
       private:
       
-    IChannelStatusProvider const& DoGetFilter() const override 
-     { return *GetFilterPtr(); }
-    IChannelStatusProvider const* DoGetFilterPtr() const override 
-     { return fFilter.get(); } 
+    virtual IChannelStatusProvider const& DoGetProvider() const override
+     { return *DoGetProviderPtr(); }
+    virtual IChannelStatusProvider const* DoGetProviderPtr() const override
+     { return fProvider.get(); } 
     
-    std::unique_ptr<SimpleChannelFilter> fFilter;
+    std::unique_ptr<SimpleChannelStatus> fProvider;
     
-    
-    
-  }; // class SimpleChannelFilterService
+  }; // class SimpleChannelStatusService
   
   
 } // namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SimpleChannelFilterService, lariov::IChannelStatusService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL
+  (lariov::SimpleChannelStatusService, lariov::IChannelStatusService, LEGACY)
 
 #endif // SIMPLECHANNELFILTERSERVICE_H

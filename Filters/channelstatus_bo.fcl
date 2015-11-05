@@ -13,7 +13,7 @@ BEGIN_PROLOG
 bo_channelstatus: {
   # implements IChannelStatusService interface:
   
-  service_provider: SimpleChannelFilterService
+  service_provider: SimpleChannelStatusService
   
   # list of bad channels:
   BadChannels:   [ 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79 ]

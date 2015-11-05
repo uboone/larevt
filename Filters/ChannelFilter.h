@@ -14,6 +14,9 @@
 #ifndef CHANNELFILTER_H
 #define CHANNELFILTER_H
 
+// LArSoft libraries
+#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
+
 // C/C++ standard libraries
 #include <set>
 #include <stdint.h>
@@ -21,7 +24,7 @@
 
 namespace filter {
 
-  class ChannelFilter {
+  class /* [[deprecated]] */ ChannelFilter {
 
   public:
     
@@ -38,6 +41,9 @@ namespace filter {
     std::set<uint32_t> SetOfBadChannels() const;
     std::set<uint32_t> SetOfNoisyChannels() const;
     ChannelStatus GetChannelStatus(uint32_t channel) const;
+    
+  private:
+    lariov::IChannelStatusProvider const& provider; ///< object doing the job
     
   }; //class ChannelFilter
 }

@@ -13,7 +13,7 @@ BEGIN_PROLOG
 standard_channelstatus: {
   # implements IChannelStatusService interface:
   
-  service_provider: SimpleChannelFilterService
+  service_provider: SimpleChannelStatusService
   
 } # standard_channelstatus
 

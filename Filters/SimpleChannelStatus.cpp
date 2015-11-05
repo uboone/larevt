@@ -1,13 +1,13 @@
 /**
- * @file   SimpleChannelFilter.cpp
+ * @file   SimpleChannelStatus.cpp
  * @brief  Channel quality provider with information from configuration file
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 25th, 2014
- * @see    SimpleChannelFilter.h
+ * @see    SimpleChannelStatus.h
  */
 
 // Our header
-#include "Filters/SimpleChannelFilter.h"
+#include "Filters/SimpleChannelStatus.h"
 
 // LArSoft library
 #include "SimpleTypesAndConstants/RawTypes.h" // raw::isValidChannelID()
@@ -27,12 +27,12 @@ namespace lariov {
   
   
   //----------------------------------------------------------------------------
-  SimpleChannelFilter::SimpleChannelFilter(fhicl::ParameterSet const& pset)
+  SimpleChannelStatus::SimpleChannelStatus(fhicl::ParameterSet const& pset)
     : fMaxChannel(raw::InvalidChannelID)
     , fMaxPresentChannel(raw::InvalidChannelID)
   {
     
-    using chan_vect_t = std::vector<DBChannelID_t>;
+    using chan_vect_t = std::vector<raw::ChannelID_t>;
     
     // Read the bad channels as a vector, then convert it into a set
     chan_vect_t BadChannels
@@ -50,12 +50,12 @@ namespace lariov {
       std::inserter(fNoisyChannels, fNoisyChannels.begin())
       );
     
-  } // SimpleChannelFilter::SimpleChannelFilter()
+  } // SimpleChannelStatus::SimpleChannelStatus()
   
   
   //----------------------------------------------------------------------------
-  void SimpleChannelFilter::Setup
-    (DBChannelID_t MaxChannel, DBChannelID_t MaxGoodChannel)
+  void SimpleChannelStatus::Setup
+    (raw::ChannelID_t MaxChannel, raw::ChannelID_t MaxGoodChannel)
   {
     
     fMaxChannel = MaxChannel;
@@ -64,47 +64,47 @@ namespace lariov {
     // clear the caches, if any
     fGoodChannels.reset();
     
-  } // SimpleChannelFilter::Setup()
+  } // SimpleChannelStatus::Setup()
   
   
   //----------------------------------------------------------------------------
-  bool SimpleChannelFilter::IsPresent(DBChannelID_t channel) const {
+  bool SimpleChannelStatus::IsPresent(raw::ChannelID_t channel) const {
     return raw::isValidChannelID(fMaxPresentChannel)
       ? raw::isValidChannelID(channel) && (channel <= fMaxPresentChannel)
       : true;
-  } // SimpleChannelFilter::isPresent()
+  } // SimpleChannelStatus::isPresent()
   
   
   //----------------------------------------------------------------------------
-  DBChannelSet_t const SimpleChannelFilter::GoodChannels() const {
+  SimpleChannelStatus::ChannelSet_t SimpleChannelStatus::GoodChannels() const {
     
     if (!fGoodChannels) FillGoodChannels();
     return *fGoodChannels;
     
-  } // SimpleChannelFilter::GoodChannels()
+  } // SimpleChannelStatus::GoodChannels()
   
   
   //----------------------------------------------------------------------------
-  void SimpleChannelFilter::FillGoodChannels() const {
+  void SimpleChannelStatus::FillGoodChannels() const {
     
-    if (!fGoodChannels) fGoodChannels.reset(new DBChannelSet_t);
+    if (!fGoodChannels) fGoodChannels.reset(new ChannelSet_t);
     
-    DBChannelSet_t& GoodChannels = *fGoodChannels;
+    ChannelSet_t& GoodChannels = *fGoodChannels;
     GoodChannels.clear();
     
     std::vector
-      <std::pair<DBChannelSet_t::const_iterator, DBChannelSet_t::const_iterator>>
+      <std::pair<ChannelSet_t::const_iterator, ChannelSet_t::const_iterator>>
       VetoedIDs;
     
     VetoedIDs.emplace_back(fBadChannels.cbegin(), fBadChannels.cend());
     VetoedIDs.emplace_back(fNoisyChannels.cbegin(), fNoisyChannels.cend());
     
     // go for the first (lowest) channel ID...
-    DBChannelID_t channel = 0;
+    raw::ChannelID_t channel = 0;
     while (!raw::isValidChannelID(channel)) ++channel;
     
     // ... to the last present one
-    DBChannelID_t last_channel = fMaxChannel;
+    raw::ChannelID_t last_channel = fMaxChannel;
     if (raw::isValidChannelID(fMaxPresentChannel)
       && (fMaxPresentChannel < last_channel))
       last_channel = fMaxPresentChannel;
@@ -113,7 +113,7 @@ namespace lariov {
     if (!raw::isValidChannelID(last_channel)) {
       // this exception means that the Setup() function was not called
       // or it was called with an invalid value
-      throw cet::exception("SimpleChannelFilter")
+      throw cet::exception("SimpleChannelStatus")
         << "Can't fill good channel list since no largest channel was set up\n";
     } // if
     
@@ -149,7 +149,7 @@ namespace lariov {
       ++channel;
     } // while
     
-  } // SimpleChannelFilter::GoodChannels()
+  } // SimpleChannelStatus::GoodChannels()
   
   
   //----------------------------------------------------------------------------

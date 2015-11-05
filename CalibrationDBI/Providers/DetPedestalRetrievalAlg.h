@@ -14,12 +14,16 @@
 #ifndef WEBDBI_DETPEDESTALRETRIEVALALG_H
 #define WEBDBI_DETPEDESTALRETRIEVALALG_H
 
-#include "art/Framework/Principal/Event.h"
+// C/C++ standard libraries
+#include <string>
+#include <array>
+
+// LArSoft libraries
 #include "CalibrationDBI/IOVData/DetPedestal.h"
 #include "CalibrationDBI/IOVData/Snapshot.h"
 #include "CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "CalibrationDBI/Interface/IDetPedestalProvider.h"
-#include "DatabaseRetrievalAlg.h"
+#include "CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 
 namespace lariov {
 
@@ -61,23 +65,22 @@ namespace lariov {
       /// Reconfigure function called by fhicl constructor
       void Reconfigure(fhicl::ParameterSet const& p);
       
-      /// Default destructor
-      ~DetPedestalRetrievalAlg() {}
-      
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-      bool Update(DBTimeStamp_t ts) override;
+      bool Update(DBTimeStamp_t ts);
       
       /// Retrieve pedestal information
-      const DetPedestal& Pedestal(DBChannelID_t ch) const;      
+      const DetPedestal& Pedestal(DBChannelID_t ch) const;
       float PedMean(DBChannelID_t ch) const override;
       float PedRms(DBChannelID_t ch) const override;
       float PedMeanErr(DBChannelID_t ch) const override;
       float PedRmsErr(DBChannelID_t ch) const override;
            
       //hardcoded information about database folder - useful for debugging cross checks
-      const unsigned int NCOLUMNS = 5;    
-      const std::vector<std::string> FIELD_NAMES = {"channel", "mean", "mean_err", "rms", "rms_err"};
-      const std::vector<std::string> FIELD_TYPES = {"unsigned int", "float", "float", "float", "float"};
+      static constexpr unsigned int NCOLUMNS = 5;
+      static constexpr const char* FIELD_NAMES[NCOLUMNS]
+        = {"channel", "mean", "mean_err", "rms", "rms_err"};
+      static constexpr const char* FIELD_TYPES[NCOLUMNS]
+        = {"unsigned int", "float", "float", "float", "float"};
       
     private:
     

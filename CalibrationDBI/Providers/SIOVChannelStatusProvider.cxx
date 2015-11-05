@@ -98,20 +98,21 @@ namespace lariov {
   
   
   //----------------------------------------------------------------------------
-  const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(DBChannelID_t ch) const {
+  const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(raw::ChannelID_t ch) const {
     try {
-      return fNewNoisy.GetRow(ch);
+      return fNewNoisy.GetRow(rawToDBChannel(ch));
     }
     catch (IOVDataError& e) {
-      return fData.GetRow(ch);
+      return fData.GetRow(rawToDBChannel(ch));
     }
   } 
   
   
   //----------------------------------------------------------------------------
-  const DBChannelSet_t SIOVChannelStatusProvider::GetChannelsWithStatus(chStatus status) const {
+  SIOVChannelStatusProvider::ChannelSet_t
+  SIOVChannelStatusProvider::GetChannelsWithStatus(chStatus status) const {
     
-    DBChannelSet_t retSet;
+    ChannelSet_t retSet;
     retSet.clear();
     DBChannelID_t maxChannel = art::ServiceHandle<geo::Geometry>()->Nchannels() - 1;
     if (fDataSource == DataSource::Default) {
@@ -136,31 +137,35 @@ namespace lariov {
   
   
   //----------------------------------------------------------------------------
-  const DBChannelSet_t SIOVChannelStatusProvider::GoodChannels() const {
+  SIOVChannelStatusProvider::ChannelSet_t
+  SIOVChannelStatusProvider::GoodChannels() const {
     return GetChannelsWithStatus(kGOOD);
   }
 
   
   //----------------------------------------------------------------------------
-  const DBChannelSet_t SIOVChannelStatusProvider::BadChannels() const {
-    DBChannelSet_t dead = GetChannelsWithStatus(kDEAD);
-    DBChannelSet_t ln = GetChannelsWithStatus(kLOWNOISE);
+  SIOVChannelStatusProvider::ChannelSet_t
+  SIOVChannelStatusProvider::BadChannels() const {
+    ChannelSet_t dead = GetChannelsWithStatus(kDEAD);
+    ChannelSet_t ln = GetChannelsWithStatus(kLOWNOISE);
     dead.insert(ln.begin(),ln.end());
     return dead;
   }
 
   
   //----------------------------------------------------------------------------
-  const DBChannelSet_t SIOVChannelStatusProvider::NoisyChannels() const {
+  SIOVChannelStatusProvider::ChannelSet_t
+  SIOVChannelStatusProvider::NoisyChannels() const {
     return GetChannelsWithStatus(kNOISY); 
   }
   
   
   //----------------------------------------------------------------------------
-  void SIOVChannelStatusProvider::AddNoisyChannel(DBChannelID_t ch) {  
-
-    if (!this->IsBad(ch) && this->IsPresent(ch)) {
-      ChannelStatus cs(ch);
+  void SIOVChannelStatusProvider::AddNoisyChannel(raw::ChannelID_t ch) {
+    
+    register DBChannelID_t const dbch = rawToDBChannel(ch);
+    if (!this->IsBad(dbch) && this->IsPresent(dbch)) {
+      ChannelStatus cs(dbch);
       cs.SetStatus(kNOISY);
       fNewNoisy.AddOrReplaceRow(cs);
     }

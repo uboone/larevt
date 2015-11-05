@@ -4,8 +4,10 @@
 #
 BEGIN_PROLOG
 
-channel_filter_argoneut: {
-  service_provider: SimpleChannelFilterService
+argoneut_channelstatus: {
+  # implements IChannelStatusService
+
+  service_provider: SimpleChannelStatusService
   
   # list of bad channels:
   BadChannels:   [ 22, 65, 237, 307, 308, 309, 310, 311, 410, 412, 438, 439, 448 ]
