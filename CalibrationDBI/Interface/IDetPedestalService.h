@@ -17,6 +17,7 @@ namespace lariov{
   class IDetPedestalService {
   
     public:
+      using provider_type = IDetPedestalProvider;
 
       virtual ~IDetPedestalService() = default;
 
@@ -24,6 +25,10 @@ namespace lariov{
       const IDetPedestalProvider& GetPedestalProvider() const {
         return this->DoGetPedestalProvider();
       }
+      
+      IDetPedestalProvider const* provider() const
+        { return &DoGetPedestalProvider(); }
+      
       
     private:
       

@@ -65,7 +65,9 @@ namespace lariov {
   class IChannelStatusService {
     
     public:
-   
+      
+      using provider_type = IChannelStatusProvider;
+      
       /// Destructor
       virtual ~IChannelStatusService() = default;
 
@@ -89,7 +91,11 @@ namespace lariov {
       IChannelStatusProvider const* GetFilterPtr() const
         { return GetProviderPtr(); }
       //@}
-
+      
+      
+      IChannelStatusProvider const* provider() const
+        { return GetProviderPtr(); }
+      
       //
       // end of interface
       //
