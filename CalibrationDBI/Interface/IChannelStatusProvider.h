@@ -58,6 +58,14 @@ namespace lariov {
       static constexpr Status_t InvalidStatus
         = std::numeric_limits<Status_t>::max();
       
+      /// Default constructor
+      IChannelStatusProvider() = default;
+      
+      // do not allow for copies or moves of this class
+      IChannelStatusProvider(IChannelStatusProvider const&) = delete;
+      IChannelStatusProvider(IChannelStatusProvider&&) = delete;
+      IChannelStatusProvider& operator = (IChannelStatusProvider const&) = delete;
+      IChannelStatusProvider& operator = (IChannelStatusProvider&&) = delete;
       
       /// Virtual destructor; destructs nothing
       virtual ~IChannelStatusProvider() = default;

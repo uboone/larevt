@@ -3,6 +3,8 @@
 
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
+#include "CoreUtils/ServiceUtil.h" // unused; for includer's convenience
+
 //forward declarations
 namespace lariov {
   class IDetPedestalProvider;
@@ -37,5 +39,9 @@ namespace lariov{
 }//end namespace lariov
 
 DECLARE_ART_SERVICE_INTERFACE(lariov::IDetPedestalService, LEGACY)
+
+
+// check that the requirements for lariov::IChannelStatusService are satisfied
+template class lar::details::ServiceRequirementsChecker<lariov::IDetPedestalService>;
 
 #endif

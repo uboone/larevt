@@ -13,6 +13,7 @@
 #define ICHANNELSTATUSSERVICE_H
 
 // LArSoft libraries
+#include "CoreUtils/ServiceUtil.h" // ServiceRequirementsChecker<>
 #include "CalibrationDBI/Interface/IChannelStatusProvider.h"
 
 // Framework libraries
@@ -116,6 +117,10 @@ namespace lariov {
 
 
 DECLARE_ART_SERVICE_INTERFACE(lariov::IChannelStatusService, LEGACY)
+
+
+// check that the requirements for lariov::IChannelStatusService are satisfied
+template class lar::details::ServiceRequirementsChecker<lariov::IChannelStatusService>;
 
 
 #endif // ICHANNELSTATUSSERVICE_H
