@@ -30,7 +30,7 @@
 
 #include "RecoBase/Hit.h"
 #include "Utilities/GeometryUtilities.h"
-#include "Utilities/IDetectorPropertiesService.h"
+#include "Utilities/DetectorPropertiesService.h"
 
  
 namespace cluster {
@@ -60,7 +60,7 @@ namespace cluster {
 			unsigned int &w);
     
     art::ServiceHandle<geo::Geometry>            geom; ///< handle to geometry service
-    const dataprov::IDetectorProperties* detp = lar::providerFrom<util::IDetectorPropertiesService>(); ///< const ptr to det properties data provider
+    const dataprov::DetectorProperties* detp = lar::providerFrom<util::DetectorPropertiesService>(); ///< const ptr to det properties data provider
     util::GeometryUtilities                      gser; ///< geometry utilities   
     std::vector< unsigned int >fNWires;		       ///< Number of wires on each plane
     

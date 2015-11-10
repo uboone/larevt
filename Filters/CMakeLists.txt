@@ -22,7 +22,7 @@ art_make( BASENAME_ONLY
                         ${Boost_SYSTEM_LIBRARY}
           MODULE_LIBRARIES Filters
                            RawData
-                           LArPropertiesService_service
+                           LArPropertiesServiceStandard_service
                            ${SIMULATIONBASE}
           SERVICE_LIBRARIES Filters
                             ${ART_FRAMEWORK_PRINCIPAL}
