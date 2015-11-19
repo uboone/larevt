@@ -149,7 +149,7 @@ void test_simple_status() {
     (pSimpleStatus->MaxChannelPresent(), statusCreator.fMaxPresentChannel);
   
   // downcast to the interface to test interface stuff
-  lariov::IChannelStatusProvider const* pStatus = pSimpleStatus;
+  lariov::ChannelStatusProvider const* pStatus = pSimpleStatus;
   
   /**
    *

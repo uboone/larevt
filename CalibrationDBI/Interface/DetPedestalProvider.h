@@ -1,13 +1,13 @@
 /**
- * \file IDetPedestalProvider
+ * \file DetPedestalProvider
  * 
- * \brief Class def header for a class IDetPedestalProvider
+ * \brief Class def header for a class DetPedestalProvider
  *
  * @author eberly@slac.stanford.edu
  */
 
-#ifndef IDETPEDESTALPROVIDER_H
-#define IDETPEDESTALPROVIDER_H
+#ifndef DETPEDESTALPROVIDER_H
+#define DETPEDESTALPROVIDER_H
 
 // LArSoft libraries
 #include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
@@ -16,16 +16,16 @@
 namespace lariov {
 
   /**
-     \class IDetPedestalProvider
+     \class DetPedestalProvider
      Pure abstract interface class for retrieving detector pedestals.
      Includes a feature to encourage database use: an Update method that can be used to update 
      an implementation's local state to ensure that the correct information is retrieved
   */
-  class IDetPedestalProvider {
+  class DetPedestalProvider {
   
     public:
     
-      virtual ~IDetPedestalProvider() = default;
+      virtual ~DetPedestalProvider() = default;
        
       /// Retrieve pedestal information     
       virtual float PedMean(raw::ChannelID_t ch) const = 0;

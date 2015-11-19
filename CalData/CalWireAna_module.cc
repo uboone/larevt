@@ -29,8 +29,8 @@
 #include "Geometry/PlaneGeo.h"
 #include "RawData/RawDigit.h"
 #include "RecoBase/Wire.h"
-#include "CalibrationDBI/Interface/IChannelStatusService.h"
-#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "CalibrationDBI/Interface/ChannelStatusService.h"
+#include "CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "Utilities/LArFFT.h"
 
 // ROOT includes
@@ -159,8 +159,8 @@ namespace caldata{
 
     // loop over the raw digits and get the adc vector for each, then compress it and uncompress it
 
-    lariov::IChannelStatusProvider const& channelStatus
-      = art::ServiceHandle<lariov::IChannelStatusService>()->GetProvider();
+    lariov::ChannelStatusProvider const& channelStatus
+      = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
     art::Handle< std::vector<raw::RawDigit> > rdHandle;
     evt.getByLabel(fDetSimModuleLabel,rdHandle);
     art::Handle< std::vector<recob::Wire> > wHandle;

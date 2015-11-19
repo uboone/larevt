@@ -3,7 +3,7 @@
  * @brief  Channel quality provider with information from configuration file
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 25th, 2014
- * @see    IChannelStatusService.h SimpleChannelStatus.cpp
+ * @see    ChannelStatusService.h SimpleChannelStatus.cpp
  */
 
 
@@ -12,7 +12,7 @@
 
 // LArSoft libraries
 #include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
-#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 // Utility libraries
 #include "fhiclcpp/ParameterSet.h"
@@ -46,9 +46,9 @@ namespace lariov {
    *   channels
    * 
    */
-  class SimpleChannelStatus: public lariov::IChannelStatusProvider {
+  class SimpleChannelStatus: public lariov::ChannelStatusProvider {
       public:
-    using ChannelSet_t = lariov::IChannelStatusProvider::ChannelSet_t;
+    using ChannelSet_t = lariov::ChannelStatusProvider::ChannelSet_t;
     
     /// Configuration
     explicit SimpleChannelStatus(fhicl::ParameterSet const& pset);

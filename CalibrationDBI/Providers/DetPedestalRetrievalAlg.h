@@ -22,7 +22,7 @@
 #include "CalibrationDBI/IOVData/DetPedestal.h"
 #include "CalibrationDBI/IOVData/Snapshot.h"
 #include "CalibrationDBI/IOVData/IOVDataConstants.h"
-#include "CalibrationDBI/Interface/IDetPedestalProvider.h"
+#include "CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 
 namespace lariov {
@@ -51,7 +51,7 @@ namespace lariov {
    * - *DefaultRmsErr* (real, default: 0.0): error on the RMS value
    *   for all channels returned when /UseDB/ and /UseFile/ parameters are false
    */
-  class DetPedestalRetrievalAlg : public DatabaseRetrievalAlg, public IDetPedestalProvider {
+  class DetPedestalRetrievalAlg : public DatabaseRetrievalAlg, public DetPedestalProvider {
   
     public:
     

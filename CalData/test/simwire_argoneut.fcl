@@ -22,7 +22,7 @@ services.LArFFT.FFTOption: ""
 services.DetectorPropertiesService: @local::argoneut_detproperties
 services.DatabaseUtil:       @local::argoneut_database
 services.DatabaseUtil.ShouldConnect: false
-services.IChannelStatusService: @local::argoneut_channelstatus
+services.ChannelStatusService: @local::argoneut_channelstatus
 
 source:
 {

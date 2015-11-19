@@ -1,5 +1,5 @@
 /**
- * @file   IChannelStatusService.h
+ * @file   ChannelStatusService.h
  * @brief  Interface for experiment-specific service for channel quality info
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 24th, 2014
@@ -9,19 +9,19 @@
  * The implementations of this interface can be directly used as art services.
  */
 
-#ifndef ICHANNELSTATUSSERVICE_H
-#define ICHANNELSTATUSSERVICE_H
+#ifndef CHANNELSTATUSSERVICE_H
+#define CHANNELSTATUSSERVICE_H
 
 // LArSoft libraries
 #include "CoreUtils/ServiceUtil.h" // ServiceRequirementsChecker<>
-#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 // Framework libraries
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
 //forward declarations
 namespace lariov {
-  class IChannelStatusProvider;
+  class ChannelStatusProvider;
 }
 
 namespace lariov {
@@ -47,30 +47,30 @@ namespace lariov {
    *      
    * to
    *      
-   *      art::ServiceHandle<lariov::IChannelStatusService> chanFilt;
+   *      art::ServiceHandle<lariov::ChannelStatusService> chanFilt;
    *      
-   * (include files CalibrationDBI/Interface/IChannelStatusService.h instead of
+   * (include files CalibrationDBI/Interface/ChannelStatusService.h instead of
    * Filters/ChannelFilter.h) or
    *      
-   *      lariov::IChannelStatusProvider const& chanFilt
-   *        = art::ServiceHandle<lariov::IChannelStatusService>()
+   *      lariov::ChannelStatusProvider const& chanFilt
+   *        = art::ServiceHandle<lariov::ChannelStatusService>()
    *          ->GetProvider();
    *      
-   * (include files CalibrationDBI/Interface/IChannelStatusService.h and
-   * CalibrationDBI/Interface/IChannelStatusProvider.h instead of
+   * (include files CalibrationDBI/Interface/ChannelStatusService.h and
+   * CalibrationDBI/Interface/ChannelStatusProvider.h instead of
    * Filters/ChannelFilter.h).
    * The latter object can in principle be passed to algorithms that are not
    * art-aware.
    * 
    */
-  class IChannelStatusService {
+  class ChannelStatusService {
     
     public:
       
-      using provider_type = IChannelStatusProvider;
+      using provider_type = ChannelStatusProvider;
       
       /// Destructor
-      virtual ~IChannelStatusService() = default;
+      virtual ~ChannelStatusService() = default;
 
       //
       // Actual interface here
@@ -78,23 +78,23 @@ namespace lariov {
 
       //@{
       /// Returns a reference to the service provider
-      IChannelStatusProvider const& GetProvider() const
+      ChannelStatusProvider const& GetProvider() const
         { return DoGetProvider(); }
       // will be deprecated:
-      IChannelStatusProvider const& GetFilter() const { return GetProvider(); }
+      ChannelStatusProvider const& GetFilter() const { return GetProvider(); }
       //@}
 
       //@{
       /// Returns a pointer to the service provider
-      IChannelStatusProvider const* GetProviderPtr() const
+      ChannelStatusProvider const* GetProviderPtr() const
         { return DoGetProviderPtr(); }
       // will be deprecated:
-      IChannelStatusProvider const* GetFilterPtr() const
+      ChannelStatusProvider const* GetFilterPtr() const
         { return GetProviderPtr(); }
       //@}
       
       
-      IChannelStatusProvider const* provider() const
+      ChannelStatusProvider const* provider() const
         { return GetProviderPtr(); }
       
       //
@@ -104,23 +104,23 @@ namespace lariov {
     private:
     
       /// Returns a pointer to the service provider 
-      virtual IChannelStatusProvider const* DoGetProviderPtr() const = 0;
+      virtual ChannelStatusProvider const* DoGetProviderPtr() const = 0;
 
       /// Returns a reference to the service provider
-      virtual IChannelStatusProvider const& DoGetProvider() const = 0;
+      virtual ChannelStatusProvider const& DoGetProvider() const = 0;
     
     
     
-  }; // class IChannelStatusService
+  }; // class ChannelStatusService
   
 } // namespace lariov
 
 
-DECLARE_ART_SERVICE_INTERFACE(lariov::IChannelStatusService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(lariov::ChannelStatusService, LEGACY)
 
 
-// check that the requirements for lariov::IChannelStatusService are satisfied
-template class lar::details::ServiceRequirementsChecker<lariov::IChannelStatusService>;
+// check that the requirements for lariov::ChannelStatusService are satisfied
+template class lar::details::ServiceRequirementsChecker<lariov::ChannelStatusService>;
 
 
-#endif // ICHANNELSTATUSSERVICE_H
+#endif // CHANNELSTATUSSERVICE_H
