@@ -44,8 +44,8 @@ extern "C" {
 #include "Geometry/Geometry.h"
 #include "Geometry/PlaneGeo.h"
 #include "Geometry/WireGeo.h"
-#include "Utilities/LArPropertiesService.h"
-#include "Utilities/DetectorPropertiesService.h"
+#include "DetectorInfoServices/LArPropertiesService.h"
+#include "DetectorInfoServices/DetectorPropertiesService.h"
 #include "Utilities/AssociationUtil.h"
  
 
@@ -119,10 +119,10 @@ namespace filter {
   bool MuonFilter::filter(art::Event &evt)
   { 
     art::ServiceHandle<geo::Geometry> geom;
-    //    art::ServiceHandle<util::LArPropertiesService> larprop_s;
-    //    art::ServiceHandle<util::DetectorPropertiesService> detprop_s;
-    auto const * larprop = lar::providerFrom<util::LArPropertiesService>();
-    auto const * detprop = lar::providerFrom<util::DetectorPropertiesService>();
+    //    art::ServiceHandle<detinfo::LArPropertiesService> larprop_s;
+    //    art::ServiceHandle<detinfo::DetectorPropertiesService> detprop_s;
+    auto const * larprop = lar::providerFrom<detinfo::LArPropertiesService>();
+    auto const * detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
     
     //Drift Velocity in cm/us Sampling rate in ns
     double drift = detprop->DriftVelocity(detprop->Efield(), larprop->Temperature())*detprop->SamplingRate()/1000.0; 
