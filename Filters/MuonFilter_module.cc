@@ -44,7 +44,6 @@ extern "C" {
 #include "Geometry/Geometry.h"
 #include "Geometry/PlaneGeo.h"
 #include "Geometry/WireGeo.h"
-#include "DetectorInfoServices/LArPropertiesService.h"
 #include "DetectorInfoServices/DetectorPropertiesService.h"
 #include "Utilities/AssociationUtil.h"
  
@@ -121,11 +120,10 @@ namespace filter {
     art::ServiceHandle<geo::Geometry> geom;
     //    art::ServiceHandle<detinfo::LArPropertiesService> larprop_s;
     //    art::ServiceHandle<detinfo::DetectorPropertiesService> detprop_s;
-    auto const * larprop = lar::providerFrom<detinfo::LArPropertiesService>();
     auto const * detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
     
     //Drift Velocity in cm/us Sampling rate in ns
-    double drift = detprop->DriftVelocity(detprop->Efield(), larprop->Temperature())*detprop->SamplingRate()/1000.0; 
+    double drift = detprop->DriftVelocity(detprop->Efield(), detprop->Temperature())*detprop->SamplingRate()/1000.0; 
 
     //This code only works comparing 2 planes so for now these are the 
     // last induction plane and collection plane
