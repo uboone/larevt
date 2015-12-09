@@ -24,7 +24,7 @@ namespace lariov {
 
   //----------------------------------------------------------------------------
   SimpleChannelStatusService::SimpleChannelStatusService
-    (fhicl::ParameterSet const& pset, art::ActivityRegistry&)
+    (fhicl::ParameterSet const& pset, art::ActivityRegistry& reg)
   {
     SimpleChannelStatus* simple_filter = new SimpleChannelStatus(pset);
     
@@ -41,6 +41,46 @@ namespace lariov {
       << "\n  - largest channel ID: " << fProvider->MaxChannel()
         << ", largest present: " << fProvider->MaxChannelPresent()
       ;
+    
+    // register a callback to be executed when a new run starts
+    reg.sPostBeginRun.watch(this, &SimpleChannelStatusService::postBeginRun);
+    
+  } // SimpleChannelStatusService::SimpleChannelStatusService()
+  
+  
+  //----------------------------------------------------------------------------
+  void SimpleChannelStatusService::postBeginRun(art::Run const&) {
+    
+    // on a new run, geometry might have changed;
+    // this makes sense only if the geometry configuration was wrong in the
+    // first place
+    UpdateChannelRange();
+    
+  } // SimpleChannelStatusService::postBeginRun()
+  
+  
+  //----------------------------------------------------------------------------
+  void SimpleChannelStatusService::UpdateChannelRange() {
+    
+    raw::ChannelID_t MaxChannel
+      = raw::ChannelID_t(art::ServiceHandle<geo::Geometry>()->Nchannels() - 1);
+    
+    if (MaxChannel != fProvider->MaxChannel()) {
+      
+      throw art::Exception(art::errors::Configuration)
+        << "SimpleChannelStatusService does not support dynamic configuration, "
+        << "but it appears that the channel configuration has sensibly changed."
+        ;
+      
+    /* // this is if we had wanted to be forgiving
+      simple_filter->Setup(MaxChannel);
+      
+      mf::LogInfo("SimpleChannelStatusService") << "Updated channel range:"
+        << "\n  - largest channel ID: " << fProvider->MaxChannel()
+          << ", largest present: " << fProvider->MaxChannelPresent()
+        ;
+    */
+    } // if updated
     
   } // SimpleChannelStatusService::SimpleChannelStatusService()
   

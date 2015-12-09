@@ -16,11 +16,14 @@
 #include "Filters/SimpleChannelStatus.h"
 #include "CalibrationDBI/Interface/IChannelStatusService.h"
 
+// framework libraries
+#include "art/Framework/Services/Registry/ActivityRegistry.h"
+
 // C/C++ standard libraries
 #include <memory> //std::unique_ptr<>
 
 namespace art {
-  class ActivityRegistry;
+  class Run;
 } // namespace art
 
 
@@ -59,6 +62,12 @@ namespace lariov {
      { return *DoGetProviderPtr(); }
     virtual IChannelStatusProvider const* DoGetProviderPtr() const override
      { return fProvider.get(); } 
+    
+    /// Update valid channel range
+    void UpdateChannelRange();
+    
+    /// React to a new run
+    void postBeginRun(art::Run const& run);
     
     std::unique_ptr<SimpleChannelStatus> fProvider;
     
