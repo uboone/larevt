@@ -55,6 +55,11 @@ namespace lariov {
 	fData.AddOrReplaceRow(cs);
       }
     } 
+    else if (fDataSource == DataSource::File) {
+      // please consider implementing it if you need it!!
+      throw cet::exception("SIOVChannelStatusProvider")
+        << "Data from file not implemented yet ('UseFile' parameter)\n";
+    } // if source from file
   }
   
   bool SIOVChannelStatusProvider::Update(DBTimeStamp_t ts) {
