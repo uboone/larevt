@@ -71,6 +71,20 @@ namespace lariov {
     return err;
   }
   
+  int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::vector<double>& data) {
+    
+    data.clear();
+    
+    Tuple tup;
+    size_t col = this->GetTupleColumn(channel, name, tup);
+    int err=0;
+    double buf[kBUFFER_SIZE];
+    int array_size = getDoubleArray(tup, col, buf, kBUFFER_SIZE, &err);
+    data.insert(data.begin(), buf, buf + array_size);
+    releaseTuple(tup);
+    return err;
+  }
+  
   int DBFolder::GetChannelList( std::vector<DBChannelID_t>& channels ) const {
     
     channels.clear();
