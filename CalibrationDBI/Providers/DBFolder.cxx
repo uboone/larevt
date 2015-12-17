@@ -16,6 +16,12 @@
 
 namespace lariov {
 
+  typedef struct {
+      size_t ncolumns;    // Number of columns in CSV row
+      size_t nelements;   // Number of elements in data array
+      char **columns;     // Pointers to columns
+  } DataRec;
+
   DBFolder::DBFolder(const std::string& name, const std::string& url, const std::string& tag /*= ""*/) :
     fCachedStart(0,0), fCachedEnd(0,0) {
 
@@ -79,7 +85,34 @@ namespace lariov {
     size_t col = this->GetTupleColumn(channel, name, tup);
     int err=0;
     double buf[kBUFFER_SIZE];
-    int array_size = getDoubleArray(tup, col, buf, kBUFFER_SIZE, &err);
+    
+    DataRec *dataRec = (DataRec *)tup;
+    if (col < 0 || col >= dataRec->ncolumns) {
+      err=-1;
+      return err;
+    }
+    
+    char* sptr = dataRec->columns[col];
+    if ( *sptr == '[') sptr +=1;  //expect an initial bracket and skip it
+    else {
+      err=-2;
+      return err;
+    }
+    
+    char* eptr;
+    double val;
+    unsigned int array_size=0;
+    for (unsigned int i=0; i < kBUFFER_SIZE; ++i) {
+      val = strtod(sptr, &eptr); //Try to convert
+      if (sptr==eptr) break;     //conversion failed
+      if (*sptr=='\0') break;    //end loop if buffer ends
+      
+      buf[array_size++] = val;
+      
+      if ( *eptr == ']') break;  //found the closing bracket, we're done
+      else sptr = eptr+1;        //point to the next value
+    }
+    
     data.insert(data.begin(), buf, buf + array_size);
     releaseTuple(tup);
     return err;
