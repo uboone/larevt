@@ -26,10 +26,10 @@
 #include "art/Persistency/Common/Ptr.h" 
 
 //Larsoft Includes
-#include "RawData/raw.h"
-#include "RawData/RawDigit.h"
-#include "CalibrationDBI/Interface/ChannelStatusProvider.h"
-#include "CalibrationDBI/Interface/ChannelStatusService.h"
+#include "lardata/RawData/raw.h"
+#include "lardata/RawData/RawDigit.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 
 
 namespace filter {

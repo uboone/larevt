@@ -3,7 +3,7 @@
 
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
-#include "CoreUtils/ServiceUtil.h" // unused; for includer's convenience
+#include "larcore/CoreUtils/ServiceUtil.h" // unused; for includer's convenience
 
 //forward declarations
 namespace lariov {

@@ -25,9 +25,9 @@
 
  
 // LArSoft includes"
-#include "RecoBase/Hit.h"
-#include "Geometry/Geometry.h"
-#include "Geometry/WireGeo.h"
+#include "lardata/RecoBase/Hit.h"
+#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireGeo.h"
 
 #include "TH1I.h"
 #include "TH2I.h"

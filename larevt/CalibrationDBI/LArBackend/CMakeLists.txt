@@ -1,5 +1,5 @@
 
-#art_make( BASENAME_ONLY
+#art_make( 
 #	  EXCLUDE WebReaderService_service.cc
 #	  LIBRARY_NAME CalibrationDBI_LArBackend
 #          MODULE_LIBRARIES
@@ -28,7 +28,7 @@
 #	      CalibrationDBI_WebDBI
 #              ${ART_FRAMEWORK_SERVICES_REGISTRY}
 #              ${FHICLCPP}
-#              BASENAME_ONLY
+#              
 #)
 
 add_subdirectory(job)

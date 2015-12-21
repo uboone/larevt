@@ -9,7 +9,7 @@ art_make( LIBRARY_NAME  CalibrationDBI_Providers
 	                ${FHICLCPP}
 			${CETLIB}
 			Geometry
-			Geometry_service
+			larcore_Geometry_Geometry_service
                         ${Boost_SYSTEM_LIBRARY}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ROOT_BASIC_LIB_LIST}

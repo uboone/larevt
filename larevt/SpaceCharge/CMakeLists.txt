@@ -4,7 +4,7 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 art_make( NO_PLUGINS
           LIBRARY_NAME  SpaceCharge
-          LIB_LIBRARIES SpaceCharge_service
+          LIB_LIBRARIES larevt_SpaceCharge_SpaceCharge_service
 	                Utilities
 	                ${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
@@ -34,7 +34,7 @@ simple_plugin(SpaceCharge "service"
 	      ${MF_UTILITIES}
   	      ${CETLIB}
    	      ${ROOT_BASIC_LIB_LIST}
-              BASENAME_ONLY
+              
 )
 
 install_headers()

@@ -13,8 +13,8 @@
 #define SIMPLECHANNELFILTERSERVICE_H
 
 // LArSoft libraries
-#include "Filters/SimpleChannelStatus.h"
-#include "CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/Filters/SimpleChannelStatus.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 
 // C/C++ standard libraries
 #include <memory> //std::unique_ptr<>

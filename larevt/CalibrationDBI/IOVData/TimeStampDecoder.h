@@ -2,7 +2,7 @@
 #define TIMESTAMPDECODER_H
 
 #include "IOVTimeStamp.h"
-#include "CalibrationDBI/Interface/CalibrationDBIFwd.h"
+#include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 
 namespace lariov {
 

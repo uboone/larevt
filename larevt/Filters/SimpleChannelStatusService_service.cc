@@ -7,11 +7,11 @@
  */
 
 // Our header
-#include "Filters/SimpleChannelStatusService.h"
+#include "larevt/Filters/SimpleChannelStatusService.h"
 
 // LArSoft libraries
-#include "Geometry/Geometry.h"
-#include "Geometry/GeometryCore.h"
+#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/GeometryCore.h"
 
 // Framework libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h"

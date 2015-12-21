@@ -28,9 +28,9 @@
 #include "art/Framework/Principal/Event.h" 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "RecoBase/Hit.h"
-#include "Utilities/GeometryUtilities.h"
-#include "DetectorInfoServices/DetectorPropertiesService.h"
+#include "lardata/RecoBase/Hit.h"
+#include "lardata/Utilities/GeometryUtilities.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
  
 namespace cluster {

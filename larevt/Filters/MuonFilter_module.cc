@@ -39,13 +39,13 @@ extern "C" {
 
 
 //Larsoft Includes
-#include "RecoBase/Hit.h"
-#include "RecoBase/Cluster.h"
-#include "Geometry/Geometry.h"
-#include "Geometry/PlaneGeo.h"
-#include "Geometry/WireGeo.h"
-#include "DetectorInfoServices/DetectorPropertiesService.h"
-#include "Utilities/AssociationUtil.h"
+#include "lardata/RecoBase/Hit.h"
+#include "lardata/RecoBase/Cluster.h"
+#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/PlaneGeo.h"
+#include "larcore/Geometry/WireGeo.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "lardata/Utilities/AssociationUtil.h"
  
 
 namespace filter {

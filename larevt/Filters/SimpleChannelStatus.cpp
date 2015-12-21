@@ -7,10 +7,10 @@
  */
 
 // Our header
-#include "Filters/SimpleChannelStatus.h"
+#include "larevt/Filters/SimpleChannelStatus.h"
 
 // LArSoft library
-#include "SimpleTypesAndConstants/RawTypes.h" // raw::isValidChannelID()
+#include "larcore/SimpleTypesAndConstants/RawTypes.h" // raw::isValidChannelID()
 
 // Framework libraries
 #include "cetlib/exception.h"

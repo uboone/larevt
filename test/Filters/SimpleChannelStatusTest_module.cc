@@ -18,8 +18,8 @@
 #include "art/Framework/Principal/Run.h"
 
 // LArSoft includes
-#include "CalibrationDBI/Interface/ChannelStatusService.h"
-#include "CalibrationDBI/Interface/ChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 
 

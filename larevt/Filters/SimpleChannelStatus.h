@@ -11,8 +11,8 @@
 #define SIMPLECHANNELFILTER_H 1
 
 // LArSoft libraries
-#include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
-#include "CalibrationDBI/Interface/ChannelStatusProvider.h"
+#include "larcore/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 // Utility libraries
 #include "fhiclcpp/ParameterSet.h"

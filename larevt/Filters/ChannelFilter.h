@@ -15,7 +15,7 @@
 #define CHANNELFILTER_H
 
 // LArSoft libraries
-#include "CalibrationDBI/Interface/ChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 // C/C++ standard libraries
 #include <set>

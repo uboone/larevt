@@ -1,10 +1,10 @@
 
-art_make( BASENAME_ONLY
+art_make( 
           LIBRARY_NAME  Filters
           LIB_LIBRARIES 
                         RecoBase
                         Geometry
-                        Geometry_service
+                        larcore_Geometry_Geometry_service
                         Utilities
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}

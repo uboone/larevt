@@ -2,7 +2,7 @@
 simple_plugin(CalWireAna "module"
                         Filters
 	                RawData
-			LArFFT_service
+			lardata_Utilities_LArFFT_service
 			Utilities
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -20,7 +20,7 @@ simple_plugin(CalWireAna "module"
                         ${ROOT_XMLIO}
                         ${ROOT_GDML}
 			${ROOT_BASIC_LIB_LIST}
-              BASENAME_ONLY
+              
 )
 
 simple_plugin(CalWire "module"
@@ -44,7 +44,7 @@ simple_plugin(CalWire "module"
                         ${ROOT_XMLIO}
                         ${ROOT_GDML}
 			${ROOT_BASIC_LIB_LIST}
-              BASENAME_ONLY
+              
 )
 
 simple_plugin(CalWireT962 "module"
@@ -52,7 +52,7 @@ simple_plugin(CalWireT962 "module"
                         RawData
                         RecoBase
                         RecoBaseArt
-                        Geometry_service
+                        larcore_Geometry_Geometry_service
                         Geometry
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -70,7 +70,7 @@ simple_plugin(CalWireT962 "module"
                         ${ROOT_XMLIO}
                         ${ROOT_GDML}
 			${ROOT_BASIC_LIB_LIST}
-               BASENAME_ONLY
+               
 )
 
 simple_plugin(DumpWires "module"
@@ -82,7 +82,7 @@ simple_plugin(DumpWires "module"
 			${MF_MESSAGELOGGER}
 	                ${FHICLCPP}
 			${CETLIB}
-              BASENAME_ONLY
+              
 )
 
 

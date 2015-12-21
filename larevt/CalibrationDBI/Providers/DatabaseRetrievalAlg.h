@@ -16,7 +16,7 @@
 
 #include <string>
 #include <vector>
-#include "CalibrationDBI/IOVData/IOVTimeStamp.h"
+#include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"
 #include "DBFolder.h"
 #include "fhiclcpp/ParameterSet.h"
 

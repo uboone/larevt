@@ -13,8 +13,8 @@
 #define CHANNELSTATUSSERVICE_H
 
 // LArSoft libraries
-#include "CoreUtils/ServiceUtil.h" // ServiceRequirementsChecker<>
-#include "CalibrationDBI/Interface/ChannelStatusProvider.h"
+#include "larcore/CoreUtils/ServiceUtil.h" // ServiceRequirementsChecker<>
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 // Framework libraries
 #include "art/Framework/Services/Registry/ServiceMacros.h"

@@ -5,8 +5,8 @@
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "CalibrationDBI/Interface/ChannelStatusService.h"
-#include "CalibrationDBI/Providers/SIOVChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/CalibrationDBI/Providers/SIOVChannelStatusProvider.h"
 
 namespace lariov{
 

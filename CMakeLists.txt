@@ -61,10 +61,8 @@ include(ArtMake)
 include(BuildPlugins)
 
 # source
-add_subdirectory(CalData)
-add_subdirectory(Filters)
-add_subdirectory(CalibrationDBI)
-add_subdirectory(SpaceCharge)
+add_subdirectory(larevt)
+
 # tests
 add_subdirectory(test)
 
