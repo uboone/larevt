@@ -21,6 +21,7 @@ namespace lariov {
       int GetNamedChannelData(DBChannelID_t channel, const std::string& name, long& data);
       int GetNamedChannelData(DBChannelID_t channel, const std::string& name, double& data);
       int GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::string& data);
+      int GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::vector<double>& data);
  
       const std::string& URL() const {return fURL;}
       const std::string& FolderName() const {return fFolderName;}

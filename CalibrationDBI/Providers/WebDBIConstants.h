@@ -4,6 +4,6 @@
 #include <string>
 namespace lariov{
   const unsigned int kNUMBER_HEADER_ROWS = 4;
-  const unsigned int kBUFFER_SIZE = 40;
+  const unsigned int kBUFFER_SIZE = 128;
 }
 #endif
