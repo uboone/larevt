@@ -3,9 +3,9 @@
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 art_make( NO_PLUGINS
-          LIBRARY_NAME  SpaceCharge
+          
           LIB_LIBRARIES larevt_SpaceCharge_SpaceCharge_service
-	                Utilities
+	                lardata_Utilities
 	                ${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}

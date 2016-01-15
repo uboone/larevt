@@ -1,7 +1,7 @@
 cet_enable_asserts()
 
 simple_plugin ( SimpleChannelStatusTest "module"
-                    Filters
+                    larevt_Filters
                     ${MF_MESSAGELOGGER}
                     ${MF_UTILITIES}
                     ${FHICLCPP}
@@ -18,8 +18,8 @@ cet_test(ChannelStatusServiceTest HANDBUILT
 
 cet_test(SimpleChannelStatus_test
   SOURCES SimpleChannelStatus_test.cxx
-  LIBRARIES Filters
-            CalibrationDBI_IOVData
+  LIBRARIES larevt_Filters
+            larevt_CalibrationDBI_IOVData
             ${FHICLCPP}
   USE_BOOST_UNIT
 )

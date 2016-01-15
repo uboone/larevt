@@ -1,7 +1,7 @@
 
 #art_make( 
 #	  EXCLUDE WebReaderService_service.cc
-#	  LIBRARY_NAME CalibrationDBI_LArBackend
+#	  
 #          MODULE_LIBRARIES
 #		   CalibrationDBI_WebDBI
 #                   WebReaderService_service

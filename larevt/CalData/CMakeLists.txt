@@ -1,9 +1,9 @@
 
 simple_plugin(CalWireAna "module"
-                        Filters
-	                RawData
+                        larevt_Filters
+	                lardata_RawData
 			lardata_Utilities_LArFFT_service
-			Utilities
+			lardata_Utilities
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -24,10 +24,10 @@ simple_plugin(CalWireAna "module"
 )
 
 simple_plugin(CalWire "module"
-                        Filters
-                        RawData
-                        RecoBase
-                        RecoBaseArt
+                        larevt_Filters
+                        lardata_RawData
+                        lardata_RecoBase
+                        lardata_RecoBaseArt
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -48,12 +48,12 @@ simple_plugin(CalWire "module"
 )
 
 simple_plugin(CalWireT962 "module"
-                        Filters
-                        RawData
-                        RecoBase
-                        RecoBaseArt
+                        larevt_Filters
+                        lardata_RawData
+                        lardata_RecoBase
+                        lardata_RecoBaseArt
                         larcore_Geometry_Geometry_service
-                        Geometry
+                        larcore_Geometry
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -74,9 +74,9 @@ simple_plugin(CalWireT962 "module"
 )
 
 simple_plugin(DumpWires "module"
-                        Filters
-	                RawData
-	                RecoBase
+                        larevt_Filters
+	                lardata_RawData
+	                lardata_RecoBase
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
 			${MF_MESSAGELOGGER}
