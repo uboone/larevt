@@ -19,11 +19,11 @@
 #include <array>
 
 // LArSoft libraries
-#include "CalibrationDBI/IOVData/DetPedestal.h"
-#include "CalibrationDBI/IOVData/Snapshot.h"
-#include "CalibrationDBI/IOVData/IOVDataConstants.h"
-#include "CalibrationDBI/Interface/IDetPedestalProvider.h"
-#include "CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
+#include "larevt/CalibrationDBI/IOVData/DetPedestal.h"
+#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
+#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/Interface/IDetPedestalProvider.h"
+#include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 
 namespace lariov {
 

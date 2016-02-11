@@ -20,8 +20,8 @@
 #include <boost/test/test_tools.hpp> // BOOST_CHECK(), BOOST_CHECK_EQUAL()
 
 // LArSoft libraries
-#include "Filters/SimpleChannelStatus.h"
-#include "SimpleTypesAndConstants/RawTypes.h"
+#include "larevt/Filters/SimpleChannelStatus.h"
+#include "larcore/SimpleTypesAndConstants/RawTypes.h"
 
 // framework libraries
 #include "fhiclcpp/ParameterSet.h"

@@ -1,11 +1,11 @@
 
-art_make( BASENAME_ONLY
-          LIBRARY_NAME  Filters
+art_make( 
+          
           LIB_LIBRARIES 
-                        RecoBase
-                        Geometry
-                        Geometry_service
-                        Utilities
+                        lardata_RecoBase
+                        larcore_Geometry
+                        larcore_Geometry_Geometry_service
+                        lardata_Utilities
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -20,11 +20,11 @@ art_make( BASENAME_ONLY
                         ${CETLIB}
                         ${ROOT_BASIC_LIB_LIST}
                         ${Boost_SYSTEM_LIBRARY}
-          MODULE_LIBRARIES Filters
-                           RawData
-                           LArProperties_service
+          MODULE_LIBRARIES larevt_Filters
+                           lardata_RawData
+                           lardata_Utilities_LArProperties_service
                            ${SIMULATIONBASE}
-          SERVICE_LIBRARIES Filters
+          SERVICE_LIBRARIES larevt_Filters
                             ${ART_FRAMEWORK_PRINCIPAL}
                             ${ART_FRAMEWORK_SERVICES_REGISTRY}
                             ${MF_MESSAGELOGGER}

@@ -25,13 +25,13 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // LArSoft includes
-#include "Geometry/Geometry.h"
-#include "Geometry/PlaneGeo.h"
-#include "RawData/RawDigit.h"
-#include "RecoBase/Wire.h"
-#include "CalibrationDBI/Interface/IChannelStatusService.h"
-#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
-#include "Utilities/LArFFT.h"
+#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/PlaneGeo.h"
+#include "lardata/RawData/RawDigit.h"
+#include "lardata/RecoBase/Wire.h"
+#include "larevt/CalibrationDBI/Interface/IChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "lardata/Utilities/LArFFT.h"
 
 // ROOT includes
 #include <TMath.h>

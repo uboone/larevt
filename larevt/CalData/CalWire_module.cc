@@ -30,15 +30,15 @@
 #include "art/Framework/Core/ModuleMacros.h" 
 
 // LArSoft includes
-#include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
-#include "Geometry/Geometry.h"
-#include "Geometry/PlaneGeo.h"
-#include "RawData/RawDigit.h"
-#include "RawData/raw.h"
-#include "RecoBase/Wire.h"
-#include "RecoBaseArt/WireCreator.h"
-#include "Utilities/LArFFT.h"
-#include "Utilities/AssociationUtil.h"
+#include "larcore/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
+#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/PlaneGeo.h"
+#include "lardata/RawData/RawDigit.h"
+#include "lardata/RawData/raw.h"
+#include "lardata/RecoBase/Wire.h"
+#include "lardata/RecoBaseArt/WireCreator.h"
+#include "lardata/Utilities/LArFFT.h"
+#include "lardata/Utilities/AssociationUtil.h"
 
 ///creation of calibrated signals on wires
 namespace caldata {

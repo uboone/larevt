@@ -23,11 +23,11 @@
 #include "art/Framework/Principal/Handle.h"
 
 // LArSoft includes
-#include "SimpleTypesAndConstants/geo_types.h"
+#include "larcore/SimpleTypesAndConstants/geo_types.h"
 // #include "RawData/RawDigit.h"
-#include "RecoBase/Wire.h"
-#include "CalibrationDBI/Interface/IChannelStatusService.h"
-#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "lardata/RecoBase/Wire.h"
+#include "larevt/CalibrationDBI/Interface/IChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
 
 namespace {
 	

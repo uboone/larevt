@@ -14,7 +14,7 @@
 
 
 // Our header
-#include "Filters/ChannelFilter.h"
+#include "larevt/Filters/ChannelFilter.h"
 
 
 // Framework libraries
@@ -23,8 +23,8 @@
 #include "art/Utilities/Exception.h"
 
 // LArSoft libraries
-#include "CalibrationDBI/Interface/IChannelStatusService.h"
-#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/IChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
 
 #include <iostream>
 

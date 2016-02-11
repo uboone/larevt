@@ -13,7 +13,7 @@
 #define ICHANNELSTATUSSERVICE_H
 
 // LArSoft libraries
-#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
 
 // Framework libraries
 #include "art/Framework/Services/Registry/ServiceMacros.h"

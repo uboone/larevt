@@ -21,7 +21,7 @@
 #include <limits> // std::numeric_limits<>
 
 // LArSoft libraries
-#include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
+#include "larcore/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 
 
 /// Filters for channels, events, etc

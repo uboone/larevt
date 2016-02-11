@@ -3,11 +3,11 @@
 
 #include "DetPedestalRetrievalAlg.h"
 #include "WebError.h"
-#include "CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 
 // art/LArSoft libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "Geometry/Geometry.h"
+#include "larcore/Geometry/Geometry.h"
 #include "cetlib/exception.h"
 
 namespace lariov {

@@ -1,5 +1,5 @@
 
-art_make( LIBRARY_NAME  CalibrationDBI_IOVData
+art_make( 
         )
 
 install_headers()

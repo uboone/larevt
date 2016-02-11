@@ -1,12 +1,12 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	larevt	v04_14_04
+parent	larevt	v05_00_00
 defaultqual	e9
 #
 fcldir product_dir job
 #
 product         version
-lardata		v04_22_01
+lardata		v05_00_00
 gcc		v4_9_3
 libwda          v2_22_2
 cetbuildtools	v4_18_02	-	only_for_build
@@ -18,9 +18,6 @@ qualifier       lardata         libwda    gcc	notes
 e9:debug        e9:debug        -nq-      -nq-
 e9:opt          e9:opt          -nq-      -nq-
 e9:prof         e9:prof         -nq-      -nq-
-e9:noifdh:debug e9:noifdh:debug -nq-      -nq-
-e9:noifdh:opt   e9:noifdh:opt   -nq-      -nq-
-e9:noifdh:prof  e9:noifdh:prof  -nq-      -nq-
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:

@@ -1,7 +1,7 @@
 cet_enable_asserts()
 
 simple_plugin(FFTTest "module"
-			LArFFT_service
+			lardata_Utilities_LArFFT_service
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
@@ -13,7 +13,7 @@ simple_plugin(FFTTest "module"
 	                ${FHICLCPP}
 			${CETLIB}
 			${ROOT_BASIC_LIB_LIST}
-              BASENAME_ONLY
+              
 )
 
 install_headers()

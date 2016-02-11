@@ -11,10 +11,10 @@
 #define SIOVCHANNELSTATUSPROVIDER_H 1
 
 // LArSoft libraries
-#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
-#include "CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
-#include "CalibrationDBI/IOVData/ChannelStatus.h"
-#include "CalibrationDBI/IOVData/Snapshot.h"
+#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
+#include "larevt/CalibrationDBI/IOVData/ChannelStatus.h"
+#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 
 // Utility libraries
 #include "fhiclcpp/ParameterSet.h"

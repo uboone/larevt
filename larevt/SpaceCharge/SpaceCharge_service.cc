@@ -23,7 +23,7 @@
 #include "stdio.h"
 
 #include "cetlib/exception.h"
-#include "SpaceCharge/SpaceCharge.h"
+#include "larevt/SpaceCharge/SpaceCharge.h"
 
 namespace spacecharge {
 
