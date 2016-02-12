@@ -1,20 +1,20 @@
 /**
- * @file   IChannelStatusProvider.h
+ * @file   ChannelStatusProvider.h
  * @brief  Interface for experiment-specific channel quality info provider
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 24th, 2014
- * @see    IChannelStatusService.h
+ * @see    ChannelStatusService.h
  *
  * This is the interface of ChannelStatus service provider core object.
  * A ChannelStatus service provider object (with the interface of ChannelStatus
  * service provider core object) provides the actual information about channels.
  * It can be instanciated by a art service (an implementation of
- * IChannelStatusService) or from whatever system needs it.
+ * ChannelStatusService) or from whatever system needs it.
  */
 
 
-#ifndef ICHANNELSTATUSPROVIDER_H
-#define ICHANNELSTATUSPROVIDER_H 1
+#ifndef CHANNELSTATUSPROVIDER_H
+#define CHANNELSTATUSPROVIDER_H 1
 
 // C/C++ standard libraries
 #include <set>
@@ -45,7 +45,7 @@ namespace lariov {
    * interested in.
    * 
    */
-  class IChannelStatusProvider {
+  class ChannelStatusProvider {
     
     public:
       
@@ -58,9 +58,17 @@ namespace lariov {
       static constexpr Status_t InvalidStatus
         = std::numeric_limits<Status_t>::max();
       
+      /// Default constructor
+      ChannelStatusProvider() = default;
+      
+      // do not allow for copies or moves of this class
+      ChannelStatusProvider(ChannelStatusProvider const&) = delete;
+      ChannelStatusProvider(ChannelStatusProvider&&) = delete;
+      ChannelStatusProvider& operator = (ChannelStatusProvider const&) = delete;
+      ChannelStatusProvider& operator = (ChannelStatusProvider&&) = delete;
       
       /// Virtual destructor; destructs nothing
-      virtual ~IChannelStatusProvider() = default;
+      virtual ~ChannelStatusProvider() = default;
       
       /// Returns whether the specified channel is physical and connected to wire
       virtual bool IsPresent(raw::ChannelID_t channel) const = 0;
@@ -105,9 +113,9 @@ namespace lariov {
       static bool IsValidStatus(Status_t status)
         { return status != InvalidStatus; }
       
-  }; // class IChannelStatusProvider
+  }; // class ChannelStatusProvider
   
 } // namespace lariov
 
 
-#endif // ICHANNELSTATUSPROVIDER_H
+#endif // CHANNELSTATUSPROVIDER_H

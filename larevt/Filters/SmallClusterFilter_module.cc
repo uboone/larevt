@@ -30,7 +30,7 @@
 
 #include "lardata/RecoBase/Hit.h"
 #include "lardata/Utilities/GeometryUtilities.h"
-#include "lardata/Utilities/DetectorProperties.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
  
 namespace cluster {
@@ -60,7 +60,7 @@ namespace cluster {
 			unsigned int &w);
     
     art::ServiceHandle<geo::Geometry>            geom; ///< handle to geometry service
-    art::ServiceHandle<util::DetectorProperties> detp; ///< handle to det properties service
+    const detinfo::DetectorProperties* detp = lar::providerFrom<detinfo::DetectorPropertiesService>(); ///< const ptr to det properties data provider
     util::GeometryUtilities                      gser; ///< geometry utilities   
     std::vector< unsigned int >fNWires;		       ///< Number of wires on each plane
     

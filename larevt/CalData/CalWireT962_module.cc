@@ -27,8 +27,8 @@
 // LArSoft includes
 #include "larcore/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 #include "larcore/Geometry/Geometry.h"
-#include "larevt/CalibrationDBI/Interface/IChannelStatusService.h"
-#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "lardata/RawData/RawDigit.h"
 #include "lardata/RawData/raw.h" // raw::Uncompress()
 #include "lardata/RecoBase/Wire.h"
@@ -229,8 +229,8 @@ namespace caldata{
     raw::ChannelID_t channel = raw::InvalidChannelID; // channel number
     unsigned int bin(0);     // time bin loop variable
     
-    lariov::IChannelStatusProvider const& channelStatus
-      = art::ServiceHandle<lariov::IChannelStatusService>()->GetProvider();
+    lariov::ChannelStatusProvider const& channelStatus
+      = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
 
     double decayConst = 0.;  // exponential decay constant of electronics shaping
     double fitAmplitude    = 0.;  //This is the seed value for the amplitude in the exponential tail fit 

@@ -11,13 +11,12 @@ services:
   #Timing:       {}
   #SimpleMemoryCheck:     { ignoreTotal: 1 } # default is one
   #RandomNumberGenerator: {} #ART native random number generator
-  user: {}
 }
 
 #services.user.Geometry: @local::detector_geo
-services.user.LArFFT: @local::argoneut_larfft
-services.user.LArFFT.FFTOption: ""
-services.user.DetectorProperties: @local::argoneut_detproperties
+services.LArFFT: @local::argoneut_larfft
+services.LArFFT.FFTOption: ""
+services.DetectorPropertiesService: @local::argoneut_detproperties
 
 source:
 {

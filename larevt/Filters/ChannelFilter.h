@@ -3,7 +3,7 @@
 // ChannelFilter class:
 // 
 // This class has been obsoleted and is now a deprecated interface for
-// IChannelStatusService.
+// ChannelStatusService.
 // 
 // Please update your code to use the service directly.
 // 
@@ -15,7 +15,7 @@
 #define CHANNELFILTER_H
 
 // LArSoft libraries
-#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 // C/C++ standard libraries
 #include <set>
@@ -43,7 +43,7 @@ namespace filter {
     ChannelStatus GetChannelStatus(uint32_t channel) const;
     
   private:
-    lariov::IChannelStatusProvider const& provider; ///< object doing the job
+    lariov::ChannelStatusProvider const& provider; ///< object doing the job
     
   }; //class ChannelFilter
 }

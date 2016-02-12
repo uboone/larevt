@@ -16,13 +16,13 @@ services:
 
 services.ExptGeoHelperInterface: @local::argoneut_geometry_helper
 services.Geometry: @local::argoneut_geo
-services.LArProperties: @local::argoneut_properties            
+services.LArPropertiesService: @local::argoneut_properties            
 services.LArFFT: @local::argoneut_larfft
 services.LArFFT.FFTOption: ""
-services.DetectorProperties: @local::argoneut_detproperties
+services.DetectorPropertiesService: @local::argoneut_detproperties
 services.DatabaseUtil:       @local::argoneut_database
 services.DatabaseUtil.ShouldConnect: false
-services.IChannelStatusService: @local::argoneut_channelstatus
+services.ChannelStatusService: @local::argoneut_channelstatus
 
 source:
 {

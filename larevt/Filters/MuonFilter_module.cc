@@ -44,8 +44,7 @@ extern "C" {
 #include "larcore/Geometry/Geometry.h"
 #include "larcore/Geometry/PlaneGeo.h"
 #include "larcore/Geometry/WireGeo.h"
-#include "lardata/Utilities/LArProperties.h"
-#include "lardata/Utilities/DetectorProperties.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/AssociationUtil.h"
  
 
@@ -119,11 +118,12 @@ namespace filter {
   bool MuonFilter::filter(art::Event &evt)
   { 
     art::ServiceHandle<geo::Geometry> geom;
-    art::ServiceHandle<util::LArProperties> larprop;
-    art::ServiceHandle<util::DetectorProperties> detprop;
-
+    //    art::ServiceHandle<detinfo::LArPropertiesService> larprop_s;
+    //    art::ServiceHandle<detinfo::DetectorPropertiesService> detprop_s;
+    auto const * detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+    
     //Drift Velocity in cm/us Sampling rate in ns
-    double drift = larprop->DriftVelocity(larprop->Efield(), larprop->Temperature())*detprop->SamplingRate()/1000.0; 
+    double drift = detprop->DriftVelocity(detprop->Efield(), detprop->Temperature())*detprop->SamplingRate()/1000.0; 
 
     //This code only works comparing 2 planes so for now these are the 
     // last induction plane and collection plane

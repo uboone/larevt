@@ -3,7 +3,7 @@
 // ChannelFilter Class
 // 
 // This class has been obsoleted and is now a deprecated interface for
-// IChannelStatusService.
+// ChannelStatusService.
 // 
 // Please update your code to use the service directly.
 // 
@@ -23,8 +23,8 @@
 #include "art/Utilities/Exception.h"
 
 // LArSoft libraries
-#include "larevt/CalibrationDBI/Interface/IChannelStatusService.h"
-#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 #include <iostream>
 
@@ -43,17 +43,17 @@
 // often don't have enough.
 //
 filter::ChannelFilter::ChannelFilter() try:
-  provider(art::ServiceHandle<lariov::IChannelStatusService>()->GetProvider())
+  provider(art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider())
 {
   
   LOG_ERROR("ChannelFilter") << "ChannelFilter is now deprecated."
-    " Replace it with IChannelStatusService";
+    " Replace it with ChannelStatusService";
   
 } // function try
 catch (art::Exception& e) { // automatic rethrow happens at end of block
   if (e.categoryCode() == art::errors::ServiceNotFound) {
     LOG_SYSTEM("ChannelFilter") <<
-      "Failed to obtain an instance of IChannelStatusService service;"
+      "Failed to obtain an instance of ChannelStatusService service;"
       " you should update your configuration, *and* update the code using"
       " ChannelFilter, that is deprecated."
       " An example are in ChannelFilter class documentation"

@@ -28,8 +28,8 @@
 //Larsoft Includes
 #include "lardata/RawData/raw.h"
 #include "lardata/RawData/RawDigit.h"
-#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
-#include "larevt/CalibrationDBI/Interface/IChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 
 
 namespace filter {
@@ -88,8 +88,8 @@ namespace filter {
       
       if(!rawdigitView.size()) return false;
       
-      lariov::IChannelStatusProvider const& channelFilter
-        = art::ServiceHandle<lariov::IChannelStatusService>()->GetProvider();
+      lariov::ChannelStatusProvider const& channelFilter
+        = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
 
       // look through the good channels
 //      for(const raw::RawDigit* digit: filter::SelectGoodChannels(rawdigitView))

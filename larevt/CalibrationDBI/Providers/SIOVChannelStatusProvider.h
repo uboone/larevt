@@ -3,7 +3,7 @@
  * @brief  Channel quality provider with information from configuration file
  * @author Brandon Eberly (eberly@fnal.gov)
  * @date   August 24, 2015
- * @see    IChannelStatusService.h SIOVChannelStatusProvider.cpp
+ * @see    ChannelStatusService.h SIOVChannelStatusProvider.cpp
  */
 
 
@@ -11,7 +11,7 @@
 #define SIOVCHANNELSTATUSPROVIDER_H 1
 
 // LArSoft libraries
-#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 #include "larevt/CalibrationDBI/IOVData/ChannelStatus.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
@@ -32,7 +32,7 @@ namespace lariov {
    * LArSoft interface to this class is through the service
    * SIOVChannelStatusService.
    */
-  class SIOVChannelStatusProvider: public DatabaseRetrievalAlg, public IChannelStatusProvider {
+  class SIOVChannelStatusProvider: public DatabaseRetrievalAlg, public ChannelStatusProvider {
     
     public:
     

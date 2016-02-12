@@ -18,8 +18,8 @@
 #include "art/Framework/Principal/Run.h"
 
 // LArSoft includes
-#include "larevt/CalibrationDBI/Interface/IChannelStatusService.h"
-#include "larevt/CalibrationDBI/Interface/IChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 
 
@@ -28,7 +28,7 @@ namespace art { class Event; } // art::Event declaration
 ///tracking algorithms
 namespace lariov {
   /**
-   * @brief Tests an instanciation of the IChannelStatusService
+   * @brief Tests an instanciation of the ChannelStatusService
    * 
    * Configuration parameters
    * =========================
@@ -116,26 +116,26 @@ namespace lariov {
     //---
     mf::LogVerbatim("SimpleChannelStatusTest")
       << "\nTesting service interface...";
-    art::ServiceHandle<lariov::IChannelStatusService> StatusSrvHandle;
+    art::ServiceHandle<lariov::ChannelStatusService> StatusSrvHandle;
   /* // since the service does not share the interface of the provider,
      // this test can't be
-    const lariov::IChannelStatusService* pStatusSrv = &*StatusSrvHandle;
+    const lariov::ChannelStatusService* pStatusSrv = &*StatusSrvHandle;
     nErrors = testObject(pStatusSrv);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
-        << nErrors << " errors while testing IChannelStatusService!";
+        << nErrors << " errors while testing ChannelStatusService!";
     } // if errors
   */
     
     //---
     mf::LogVerbatim("SimpleChannelStatusTest")
       << "\nTesting base interface...";
-    lariov::IChannelStatusProvider const* pChStatus
+    lariov::ChannelStatusProvider const* pChStatus
       = StatusSrvHandle->GetProviderPtr();
     nErrors = testObject(pChStatus);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
-        << nErrors << " errors while testing IChannelStatusProvider!";
+        << nErrors << " errors while testing ChannelStatusProvider!";
     } // if errors
     
   } // SimpleChannelStatusTest::beginRun()

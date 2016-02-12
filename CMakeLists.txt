@@ -62,6 +62,7 @@ include(BuildPlugins)
 
 # source
 add_subdirectory(larevt)
+
 # tests
 add_subdirectory(test)
 

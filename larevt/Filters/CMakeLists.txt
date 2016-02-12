@@ -22,7 +22,6 @@ art_make(
                         ${Boost_SYSTEM_LIBRARY}
           MODULE_LIBRARIES larevt_Filters
                            lardata_RawData
-                           lardata_Utilities_LArProperties_service
                            ${SIMULATIONBASE}
           SERVICE_LIBRARIES larevt_Filters
                             ${ART_FRAMEWORK_PRINCIPAL}

@@ -5,18 +5,18 @@
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "larevt/CalibrationDBI/Interface/IChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Providers/SIOVChannelStatusProvider.h"
 
 namespace lariov{
 
   /**
      \class SIOVChannelStatusService
-     art service implementation of IChannelStatusService.  Implements 
+     art service implementation of ChannelStatusService.  Implements 
      a channel status retrieval service for database scheme in which 
      all elements in a database folder share a common interval of validity
   */
-  class SIOVChannelStatusService : public IChannelStatusService {
+  class SIOVChannelStatusService : public ChannelStatusService {
   
     public:
     
@@ -26,11 +26,11 @@ namespace lariov{
      
     private:
     
-      const IChannelStatusProvider& DoGetProvider() const override {
+      const ChannelStatusProvider& DoGetProvider() const override {
         return fProvider;
       }    
       
-      const IChannelStatusProvider* DoGetProviderPtr() const override {
+      const ChannelStatusProvider* DoGetProviderPtr() const override {
         return &fProvider;
       }
     
@@ -38,7 +38,7 @@ namespace lariov{
   };
 }//end namespace lariov
       
-DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::IChannelStatusService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::ChannelStatusService, LEGACY)
       
 
 namespace lariov{
@@ -61,6 +61,6 @@ namespace lariov{
 
 }//end namespace lariov
 
-DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::IChannelStatusService)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::ChannelStatusService)
 
 #endif

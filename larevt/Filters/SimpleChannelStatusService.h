@@ -3,7 +3,7 @@
  * @brief  Service for channel quality info
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 24th, 2014
- * @see    IChannelStatusService.h SimpleChannelStatus.h
+ * @see    ChannelStatusService.h SimpleChannelStatus.h
  *
  * Service serving a SimpleChannelStatus.
  */
@@ -14,10 +14,7 @@
 
 // LArSoft libraries
 #include "larevt/Filters/SimpleChannelStatus.h"
-#include "larevt/CalibrationDBI/Interface/IChannelStatusService.h"
-
-// framework libraries
-#include "art/Framework/Services/Registry/ActivityRegistry.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 
 // C/C++ standard libraries
 #include <memory> //std::unique_ptr<>
@@ -32,7 +29,7 @@ namespace lariov {
   /**
    * @brief Service providing information about the quality of channels
    *
-   * This is a simple implementation of the IChannelStatusService
+   * This is a simple implementation of the ChannelStatusService
    * service interface.
    * Channel lists are passed by FHiCL configuration.
    * Note that there is no support for conditions varying with time.
@@ -48,7 +45,7 @@ namespace lariov {
    * - *service_type* (string): must be set to "SimpleChannelStatusService"
    * 
    */
-  class SimpleChannelStatusService: public IChannelStatusService {
+  class SimpleChannelStatusService: public ChannelStatusService {
       public:
     
     /// Constructor: reads the channel IDs from the configuration
@@ -58,9 +55,9 @@ namespace lariov {
     
       private:
       
-    virtual IChannelStatusProvider const& DoGetProvider() const override
+    virtual ChannelStatusProvider const& DoGetProvider() const override
      { return *DoGetProviderPtr(); }
-    virtual IChannelStatusProvider const* DoGetProviderPtr() const override
+    virtual ChannelStatusProvider const* DoGetProviderPtr() const override
      { return fProvider.get(); } 
     
     /// Update valid channel range
@@ -77,6 +74,6 @@ namespace lariov {
 } // namespace lariov
 
 DECLARE_ART_SERVICE_INTERFACE_IMPL
-  (lariov::SimpleChannelStatusService, lariov::IChannelStatusService, LEGACY)
+  (lariov::SimpleChannelStatusService, lariov::ChannelStatusService, LEGACY)
 
 #endif // SIMPLECHANNELFILTERSERVICE_H
