@@ -23,6 +23,7 @@
 #include <algorithm> // std::copy()
 #include <iterator> // std::inserter()
 #include <utility> // std::pair<>
+#include <fstream>
 
 
 namespace lariov {
@@ -36,6 +37,7 @@ namespace lariov {
 
     bool UseDB    = pset.get<bool>("UseDB", false);
     bool UseFile  = pset.get<bool>("UseFile", false);
+    std::string fileName = pset.get<std::string>("FileName", "");
     
     //priority:  (1) use db, (2) use table, (3) use defaults
     //If none are specified, use defaults
@@ -44,6 +46,7 @@ namespace lariov {
     else              fDataSource = DataSource::Default;
     
     if (fDataSource == DataSource::Default) {
+      std::cout << "Using default channel status value: "<<kGOOD<<"\n";
       ChannelStatus cs(0);
       cs.SetStatus(kGOOD);
       
@@ -56,10 +59,27 @@ namespace lariov {
       }
     } 
     else if (fDataSource == DataSource::File) {
-      // please consider implementing it if you need it!!
-      throw cet::exception("SIOVChannelStatusProvider")
-        << "Data from file not implemented yet ('UseFile' parameter)\n";
+      std::cout << "Using channel statuses from local file: "<<fileName<<"\n";
+      std::ifstream file(fileName);
+      if (!file) {
+        throw cet::exception("SIOVChannelStatusProvider")
+	  << "File "<<fileName<<" is not found.";
+      }
+      
+      std::string line;
+      ChannelStatus cs(0);
+      while (std::getline(file, line)) {
+        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, line.find(',')));
+	int status = std::stoi(line.substr(line.find(',')+1));
+	
+	cs.SetChannel(ch);
+	cs.SetStatus( ChannelStatus::GetStatusFromInt(status) );
+	fData.AddOrReplaceRow(cs);
+      }
     } // if source from file
+    else {
+      std::cout << "Using channel statuses from conditions database\n";
+    }
   }
   
   bool SIOVChannelStatusProvider::Update(DBTimeStamp_t ts) {
@@ -80,21 +100,7 @@ namespace lariov {
       fFolder->GetNamedChannelData(*it, "status", status);
 
       ChannelStatus cs(*it);
-      
-      switch(status)
-      {
-        case kDISCONNECTED : cs.SetStatus(kDISCONNECTED);
-	                     break;
-	case kDEAD         : cs.SetStatus(kDEAD);
-	                     break;
-	case kLOWNOISE     : cs.SetStatus(kLOWNOISE);
-	                     break;
-	case kNOISY        : cs.SetStatus(kNOISY);
-	                     break;
-	case kGOOD         : cs.SetStatus(kGOOD);
-	                     break;
-	default            : cs.SetStatus(kUNKNOWN);
-      }
+      cs.SetStatus( ChannelStatus::GetStatusFromInt((int)status) );
 
       fData.AddOrReplaceRow(cs);
     }

@@ -10,6 +10,9 @@
 #include "larcore/Geometry/Geometry.h"
 #include "cetlib/exception.h"
 
+//C/C++
+#include <fstream>
+
 namespace lariov {
 
   //constructors
@@ -42,6 +45,7 @@ namespace lariov {
 
     bool UseDB      = p.get<bool>("UseDB", false);
     bool UseFile   = p.get<bool>("UseFile", false);
+    std::string fileName = p.get<std::string>("FileName", "");
 
     //priority:  (1) use db, (2) use table, (3) use defaults
     //If none are specified, use defaults
@@ -50,6 +54,7 @@ namespace lariov {
     else              fDataSource = DataSource::Default;
 
     if (fDataSource == DataSource::Default) {
+      std::cout << "Using default pedestal values\n";
       float default_collmean     = p.get<float>("DefaultCollMean", 400.0);
       float default_collrms      = p.get<float>("DefaultCollRms", 0.3);
       float default_mean_err     = p.get<float>("DefaultMeanErr", 0.0);
@@ -87,9 +92,39 @@ namespace lariov {
       }
     }
     else if (fDataSource == DataSource::File) {
-      throw cet::exception("DetPedestalRetrievalAlg")
-        << "DetPedestalRetrievalAlg: input from file not implemented yet\n";
-      //need to implement
+      std::cout << "Using pedestals from local file: "<<fileName<<"\n";
+      std::ifstream file(fileName);
+      if (!file) {
+        throw cet::exception("DetPedestalRetrievalAlg")
+	  << "File "<<fileName<<" is not found.";
+      }
+      
+      std::string line;
+      DetPedestal dp(0);
+      while (std::getline(file, line)) {
+        size_t current_comma = line.find(',');
+        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));	
+	float ped = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	
+	current_comma = line.find(',',current_comma+1);
+	float rms = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	
+	current_comma = line.find(',',current_comma+1);
+	float ped_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	
+	current_comma = line.find(',',current_comma+1);
+	float rms_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+
+	dp.SetChannel(ch);
+	dp.SetPedMean(ped);
+        dp.SetPedMeanErr(ped_err);
+        dp.SetPedRms(rms);
+        dp.SetPedRmsErr(rms_err);
+	fData.AddOrReplaceRow(dp);
+      }
+    } // if source from file
+    else { 
+      std::cout << "Using pedestals from conditions database\n";
     }
   }
 

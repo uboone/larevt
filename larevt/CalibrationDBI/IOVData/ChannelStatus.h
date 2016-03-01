@@ -38,9 +38,28 @@ namespace lariov {
       bool IsNoisy()     const { return fStatus == kNOISY        ? true : false; }
       bool IsPresent()   const { return fStatus == kDISCONNECTED ? false : true; }
       bool IsGood()      const { return fStatus == kGOOD         ? true : false; }
-      chStatus Status()  const { return fStatus; }
+      chStatus Status()  const { return fStatus; } 
 
       void SetStatus(chStatus status) { fStatus = status; }
+      
+      static chStatus GetStatusFromInt(int status) {
+	switch(status)
+	{
+	  case kDISCONNECTED : return kDISCONNECTED;
+	                       break;
+	  case kDEAD         : return kDEAD;
+	                       break;
+	  case kLOWNOISE     : return kLOWNOISE;
+	                       break;
+	  case kNOISY        : return kNOISY;
+	                       break;
+	  case kGOOD         : return kGOOD;
+	                       break;
+	  default            : return kUNKNOWN;
+	};
+
+	return kUNKNOWN;
+      }
       
     private:
       chStatus fStatus;
