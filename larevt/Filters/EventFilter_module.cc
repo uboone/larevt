@@ -81,7 +81,7 @@ void filter::EventFilter::reconfigure(fhicl::ParameterSet const& p)
   fEventList = p.get< std::string >("EventList");
   fSelEvents.clear();
   fSelRuns.clear();
-  ifstream in;
+  std::ifstream in;
   in.open(fEventList.c_str());
   char line[1024];
   while(1){
