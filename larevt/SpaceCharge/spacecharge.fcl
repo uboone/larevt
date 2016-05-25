@@ -6,6 +6,7 @@ standard_spacecharge:
   EnableCorrectionsSCE:   false
   RepresentationType:     "Parametric"
   InputFilename:          "SCEoffsets.root"
+  service_provider:       SpaceChargeServiceStandard
 }
 
 bo_spacecharge:         @local::standard_spacecharge
