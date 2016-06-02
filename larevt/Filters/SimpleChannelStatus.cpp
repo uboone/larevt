@@ -10,7 +10,7 @@
 #include "larevt/Filters/SimpleChannelStatus.h"
 
 // LArSoft library
-#include "larcore/SimpleTypesAndConstants/RawTypes.h" // raw::isValidChannelID()
+#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::isValidChannelID()
 
 // Framework libraries
 #include "cetlib/exception.h"

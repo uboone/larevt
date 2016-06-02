@@ -20,7 +20,7 @@
 // Framework libraries
 #include "messagefacility/MessageLogger/MessageLogger.h" 
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Utilities/Exception.h"
+#include "canvas/Utilities/Exception.h"
 
 // LArSoft libraries
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"

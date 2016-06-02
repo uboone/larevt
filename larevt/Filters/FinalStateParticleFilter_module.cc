@@ -16,8 +16,8 @@
 #include "art/Framework/Principal/Event.h" 
 #include "fhiclcpp/ParameterSet.h" 
 #include "art/Framework/Principal/Handle.h" 
-#include "art/Persistency/Common/Ptr.h" 
-#include "art/Persistency/Common/PtrVector.h" 
+#include "canvas/Persistency/Common/Ptr.h" 
+#include "canvas/Persistency/Common/PtrVector.h" 
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "art/Framework/Services/Optional/TFileService.h" 
 #include "art/Framework/Services/Optional/TFileDirectory.h" 
@@ -25,8 +25,8 @@
 
 
 //Larsoft Includes
-#include "SimulationBase/MCNeutrino.h"
-#include "SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/MCNeutrino.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
 
 #include "TH1.h"
 #include "TH2.h"

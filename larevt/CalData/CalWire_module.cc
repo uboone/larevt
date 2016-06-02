@@ -21,8 +21,8 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "cetlib/exception.h"
 #include "cetlib/search_path.h"
-#include "art/Persistency/Common/Ptr.h"
-#include "art/Persistency/Common/Assns.h"
+#include "canvas/Persistency/Common/Ptr.h"
+#include "canvas/Persistency/Common/Assns.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
@@ -30,11 +30,11 @@
 #include "art/Framework/Core/ModuleMacros.h" 
 
 // LArSoft includes
-#include "larcore/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
+#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 #include "larcore/Geometry/Geometry.h"
 #include "larcore/Geometry/PlaneGeo.h"
-#include "lardata/RawData/RawDigit.h"
-#include "lardata/RawData/raw.h"
+#include "lardataobj/RawData/RawDigit.h"
+#include "lardataobj/RawData/raw.h"
 #include "lardata/RecoBase/Wire.h"
 #include "lardata/RecoBaseArt/WireCreator.h"
 #include "lardata/Utilities/LArFFT.h"

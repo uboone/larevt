@@ -13,7 +13,7 @@ art_make(
                         ${Boost_SYSTEM_LIBRARY}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ROOT_BASIC_LIB_LIST}
-			${ART_UTILITIES}
+			art_Utilities canvas_Utilities
         )
 
 install_headers()

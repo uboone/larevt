@@ -23,11 +23,11 @@
 #include "art/Framework/Principal/Handle.h" 
 #include "art/Framework/Principal/View.h" 
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Persistency/Common/Ptr.h" 
+#include "canvas/Persistency/Common/Ptr.h" 
 
 //Larsoft Includes
-#include "lardata/RawData/raw.h"
-#include "lardata/RawData/RawDigit.h"
+#include "lardataobj/RawData/raw.h"
+#include "lardataobj/RawData/RawDigit.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 

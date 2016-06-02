@@ -23,7 +23,7 @@
 #include "art/Framework/Principal/Handle.h"
 
 // LArSoft includes
-#include "larcore/SimpleTypesAndConstants/geo_types.h"
+#include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
 // #include "RawData/RawDigit.h"
 #include "lardata/RecoBase/Wire.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"

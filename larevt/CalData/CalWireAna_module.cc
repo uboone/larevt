@@ -16,7 +16,7 @@
 
 // Framework includes
 #include "art/Framework/Core/ModuleMacros.h"
-#include "art/Framework/Core/FindOneP.h"
+#include "canvas/Persistency/Common/FindOneP.h"
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "art/Framework/Principal/Handle.h"
@@ -27,7 +27,7 @@
 // LArSoft includes
 #include "larcore/Geometry/Geometry.h"
 #include "larcore/Geometry/PlaneGeo.h"
-#include "lardata/RawData/RawDigit.h"
+#include "lardataobj/RawData/RawDigit.h"
 #include "lardata/RecoBase/Wire.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"

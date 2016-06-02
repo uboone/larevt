@@ -10,7 +10,7 @@
 #define DETPEDESTALPROVIDER_H
 
 // LArSoft libraries
-#include "larcore/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
+#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 
 
 namespace lariov {
