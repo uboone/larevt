@@ -28,7 +28,7 @@
 #include "larcore/Geometry/Geometry.h"
 #include "larcore/Geometry/PlaneGeo.h"
 #include "lardataobj/RawData/RawDigit.h"
-#include "lardata/RecoBase/Wire.h"
+#include "lardataobj/RecoBase/Wire.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "lardata/Utilities/LArFFT.h"

@@ -28,7 +28,7 @@
 #include "art/Framework/Principal/Event.h" 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "lardata/RecoBase/Hit.h"
+#include "lardataobj/RecoBase/Hit.h"
 #include "lardata/Utilities/GeometryUtilities.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 

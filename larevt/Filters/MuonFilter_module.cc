@@ -39,8 +39,8 @@ extern "C" {
 
 
 //Larsoft Includes
-#include "lardata/RecoBase/Hit.h"
-#include "lardata/RecoBase/Cluster.h"
+#include "lardataobj/RecoBase/Hit.h"
+#include "lardataobj/RecoBase/Cluster.h"
 #include "larcore/Geometry/Geometry.h"
 #include "larcore/Geometry/PlaneGeo.h"
 #include "larcore/Geometry/WireGeo.h"

@@ -1,7 +1,7 @@
 art_make( NO_PLUGINS
           
-          LIB_LIBRARIES larevt_SpaceCharge_SpaceCharge_service
-	                lardata_Utilities
+          LIB_LIBRARIES lardata_Utilities
+	                larcore_Geometry
 	                nusimdata_SimulationBase
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -14,24 +14,6 @@ art_make( NO_PLUGINS
 			${CETLIB}
 			${ROOT_BASIC_LIB_LIST}
         )
-
-simple_plugin(SpaceCharge "service"
-	      ${ART_FRAMEWORK_CORE}
-	      ${ART_FRAMEWORK_PRINCIPAL}
-	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
-	      art_Persistency_Common canvas_Persistency_Common
-	      art_Persistency_Provenance canvas_Persistency_Provenance
-	      ${ART_FRAMEWORK_SERVICES_BASIC}
-	      ${ART_FRAMEWORK_SERVICES_OPTIONAL}
-	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
-	      art_Utilities canvas_Utilities
-	      ${MF_MESSAGELOGGER}
-	      ${MF_UTILITIES}
-  	      ${CETLIB}
-   	      ${ROOT_BASIC_LIB_LIST}
-              
-)
 
 install_headers()
 install_fhicl()

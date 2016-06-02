@@ -35,7 +35,7 @@
 #include "larcore/Geometry/PlaneGeo.h"
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardataobj/RawData/raw.h"
-#include "lardata/RecoBase/Wire.h"
+#include "lardataobj/RecoBase/Wire.h"
 #include "lardata/RecoBaseArt/WireCreator.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "lardata/Utilities/AssociationUtil.h"
