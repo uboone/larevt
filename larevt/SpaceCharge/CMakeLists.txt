@@ -1,7 +1,3 @@
-
-# for classes_def.xml!!
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
-
 art_make( NO_PLUGINS
           
           LIB_LIBRARIES larevt_SpaceCharge_SpaceCharge_service
