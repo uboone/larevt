@@ -51,8 +51,20 @@ namespace lariov {
       
       const std::vector<T>& Data() const {return fData;}
 
+     
       
       /// Only included with class if T has base class ChData
+      template< class U = T,
+                typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
+      bool HasChannel(unsigned int ch) const {
+        
+	typename std::vector<T>::const_iterator it = std::lower_bound(fData.begin(), fData.end(), ch);
+	if ( it == fData.end() || it->Channel() != ch) {
+	  return false;
+	}
+	else return true;
+      }
+      
       template< class U = T,
                 typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
       const T& GetRow(unsigned int ch) const {

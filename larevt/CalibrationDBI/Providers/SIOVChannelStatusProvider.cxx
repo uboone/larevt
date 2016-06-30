@@ -110,10 +110,10 @@ namespace lariov {
   
   //----------------------------------------------------------------------------
   const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(raw::ChannelID_t ch) const {
-    try {
+    if (fNewNoisy.HasChannel(rawToDBChannel(ch))) {
       return fNewNoisy.GetRow(rawToDBChannel(ch));
     }
-    catch (IOVDataError& e) {
+    else { 
       return fData.GetRow(rawToDBChannel(ch));
     }
   } 
