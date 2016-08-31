@@ -8,7 +8,7 @@
 
 namespace lariov {
 
-  //Do NOT change to following code without very good reason!
+  //Do NOT change the following code without very good reason!
   //MicroBooNE and other experiments depend on it!
   IOVTimeStamp TimeStampDecoder::DecodeTimeStamp(DBTimeStamp_t ts) {
         
@@ -23,6 +23,10 @@ namespace lariov {
       time.insert(10,".");
 
       //finish construction
+      IOVTimeStamp tmp = IOVTimeStamp::GetFromString(time);
+      return tmp;
+    }
+    else if (time.length() < kMAX_SUBSTAMP_LENGTH && ts!=0) {
       IOVTimeStamp tmp = IOVTimeStamp::GetFromString(time);
       return tmp;
     }
