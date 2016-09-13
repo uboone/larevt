@@ -37,9 +37,17 @@ namespace lariov {
   }
   
   IOVTimeStamp IOVTimeStamp::GetFromString(const std::string& ts) {
-    unsigned long stamp = std::stoul(ts.substr(0, ts.find_first_of(".")));
+    unsigned long stamp;
+    std::string substamp_str;
+    if (ts.find_first_of(".") == std::string::npos) {
+      stamp = std::stoul(ts);
+      substamp_str = "0";
+    }
+    else {
+      stamp = std::stoul(ts.substr(0, ts.find_first_of(".")));
+      substamp_str = ts.substr(ts.find_first_of(".")+1);
+    }
     
-    std::string substamp_str = ts.substr(ts.find_first_of(".")+1);
     if (substamp_str.length() > kMAX_SUBSTAMP_LENGTH) {
       throw IOVDataError("SubStamp of an IOVTimeStamp cannot have more than six digits!");
     }
