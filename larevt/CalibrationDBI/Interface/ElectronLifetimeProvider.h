@@ -24,9 +24,9 @@ namespace lariov {
       virtual ~ElectronLifetimeProvider() = default;
        
       /// Retrieve pedestal information     
-      virtual float Lifetime() const = 0;
+      virtual float Lifetime(float t) const = 0;
       virtual float Purity() const = 0;
-      virtual float LifetimeErr() const = 0;
+      virtual float LifetimeErr(float t) const = 0;
       virtual float PurityErr() const = 0;
       
  
