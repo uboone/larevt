@@ -19,7 +19,7 @@
 #include "larevt/SpaceCharge/SpaceChargeStandard.h"
 
 // Framework includes
-#include "cetlib/exception.h"
+#include "canvas/Utilities/Exception.h"
 
 //-----------------------------------------------
 spacecharge::SpaceChargeStandard::SpaceChargeStandard(
@@ -35,6 +35,12 @@ bool spacecharge::SpaceChargeStandard::Configure(fhicl::ParameterSet const& pset
   fEnableSimSpatialSCE = pset.get<bool>("EnableSimSpatialSCE");
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
   fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
+  
+  // check that the old obsoleted parameter is not in configuration:
+  if (pset.has_key("EnableSimulationSCE")) {
+    throw art::Exception(art::errors::Configuration)
+      << "Configuration parameter 'EnableSimulationSCE' has been replaced by 'EnableSimSpatialSCE'.\n";
+  }
 
   if((fEnableSimSpatialSCE == true) | (fEnableSimEfieldSCE == true))
   {
@@ -46,7 +52,7 @@ bool spacecharge::SpaceChargeStandard::Configure(fhicl::ParameterSet const& pset
     sp.find_file(fInputFilename,fname);
 
     std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
-    if(!infile->IsOpen()) throw cet::exception("SpaceChargeStandard") << "Could not find the space charge effect file '" << fname << "'!\n";
+    if(!infile->IsOpen()) throw art::Exception(art::errors::Configuration) << "Could not find the space charge effect file '" << fname << "'!\n";
 
     if(fRepresentationType == "Parametric")
     {      
