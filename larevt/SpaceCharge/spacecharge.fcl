@@ -1,0 +1,20 @@
+BEGIN_PROLOG
+
+standard_spacecharge:
+{
+  EnableSimSpatialSCE:    false
+  EnableSimEfieldSCE:    false
+  EnableCorrSCE:   false
+  RepresentationType:     "Parametric"
+  InputFilename:          "SCEoffsets.root"
+  service_provider:       SpaceChargeServiceStandard
+}
+
+bo_spacecharge:         @local::standard_spacecharge
+jp250L_spacecharge:     @local::standard_spacecharge
+argoneut_spacecharge:   @local::standard_spacecharge
+microboone_spacecharge: @local::standard_spacecharge
+dune35t_spacecharge:    @local::standard_spacecharge
+dunefd_spacecharge:     @local::standard_spacecharge
+
+END_PROLOG
