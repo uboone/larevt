@@ -5,8 +5,8 @@
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "CalibrationDBI/Interface/IPmtGainService.h"
-#include "CalibrationDBI/Providers/SIOVPmtGainProvider.h"
+#include "larevt/CalibrationDBI/Interface/IPmtGainService.h"
+#include "larevt/CalibrationDBI/Providers/SIOVPmtGainProvider.h"
 
 namespace lariov{
 

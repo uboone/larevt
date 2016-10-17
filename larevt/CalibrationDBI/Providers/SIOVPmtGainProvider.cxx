@@ -3,7 +3,6 @@
 
 #include "SIOVPmtGainProvider.h"
 #include "WebError.h"
-#include "CalibrationDBI/IOVData/IOVDataConstants.h"
 
 // art/LArSoft libraries
 #include "cetlib/exception.h"

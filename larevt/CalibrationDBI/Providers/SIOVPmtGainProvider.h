@@ -11,10 +11,10 @@
 #ifndef SIOVPMTGAINPROVIDER_H
 #define SIOVPMTGAINPROVIDER_H
 
-#include "CalibrationDBI/IOVData/PmtGain.h"
-#include "CalibrationDBI/IOVData/Snapshot.h"
-#include "CalibrationDBI/IOVData/IOVDataConstants.h"
-#include "CalibrationDBI/Interface/IPmtGainProvider.h"
+#include "larevt/CalibrationDBI/IOVData/PmtGain.h"
+#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
+#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/Interface/IPmtGainProvider.h"
 #include "DatabaseRetrievalAlg.h"
 
 namespace lariov {
