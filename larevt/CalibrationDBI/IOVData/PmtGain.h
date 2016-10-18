@@ -12,9 +12,10 @@
 
     @{*/
 #ifndef IOVDATA_PMTGAIN_H
-#define IOVDATA_PMTGAIN_H 1
+#define IOVDATA_PMTGAIN_H
 
 #include "ChData.h"
+#include "CalibrationExtraInfo.h"
 
 namespace lariov {
   /**
@@ -25,33 +26,27 @@ namespace lariov {
     public:
     
       /// Constructor
-      PmtGain(unsigned int ch) : ChData(ch) {}
+      PmtGain(unsigned int ch) : 
+        ChData(ch),
+	fExtraInfo("PmtGain") {}
       
       /// Default destructor
       ~PmtGain() {}
             
-      float SpeHeight()    const { return fHeight; }
-      float SpeHeightErr() const { return fHeightErr; }
-      float SpeWidth()     const { return fWidth; }
-      float SpeWidthErr()  const { return fWidthErr; }
-      float SpeArea()      const { return fArea; }
-      float SpeAreaErr()   const { return fAreaErr; }
+      float Gain()    const { return fGain; }
+      float GainErr() const { return fGainErr; }
+      CalibrationExtraInfo const& ExtraInfo() const { return fExtraInfo; }
       
-      void SetSpeHeight(float v)    { fHeight    = v; }
-      void SetSpeHeightErr(float v) { fHeightErr = v; }
-      void SetSpeWidth(float v)     { fWidth     = v; }
-      void SetSpeWidthErr(float v)  { fWidthErr  = v; }
-      void SetSpeArea(float v)      { fArea      = v; }
-      void SetSpeAreaErr(float v)   { fAreaErr   = v; }
+      void SetGain(float v)    { fGain    = v; }
+      void SetGainErr(float v) { fGainErr = v; }
+      void SetExtraInfo(CalibrationExtraInfo const& info) 
+      { fExtraInfo = info; }
       
     private:
     
-      float fHeight;
-      float fHeightErr;
-      float fWidth;
-      float fWidthErr;
-      float fArea;
-      float fAreaErr;
+      float fGain;
+      float fGainErr;
+      CalibrationExtraInfo fExtraInfo;
       
   }; // end class
 } // end namespace lariov

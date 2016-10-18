@@ -14,7 +14,7 @@
 #include "larevt/CalibrationDBI/IOVData/PmtGain.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
-#include "larevt/CalibrationDBI/Interface/IPmtGainProvider.h"
+#include "larevt/CalibrationDBI/Interface/PmtGainProvider.h"
 #include "DatabaseRetrievalAlg.h"
 
 namespace lariov {
@@ -30,20 +30,12 @@ namespace lariov {
    * - *UseDB* (boolean, default: false): retrieve information from the database
    * - *UseFile* (boolean, default: false): retrieve information from a file;
    *   not implemented yet
-   * - *DefaultSPEHeight* (real, default: ): SPE height returned 
+   * - *DefaultGain* (real, default: ): Gain returned 
    *   when /UseDB/ and /UseFile/ parameters are false
-   * - *DefaultSPEHeightErr* (real, default: ): SPE height uncertainty returned
-   *   when /UseDB/ and /UseFile/ parameters are false
-   * - *DefaultSPEWidth* (real, default: ): SPE width returned
-   *   when /UseDB/ and /UseFile/ parameters are false
-   * - *DefaultSPEWidthErr* (real, default: 0.3): SPE width uncertainty returned
-   *   when /UseDB/ and /UseFile/ parameters are false
-   * - *DefaultSPEArea* (real, default: 0.0): SPE area returned
-   *   when /UseDB/ and /UseFile/ parameters are false
-   * - *DefaultSPEAreaErr* (real, default: 0.0): SPE area uncertainty returned
+   * - *DefaultGainErr* (real, default: ): Gain uncertainty returned
    *   when /UseDB/ and /UseFile/ parameters are false
    */
-  class SIOVPmtGainProvider : public DatabaseRetrievalAlg, public IPmtGainProvider {
+  class SIOVPmtGainProvider : public DatabaseRetrievalAlg, public PmtGainProvider {
   
     public:
     
@@ -53,32 +45,20 @@ namespace lariov {
       /// Reconfigure function called by fhicl constructor
       void Reconfigure(fhicl::ParameterSet const& p);
       
-      /// Default destructor
-      ~SIOVPmtGainProvider() {}
-      
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-      bool Update(DBTimeStamp_t ts) override;
+      bool Update(DBTimeStamp_t ts);
       
       /// Retrieve pedestal information
-      const PmtGain& ChannelInfo(DBChannelID_t ch) const;      
-      float SpeHeight(DBChannelID_t ch) const override;
-      float SpeHeightErr(DBChannelID_t ch) const override;
-      float SpeWidth(DBChannelID_t ch) const override;
-      float SpeWidthErr(DBChannelID_t ch) const override;
-      float SpeArea(DBChannelID_t ch) const override;
-      float SpeAreaErr(DBChannelID_t ch) const override;
-           
-      //hardcoded information about database folder - useful for debugging cross checks
-      const unsigned int NCOLUMNS = 7;    
-      const std::vector<std::string> FIELD_NAMES = {"channel", "spe_height", "spe_height_err", "spe_width", "spe_width_err", "spe_area", "spe_area_err"};
-      const std::vector<std::string> FIELD_TYPES = {"unsigned int", "float", "float", "float", "float", "float", "float"};
+      const PmtGain& PmtGainObject(DBChannelID_t ch) const;      
+      float Gain(DBChannelID_t ch) const override;
+      float GainErr(DBChannelID_t ch) const override;
+      CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
       
     private:
     
       DataSource::ds fDataSource;
           
       Snapshot<PmtGain> fData;
-      mutable PmtGain   fDefault;
   };
 }//end namespace lariov
 

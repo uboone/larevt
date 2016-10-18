@@ -5,18 +5,18 @@
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "larevt/CalibrationDBI/Interface/IPmtGainService.h"
+#include "larevt/CalibrationDBI/Interface/PmtGainService.h"
 #include "larevt/CalibrationDBI/Providers/SIOVPmtGainProvider.h"
 
 namespace lariov{
 
   /**
      \class SIOVPmtGainService
-     art service implementation of IPmtGainService.  Implements 
+     art service implementation of PmtGainService.  Implements 
      a pmt gain retrieval service for database scheme in which 
      all elements in a database folder share a common interval of validity
   */
-  class SIOVPmtGainService : public IPmtGainService {
+  class SIOVPmtGainService : public PmtGainService {
   
     public:
     
@@ -29,15 +29,19 @@ namespace lariov{
      
     private:
     
-      const IPmtGainProvider& DoGetProvider() const override {
+      PmtGainProvider const& DoGetProvider() const override {
         return fProvider;
-      }    
+      }   
+      
+      PmtGainProvider const* DoGetProviderPtr() const override {
+        return &fProvider; 
+      }
     
       SIOVPmtGainProvider fProvider;
   };
 }//end namespace lariov
       
-DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVPmtGainService, lariov::IPmtGainService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVPmtGainService, lariov::PmtGainService, LEGACY)
       
 
 namespace lariov{
@@ -51,6 +55,6 @@ namespace lariov{
 
 }//end namespace lariov
 
-DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVPmtGainService, lariov::IPmtGainService)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVPmtGainService, lariov::PmtGainService)
 
 #endif

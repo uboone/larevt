@@ -6,13 +6,16 @@
 
 // art/LArSoft libraries
 #include "cetlib/exception.h"
+#include "larcore/Geometry/Geometry.h"
+
+
+#include <fstream>
 
 namespace lariov {
 
   //constructor      
   SIOVPmtGainProvider::SIOVPmtGainProvider(fhicl::ParameterSet const& p) :
-    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
-    fDefault(0) {	
+    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")) {	
     
     this->Reconfigure(p);
   }
@@ -27,6 +30,7 @@ namespace lariov {
 
     bool UseDB      = p.get<bool>("UseDB", false);
     bool UseFile    = p.get<bool>("UseFile", false);
+    std::string fileName = p.get<std::string>("FileName", "");
 
     //priority:  (1) use db, (2) use table, (3) use defaults
     //If none are specified, use defaults
@@ -35,27 +39,56 @@ namespace lariov {
     else              fDataSource = DataSource::Default;
 
     if (fDataSource == DataSource::Default) {
-      float default_height     = p.get<float>("DefaultSPEHeight");
-      float default_height_err = p.get<float>("DefaultSPEHeightErr");
-      float default_width      = p.get<float>("DefaultSPEWidth");
-      float default_width_err  = p.get<float>("DefaultSPEWidthErr");
-      float default_area       = p.get<float>("DefaultSPEArea");
-      float default_area_err   = p.get<float>("DefaultSPEAreaErr");
+      float default_gain     = p.get<float>("DefaultGain");
+      float default_gain_err = p.get<float>("DefaultGainErr");
 
-      fDefault.SetSpeHeight(default_height);
-      fDefault.SetSpeHeightErr(default_height_err);
-      fDefault.SetSpeWidth(default_width);
-      fDefault.SetSpeWidthErr(default_width_err);
-      fDefault.SetSpeArea(default_area);
-      fDefault.SetSpeAreaErr(default_area_err);      
+      PmtGain defaultGain(0);
+
+      defaultGain.SetGain(default_gain);
+      defaultGain.SetGainErr(default_gain_err);
+      defaultGain.SetExtraInfo(CalibrationExtraInfo("PmtGain"));
+      
+      art::ServiceHandle<geo::Geometry> geo;
+      for (unsigned int od=0; od!=geo->NOpDets(); ++od) {
+        if (geo->IsValidOpChannel(od)) {
+	  defaultGain.SetChannel(od);
+	  fData.AddOrReplaceRow(defaultGain);
+	}
+      }
+      
     }
     else if (fDataSource == DataSource::File) {
-      throw cet::exception("SIOVPmtGainProvider")
-        << "SIOVPmtGainProvider: input from file not implemented yet\n";
-      //need to implement
+      std::cout << "Using gains from local file: "<<fileName<<"\n";
+      std::ifstream file(fileName);
+      if (!file) {
+        throw cet::exception("SIOVPmtGainProvider")
+          << "File "<<fileName<<" is not found.";
+      }
+      
+      std::string line;
+      PmtGain dp(0);
+      while (std::getline(file, line)) {
+        size_t current_comma = line.find(',');
+        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));     
+        float gain = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        
+        current_comma = line.find(',',current_comma+1);
+        float gain_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+
+        CalibrationExtraInfo info("PmtGain");
+
+        dp.SetChannel(ch);
+        dp.SetGain(gain);
+        dp.SetGainErr(gain_err);
+	dp.SetExtraInfo(info);
+        
+        fData.AddOrReplaceRow(dp);
+      }
+    }
+    else {
+      std::cout << "Using pedestals from conditions database"<<std::endl;
     }
   }
-
 
   bool SIOVPmtGainProvider::Update(DBTimeStamp_t ts) {
     
@@ -71,60 +104,37 @@ namespace lariov {
     fFolder->GetChannelList(channels);
     for (auto it = channels.begin(); it != channels.end(); ++it) {
 
-      double height, height_err, width, width_err, area, area_err;
-      fFolder->GetNamedChannelData(*it, "spe_height",     height);
-      fFolder->GetNamedChannelData(*it, "spe_height_err", height_err);
-      fFolder->GetNamedChannelData(*it, "spe_width",      width);
-      fFolder->GetNamedChannelData(*it, "spe_width_err",  width_err);
-      fFolder->GetNamedChannelData(*it, "spe_area",       area);
-      fFolder->GetNamedChannelData(*it, "spe_area_err",   area_err);      
+      double gain, gain_err;
+      fFolder->GetNamedChannelData(*it, "gain",     gain);
+      fFolder->GetNamedChannelData(*it, "gain_sigma", gain_err); 
 
       PmtGain pg(*it);
-      pg.SetSpeHeight( (float)height );
-      pg.SetSpeHeightErr( (float)height_err );
-      pg.SetSpeWidth( (float)width );
-      pg.SetSpeWidthErr( (float)width_err );
-      pg.SetSpeArea( (float)area );
-      pg.SetSpeAreaErr( (float)area_err );
+      pg.SetGain( (float)gain );
+      pg.SetGainErr( (float)gain_err );
+      pg.SetExtraInfo(CalibrationExtraInfo("PmtGain"));
 
       fData.AddOrReplaceRow(pg);
     }
 
     return true;
-
   }
   
-  const PmtGain& SIOVPmtGainProvider::ChannelInfo(DBChannelID_t ch) const { 
-    if (fDataSource == DataSource::Default) {
-      fDefault.SetChannel(ch);
-      return fDefault;
-    }
-    else return fData.GetRow(ch);
+  const PmtGain& SIOVPmtGainProvider::PmtGainObject(DBChannelID_t ch) const { 
+    return fData.GetRow(ch);
   }
       
-  float SIOVPmtGainProvider::SpeHeight(DBChannelID_t ch) const {
-    return this->ChannelInfo(ch).SpeHeight();
+  float SIOVPmtGainProvider::Gain(DBChannelID_t ch) const {
+    return this->PmtGainObject(ch).Gain();
   }
   
-  float SIOVPmtGainProvider::SpeHeightErr(DBChannelID_t ch) const {
-    return this->ChannelInfo(ch).SpeHeightErr();
+  float SIOVPmtGainProvider::GainErr(DBChannelID_t ch) const {
+    return this->PmtGainObject(ch).GainErr();
   }
   
-  float SIOVPmtGainProvider::SpeWidth(DBChannelID_t ch) const {
-    return this->ChannelInfo(ch).SpeWidth();
-  }
-  
-  float SIOVPmtGainProvider::SpeWidthErr(DBChannelID_t ch) const {
-    return this->ChannelInfo(ch).SpeWidthErr();
+  CalibrationExtraInfo const& SIOVPmtGainProvider::ExtraInfo(DBChannelID_t ch) const {
+    return this->PmtGainObject(ch).ExtraInfo();
   }
 
-  float SIOVPmtGainProvider::SpeArea(DBChannelID_t ch) const {
-    return this->ChannelInfo(ch).SpeArea();
-  }
-  
-  float SIOVPmtGainProvider::SpeAreaErr(DBChannelID_t ch) const {
-    return this->ChannelInfo(ch).SpeAreaErr();
-  }
 
 }//end namespace lariov
 	
