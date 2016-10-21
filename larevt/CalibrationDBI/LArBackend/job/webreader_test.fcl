@@ -6,8 +6,7 @@ services:
 {
   TFileService: { fileName: "ana_hist.root" }
   Timing:       {}
-  user:         { WebReaderService: @local::standard_webreader }
-}
+  WebReaderService: @local::standard_webreader }
 
 source:
 {
@@ -30,9 +29,9 @@ physics:
 
 # Override service parameters temporarily for UB (testing)
 
-services.user.WebReaderService.WDA_SERVER:  "dbdata0.fnal.gov"
-services.user.WebReaderService.WDA_PORT:    "8086"
-services.user.WebReaderService.WDA_DBNAME:  "uboonecon_dev"
-services.user.WebReaderService.WDA_TIMEOUT: 5
+services.WebReaderService.WDA_SERVER:  "dbdata0.fnal.gov"
+services.WebReaderService.WDA_PORT:    "8086"
+services.WebReaderService.WDA_DBNAME:  "uboonecon_dev"
+services.WebReaderService.WDA_TIMEOUT: 5
 
 
