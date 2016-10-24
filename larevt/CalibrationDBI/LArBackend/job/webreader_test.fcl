@@ -5,7 +5,7 @@ process_name: WebReaderTest
 services:
 {
   TFileService: { fileName: "ana_hist.root" }
-  Timing:       {}
+  TimeTracker:  {}
   WebReaderService: @local::standard_webreader }
 
 source:
