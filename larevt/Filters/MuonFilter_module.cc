@@ -184,12 +184,6 @@ namespace filter {
       mf::LogInfo("MuonFilter") << "At least one plane with no track";
     }
     else {  
-      double x1,x2,y1,y2,z1,z2;
-      int uPos1,vPos1,uPos2,vPos2;
-      std::vector<double> w1Start(3);
-      std::vector<double> w1End(3);
-      std::vector<double> w2Start(3);
-      std::vector<double> w2End(3);
 
       for(unsigned int i = 0; i < inductionSegments.size(); i++) { 
         if(indMap[i]) continue;
@@ -208,10 +202,10 @@ namespace filter {
           double trk2Start =colSeg->StartTick();
           double trk2End =colSeg->EndTick();
           
-          uPos1 = indSeg->StartWire();
-          uPos2 = indSeg->EndWire(); 
-          vPos1 = colSeg->StartWire();
-          vPos2 = colSeg->EndWire();
+          int uPos1 = indSeg->StartWire();
+          int uPos2 = indSeg->EndWire(); 
+          int const vPos1 = colSeg->StartWire();
+          int const vPos2 = colSeg->EndWire();
           mf::LogInfo("MuonFilter") << "I J " << i <<" " << j ;
           mf::LogInfo("MuonFilter") << "Start/end " << indSeg->StartWire() 
                                     <<" "<< colSeg->StartWire() 
@@ -242,18 +236,20 @@ namespace filter {
           //again needs to be fixed
           ///\todo: the delta wire numbers seem a bit magic, 
           ///\todo: should also change to using Geometry::ChannelsIntersect method
-          ///\todo: should also make this detector agnostic, the following assumes 1 cryostat and 1 tpc
           if((TMath::Abs(trk1Start-trk2Start) < fTolerance && TMath::Abs(trk1End-trk2End) < fTolerance)    && 
              (TMath::Abs(uPos1-vPos1) <=fDeltaWire+2 && TMath::Abs(uPos2-vPos2) <= fDeltaWire+2))
           {
-            geom->WireEndPoints(0,0,uPlane,uPos1,&w1Start[0],&w1End[0]);
-            geom->WireEndPoints(0,0,vPlane,vPos1,&w2Start[0],&w2End[0]);
-            geom->IntersectionPoint(uPos1,vPos1,uPlane,vPlane,0,0,&w1Start[0],&w1End[0],&w2Start[0],&w2End[0],y1,z1);
-            geom->WireEndPoints(0,0,uPlane,uPos2,&w1Start[0],&w1End[0]);
-            geom->WireEndPoints(0,0,vPlane,vPos2,&w2Start[0],&w2End[0]);
-            geom->IntersectionPoint(uPos2,vPos2,uPlane,vPlane,0,0,&w1Start[0],&w1End[0],&w2Start[0],&w2End[0],y2,z2);
-            x1 = (trk1Start+trk2Start)/2.0*drift-fDCenter;
-            x2 = (trk1End+trk2End)/2.0*drift-fDCenter;
+            geo::WireID u_wID1(indSeg->Plane(), uPos1);
+            geo::WireID u_wID2(indSeg->Plane(), uPos2);
+            geo::WireID v_wID1(colSeg->Plane(), vPos1);
+            geo::WireID v_wID2(colSeg->Plane(), vPos2);
+            
+            double y1, y2, z1, z2;
+            geom->IntersectionPoint(u_wID1, v_wID1, y1, z1);
+            geom->IntersectionPoint(u_wID2, v_wID2, y2, z2);
+            
+            double const x1 = (trk1Start+trk2Start)/2.0*drift-fDCenter;
+            double const x2 = (trk1End+trk2End)/2.0*drift-fDCenter;
             mf::LogInfo("MuonFilter") <<"Match " << matchNum 
                                       <<" " << x1 << " " << y1 << " " << z1 
                                       <<" " << x2 << " " << y2 << " " << z2;
