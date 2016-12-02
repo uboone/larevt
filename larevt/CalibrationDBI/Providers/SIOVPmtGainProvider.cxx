@@ -58,18 +58,19 @@ namespace lariov {
       
     }
     else if (fDataSource == DataSource::File) {
-      std::cout << "Using gains from local file: "<<fileName<<"\n";
+      std::cout << "Using pmt gains from local file: "<<fileName<<"\n";
       std::ifstream file(fileName);
       if (!file) {
         throw cet::exception("SIOVPmtGainProvider")
           << "File "<<fileName<<" is not found.";
       }
-      
+
       std::string line;
       PmtGain dp(0);
       while (std::getline(file, line)) {
+        if (line[0] == '#') continue;
         size_t current_comma = line.find(',');
-        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));     
+        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));   
         float gain = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
         
         current_comma = line.find(',',current_comma+1);
@@ -86,7 +87,7 @@ namespace lariov {
       }
     }
     else {
-      std::cout << "Using pedestals from conditions database"<<std::endl;
+      std::cout << "Using pmt gains from conditions database"<<std::endl;
     }
   }
 

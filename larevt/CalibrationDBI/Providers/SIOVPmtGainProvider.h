@@ -48,7 +48,7 @@ namespace lariov {
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
       bool Update(DBTimeStamp_t ts);
       
-      /// Retrieve pedestal information
+      /// Retrieve gain information
       const PmtGain& PmtGainObject(DBChannelID_t ch) const;      
       float Gain(DBChannelID_t ch) const override;
       float GainErr(DBChannelID_t ch) const override;
