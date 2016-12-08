@@ -1,26 +1,26 @@
 /**
- * \file SIOVPmtGainProvider.h
+ * \file SIOVElectronicsCalibProvider.h
  *
  * \ingroup WebDBI
  * 
- * \brief Class def header for a class SIOVPmtGainProvider
+ * \brief Class def header for a class SIOVElectronicsCalibProvider
  *
  * @author eberly@slac.stanford.edu
  */
 
-#ifndef SIOVPMTGAINPROVIDER_H
-#define SIOVPMTGAINPROVIDER_H
+#ifndef SIOVELECTRONICSCALIBPROVIDER_H
+#define SIOVELECTRONICSCALIBPROVIDER_H
 
-#include "larevt/CalibrationDBI/IOVData/PmtGain.h"
+#include "larevt/CalibrationDBI/IOVData/ElectronicsCalib.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
-#include "larevt/CalibrationDBI/Interface/PmtGainProvider.h"
+#include "larevt/CalibrationDBI/Interface/ElectronicsCalibProvider.h"
 #include "DatabaseRetrievalAlg.h"
 
 namespace lariov {
 
   /**
-   * @brief Retrieves information: pmt gain
+   * @brief Retrieves information: electronics calibrations, specifically gain and shaping time
    * 
    * Configuration parameters
    * =========================
@@ -34,13 +34,17 @@ namespace lariov {
    *   when /UseDB/ and /UseFile/ parameters are false
    * - *DefaultGainErr* (real, default: ): Gain uncertainty returned
    *   when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultShapingTime* (real, default: ): Shaping Time returned 
+   *   when /UseDB/ and /UseFile/ parameters are false
+   * - *DefaultShapingTimeErr* (real, default: ): Shaping Time uncertainty returned
+   *   when /UseDB/ and /UseFile/ parameters are false
    */
-  class SIOVPmtGainProvider : public DatabaseRetrievalAlg, public PmtGainProvider {
+  class SIOVElectronicsCalibProvider : public DatabaseRetrievalAlg, public ElectronicsCalibProvider {
   
     public:
     
       /// Constructors
-      SIOVPmtGainProvider(fhicl::ParameterSet const& p);
+      SIOVElectronicsCalibProvider(fhicl::ParameterSet const& p);
       
       /// Reconfigure function called by fhicl constructor
       void Reconfigure(fhicl::ParameterSet const& p);
@@ -48,17 +52,19 @@ namespace lariov {
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
       bool Update(DBTimeStamp_t ts);
       
-      /// Retrieve gain information
-      const PmtGain& PmtGainObject(DBChannelID_t ch) const;      
+      /// Retrieve electronics calibration information
+      const ElectronicsCalib& ElectronicsCalibObject(DBChannelID_t ch) const;      
       float Gain(DBChannelID_t ch) const override;
       float GainErr(DBChannelID_t ch) const override;
+      float ShapingTime(DBChannelID_t ch) const override;
+      float ShapingTimeErr(DBChannelID_t ch) const override;
       CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
       
     private:
     
       DataSource::ds fDataSource;
           
-      Snapshot<PmtGain> fData;
+      Snapshot<ElectronicsCalib> fData;
   };
 }//end namespace lariov
 

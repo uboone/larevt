@@ -44,13 +44,44 @@ namespace lariov {
     if (fCachedDataset) releaseDataset(fCachedDataset);
   }
 
-
+  int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, bool& data) {
+  
+    Tuple tup;
+    size_t col = this->GetTupleColumn(channel, name, tup);
+    int err=0;
+    char buf[kBUFFER_SIZE];
+    int str_size = getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
+    data = false;
+    if (std::string(buf, str_size)=="True") {
+      data = true;
+    }
+    else if (std::string(buf, str_size)=="False") {
+      data = false;
+    }
+    else std::cout<<"(DBFolder) ERROR: Can't identify data: "<<std::string(buf, str_size)<<" as boolean!"<<std::endl;
+    
+    releaseTuple(tup);
+    return err;
+  }
+  
   int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, long& data) {
 
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
     int err=0;
-    data = getLongValue(tup, col, &err);
+    
+    //first handle special case that the db data is boolean, but user mistakenly used long version of this function
+    char buf[kBUFFER_SIZE];
+    int str_size = getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
+    if (std::string(buf, str_size)=="True") {
+      data = 1;
+    }
+    else if (std::string(buf, str_size)=="False") {
+      data = 0;
+    }
+    else { //ok, we really have a long (hopefully)   
+      data = getLongValue(tup, col, &err);
+    }
     releaseTuple(tup);
     return err;
   }
