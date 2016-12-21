@@ -1,13 +1,13 @@
 /**
- * \file PmtGainProvider
+ * \file ElectronicsCalibProvider
  * 
- * \brief Class def header for a class PmtGainProvider
+ * \brief Class def header for a class ElectronicsCalibProvider
  *
  * @author eberly@slac.stanford.edu
  */
 
-#ifndef PMTGAINPROVIDER_H
-#define PMTGAINPROVIDER_H
+#ifndef ELECTRONICSCALIBPROVIDER_H
+#define ELECTRONICSCALIBPROVIDER_H
 
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "larevt/CalibrationDBI/IOVData/CalibrationExtraInfo.h"
@@ -15,20 +15,23 @@
 namespace lariov {
 
   /**
-   \class PmtGainProvider
+   \class ElectronicsCalibProvider
    * Currently, the class provides interface for the following information:
-   * - pmt gain and its error
-   * - pmt extra info, related to procedure that determines gain
+   * - electronics gain and its error
+   * - electronics shaping time and its error
+   * - electronics extra info, related to procedure that determines the gain and shaping time
    */
-  class PmtGainProvider {
+  class ElectronicsCalibProvider {
   
     public:
     
-      virtual ~PmtGainProvider() = default;
+      virtual ~ElectronicsCalibProvider() = default;
        
       /// Retrieve pmt gain information     
       virtual float Gain(raw::ChannelID_t ch) const = 0;
       virtual float GainErr(raw::ChannelID_t ch) const = 0;
+      virtual float ShapingTime(raw::ChannelID_t ch) const = 0;
+      virtual float ShapingTimeErr(raw::ChannelID_t ch) const = 0;
       
       virtual CalibrationExtraInfo const& ExtraInfo(raw::ChannelID_t ch) const = 0;
   };

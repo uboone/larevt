@@ -18,6 +18,7 @@ namespace lariov {
       DBFolder(const std::string& name, const std::string& url, const std::string& tag = "");
       virtual ~DBFolder();
       
+      int GetNamedChannelData(DBChannelID_t channel, const std::string& name, bool& data);
       int GetNamedChannelData(DBChannelID_t channel, const std::string& name, long& data);
       int GetNamedChannelData(DBChannelID_t channel, const std::string& name, double& data);
       int GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::string& data);

@@ -3,6 +3,10 @@
 
 namespace lariov {
 
+  void CalibrationExtraInfo::AddOrReplaceBoolData(std::string const& label, bool const data) {
+    fBoolData[label] = data;
+  }
+
   void CalibrationExtraInfo::AddOrReplaceIntData(std::string const& label, int const data) {
     fIntData[label] = data;
   }
@@ -26,6 +30,7 @@ namespace lariov {
   void CalibrationExtraInfo::ClearDataByLabel(std::string const& label) {
     unsigned int n_erased = 0;
 
+    n_erased += fBoolData.erase(label);
     n_erased += fIntData.erase(label);
     n_erased += fVecIntData.erase(label);
     n_erased += fFloatData.erase(label);
@@ -38,11 +43,21 @@ namespace lariov {
   }
   
   void CalibrationExtraInfo::ClearAllData() {
+    fBoolData.clear();
     fIntData.clear();
     fVecIntData.clear();
     fFloatData.clear();
     fVecFloatData.clear();
     fStringData.clear();
+  }
+  
+  bool CalibrationExtraInfo::GetBoolData(std::string const& label) const {
+    if (fBoolData.find(label) != fBoolData.end()) {
+      return fBoolData.at(label);
+    }
+
+    throw IOVDataError("CalibrationExtraInfo: Could not find extra bool data "+label+" for calibration "+fName);
+
   }
   
   int CalibrationExtraInfo::GetIntData(std::string const& label) const {
