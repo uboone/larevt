@@ -53,10 +53,7 @@ namespace filt {
  
     std::string fGenieModuleLabel;
     bool fInclusive;      /// Returns events which contain AT LEAST the listed particles
-    bool fChargedCurrent; /// Returns events which contain CC interactions
-    bool fNeutralCurrent; /// Returns events which contain NC interactions
     std::vector<int> fPDG;     /// List of particle PDGs we want to keep 
-    bool fCheckCount;     /// Returns events which contain N of the particles with the PDG
     std::vector<int> fPDGCount;/// List of N's for the particle PDGs  
     std::vector<bool> fPDGCountExclusive;/// If true:  Only select events with EXACTLY  that number of particles
                                          /// If false:      select events with AT LEAST that number of particles  
@@ -91,9 +88,6 @@ namespace filt{
     fGenieModuleLabel  = p.get< std::string      >("GenieModuleLabel");
     fPDG               = p.get< std::vector<int> >("PDG");
     fInclusive         = p.get< bool >("isInclusive");        
-    fChargedCurrent    = p.get< bool >("isChargedCurrent");        
-    fNeutralCurrent    = p.get< bool >("isNeutralCurrent");        
-    fCheckCount        = p.get< bool >("CheckCount"); 
     fPDGCount          = p.get< std::vector<int> >("PDGCount");
     fPDGCountExclusive = p.get< std::vector<bool> >("PDGCountExclusivity");
 
