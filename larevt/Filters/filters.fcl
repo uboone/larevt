@@ -57,6 +57,27 @@ argoneut_finalstateparticlefilter:
  PDG:              [3122, -13]   #pdg codes of final state particles in an event that you want to pick 
 }
 
+microboone_finalstateselectfilter:
+{
+ module_type: "FinalStateSelectFilter"
+ GenieModuleLabel: "generator" 
+        #Return an inclusive final state
+ isInclusive: true
+        # List of particles to search for
+ PDG: [ 13, -13, 11, -11, 2212, 22] #NC 1 photon
+        # Will return events with this many of above particles
+ PDGCount: [0, 0, 0, 0, 1, 1]
+        # Will return events with only the specified number
+ PDGCountExclusivity: [true, true, true, true, false, true]
+ ######
+ # Commentary by Joseph 
+ # 
+ # This example allows for no charged leptons
+ # more than 1 proton and exactly 1 photon
+ #
+ ######
+}
+
 standard_smallclusterfilter:
 {
  module_type:			"SmallClusterFilter"
