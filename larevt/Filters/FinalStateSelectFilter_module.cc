@@ -3,10 +3,13 @@
 // FinalStateSelectFilter class:
 // Algoritm to produce a filtered event file having
 // events with user-defined final state particles 
+// Now with more control! 
 //
-// saima@ksu.edu
+// Joseph Zennamo, UChicago, 2016 (almost 2017 really, happy holidays!)
+// jzennamo@uchicago.edu
 //
 ////////////////////////////////////////////////////////////////////////
+
 #ifndef FINALSTATESELECTFILTER_H
 #define FINALSTATESELECTFILTER_H
 
@@ -61,7 +64,7 @@ namespace filt {
 
   protected: 
 
-    bool isSubset(std::vector<int>& a, std::vector<int>& b, bool IsInclusive);
+    bool isSubset(std::vector<int>& a, std::vector<int>& aN, std::vector<int>& b, bool IsInclusive);
     
   }; // class FinalStateSelectFilter
 
@@ -115,8 +118,15 @@ namespace filt{
 
     std::vector<int> finalstateparticles;
     
-    
-
+    //Guard agaist lazy people not including this 
+    if(fPDGCount.size() != 0){
+      //Make sure we have all that we need
+      if(fPDGCount.size() != fPDG.size()){
+	std::cout << "PDG and PDGCount Vector size mismatch." << std::endl;
+	return false;
+      }
+    }
+   
     //get a vector of final state particles   
     for(int i = 0; i < mc->NParticles(); ++i){
       simb::MCParticle part(mc->GetParticle(i));
@@ -124,41 +134,72 @@ namespace filt{
 	finalstateparticles.push_back(part.PdgCode());
     }
 
-    if(isSubset(fPDG, finalstateparticles,fInclusive)){
+    if(isSubset(fPDG, fPDGCount, finalstateparticles,fInclusive)){
       fSelectedEvents->Fill(1);
       std::cout << "this is a selected event" << std::endl;
     }
 
-    return isSubset(fPDG, finalstateparticles, fInclusive); // returns true if the user-defined fPDG exist(s) in the final state particles
+    return isSubset(fPDG, fPDGCount, finalstateparticles, fInclusive); // returns true if the user-defined fPDG exist(s) in the final state particles
 
   } // bool  
   //} // namespace
     
   //------------------------------------------------   
   
-  bool FinalStateSelectFilter::isSubset(std::vector<int>& a, std::vector<int>& b, bool IsInclusive)
+  bool FinalStateSelectFilter::isSubset(std::vector<int>& a, std::vector<int>& aN, std::vector<int>& b, bool IsInclusive)
   {
     bool end;
+
+    // check if the analyzer wants an includive final state
     if(IsInclusive){
+      //Sweet 
       end = true;
     }
     /// else it is exclusive
     else{
-      for (std::vector<int>::iterator i = a.begin(); i != a.end(); i++){
-	bool found = false;
-	for (std::vector<int>::iterator j = b.begin(); j != b.end(); j++){
-	  if (*i == *j){
-	    found = true;
-	    break;
-	  }
-	}
+      //Exclusive filter is fine too, though I am less excited.
+
+      std::vector< int > counts(a.size());
+
+      //Particle Checking
+      //  Iterate through all the wanted PDGs (vector a) and compare
+      //  to what we have in the final state (vecotr b). Need to count
+      //  how many matches we since this is supposed to be the exclusive
+      //  portion of the code. 
+      for(unsigned int i = 0; i < a.size(); i++){
 	
-	if (!found){
+	//Search in b vector is there is the wanted PDG!
+	//   If we find it iterate the counter so that we can
+	//   check against the wanted counts later, BUT if that
+	//   PDG we want isn't in the final state (vector b) then
+	//   we want to ditch the event! 
+	if(std::find(b.begin(), b.end(), a[i]) != b.end()){
+	  counts[i] += 1;
+	}
+	// else, ditch the event
+	else{
 	  return false;
 	}
       }
-      return true;
-    }
+      
+      
+      // Exclusive Check
+      //   iterate through the count vectors and make sure they 
+      //   are the same, I am sure there is a smart computer-ing
+      //   way to do this but I wrote it this way, if it turns out
+      //   to be too slow we can address this. 
+      bool AllGood = true; 
+      for(unsigned int i = 0; i < aN.size(); i++){	
+	if(aN[i] != counts[i]){
+	  AllGood = false;
+	  break;
+	}
+      }
+   
+      //Make the final return what I think the final exclusive check is 
+      end = AllGood; 
+
+    }          
     return end;
   }
 }
