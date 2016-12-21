@@ -58,13 +58,15 @@ namespace filt {
     std::vector<int> fPDG;     /// List of particle PDGs we want to keep 
     bool fCheckCount;     /// Returns events which contain N of the particles with the PDG
     std::vector<int> fPDGCount;/// List of N's for the particle PDGs  
+    std::vector<bool> fPDGCountExclusive;/// If true:  Only select events with EXACTLY  that number of particles
+                                         /// If false:      select events with AT LEAST that number of particles  
     std::vector<int> fStatusCode;
     TH1D* fSelectedEvents;
     TH1D* fTotalEvents;
 
   protected: 
 
-    bool isSubset(std::vector<int>& a, std::vector<int>& aN, std::vector<int>& b, bool IsInclusive);
+    bool isSubset(std::vector<int>& a, std::vector<int>& aN, std::vector<bool> aNex, std::vector<int>& b, bool IsInclusive);
     
   }; // class FinalStateSelectFilter
 
@@ -86,13 +88,15 @@ namespace filt{
   //-------------------------------------------------
   void FinalStateSelectFilter::reconfigure(fhicl::ParameterSet const& p)
   {
-    fGenieModuleLabel = p.get< std::string      >("GenieModuleLabel");
-    fPDG              = p.get< std::vector<int> >("PDG");
-    fInclusive        = p.get< bool >("isInclusive");        
-    fChargedCurrent   = p.get< bool >("isChargedCurrent");        
-    fNeutralCurrent   = p.get< bool >("isNeutralCurrent");        
-    fCheckCount       = p.get< bool >("CheckCount"); 
-    fPDGCount         = p.get< std::vector<int> >("PDGCount");
+    fGenieModuleLabel  = p.get< std::string      >("GenieModuleLabel");
+    fPDG               = p.get< std::vector<int> >("PDG");
+    fInclusive         = p.get< bool >("isInclusive");        
+    fChargedCurrent    = p.get< bool >("isChargedCurrent");        
+    fNeutralCurrent    = p.get< bool >("isNeutralCurrent");        
+    fCheckCount        = p.get< bool >("CheckCount"); 
+    fPDGCount          = p.get< std::vector<int> >("PDGCount");
+    fPDGCountExclusive = p.get< std::vector<bool> >("PDGCountExclusivity");
+
 
   } 
 
@@ -119,10 +123,12 @@ namespace filt{
     std::vector<int> finalstateparticles;
     
     //Guard agaist lazy people not including this 
-    if(fPDGCount.size() != 0){
+    if(fPDGCount.size() != 0 || fPDGCountExclusive.size() != 0){
       //Make sure we have all that we need
-      if(fPDGCount.size() != fPDG.size()){
-	std::cout << "PDG and PDGCount Vector size mismatch." << std::endl;
+      if(fPDGCount.size() != fPDG.size() ||
+	 fPDGCountExclusive.size() != fPDGCount.size() || 
+	 fPDGCountExclusive.size() != fPDG.size()){
+	std::cout << "PDG, PDGCount, and PDGCountExclusivity Vector size mismatch." << std::endl;
 	return false;
       }
     }
@@ -134,25 +140,76 @@ namespace filt{
 	finalstateparticles.push_back(part.PdgCode());
     }
 
-    if(isSubset(fPDG, fPDGCount, finalstateparticles,fInclusive)){
+    if(isSubset(fPDG, fPDGCount, fPDGCountExclusive, finalstateparticles,fInclusive)){
       fSelectedEvents->Fill(1);
       std::cout << "this is a selected event" << std::endl;
     }
 
-    return isSubset(fPDG, fPDGCount, finalstateparticles, fInclusive); // returns true if the user-defined fPDG exist(s) in the final state particles
+    // returns true if the user-defined fPDG exist(s) in the final state particles
+    return isSubset(fPDG, fPDGCount, fPDGCountExclusive, finalstateparticles, fInclusive); 
 
   } // bool  
   //} // namespace
     
   //------------------------------------------------   
   
-  bool FinalStateSelectFilter::isSubset(std::vector<int>& a, std::vector<int>& aN, std::vector<int>& b, bool IsInclusive)
+  bool FinalStateSelectFilter::isSubset(std::vector<int>& a, std::vector<int>& aN, std::vector<bool> aNex, std::vector<int>& b, bool IsInclusive)
   {
     bool end;
 
     // check if the analyzer wants an includive final state
     if(IsInclusive){
-      //Sweet 
+      // Sweet, OK, so things get a bit annoying because we want this 
+      // to be fairly generic. What I am trying to do is let analyzers 
+      // create complicated inclusive final states with exclusive or inclusive 
+      // numbers of particles. This requires this "exclusivity" vector
+      //
+      // an example final state would be NC 1 photon inclusive, 
+      // all the analyzer wants is events with EXACTLY 1 photon in the final 
+      // state. 
+
+      // Create a vector for the exclusivity check;
+      std::vector< int > counts(a.size());
+
+      //Particle Checking
+      //  Iterate through all the wanted PDGs (vector a) and compare
+      //  to what we have in the final state (vecotr b). 
+      for(unsigned int i = 0; i < a.size(); i++){
+	if(std::find(b.begin(), b.end(), a[i]) != b.end()){
+	  counts[i] += 1;
+	}	       	
+      }
+      
+      //Verify we have the final state we want
+      //  Iterate through the full vector and make sure we have at least
+      //  as many particles we wanted, also check the exclusivity
+      if(aN.size() != 0){
+	for(unsigned int i = 0; i < a.size(); i++){
+	  if(counts[i] <= aN[i]){
+	    end = false;
+	    break;
+	  }
+	  if(aNex[i] = true && counts[i] != aN[i]){
+	    end = false;
+	    break;
+	  }
+	}
+      }
+      // If the count vector size is zero then the user was being lazy...
+      // but no one is perfect so I will try to accommodate this. I make the 
+      // assumption that they only are asking for final state which contain
+      // ANY NUMBER of the requested PDG. If this isn't true then the user
+      // should specify all the arguments
+      else{
+
+	for(unsigned int i = 0; i < a.size(); i++){
+	  if(std::find(b.begin(), b.end(), a[i]) == b.end()){
+	    end = false;
+	    break;
+	  }
+	}		
+      }
+      // if things didn't break then things went well.
       end = true;
     }
     /// else it is exclusive
@@ -198,7 +255,6 @@ namespace filt{
    
       //Make the final return what I think the final exclusive check is 
       end = AllGood; 
-
     }          
     return end;
   }
