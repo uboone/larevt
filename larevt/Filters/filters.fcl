@@ -59,6 +59,7 @@ argoneut_finalstateparticlefilter:
 
 microboone_finalstateselectfilter:
 {
+ isVerbose: false
  module_type: "FinalStateSelectFilter"
  GenieModuleLabel: "generator" 
         #Return an inclusive final state

@@ -52,6 +52,7 @@ namespace filt {
   private: 
  
     std::string fGenieModuleLabel;
+    bool fDebug;
     bool fInclusive;      /// Returns events which contain AT LEAST the listed particles
     std::vector<int> fPDG;     /// List of particle PDGs we want to keep 
     std::vector<int> fPDGCount;/// List of N's for the particle PDGs  
@@ -85,6 +86,7 @@ namespace filt{
   //-------------------------------------------------
   void FinalStateSelectFilter::reconfigure(fhicl::ParameterSet const& p)
   {
+    fDebug             = p.get< bool >("IsVerbose"); 
     fGenieModuleLabel  = p.get< std::string      >("GenieModuleLabel");
     fPDG               = p.get< std::vector<int> >("PDG");
     fInclusive         = p.get< bool >("isInclusive");        
@@ -128,15 +130,57 @@ namespace filt{
     }
    
     //get a vector of final state particles   
+    std::vector< int > pizeroDecayIndex; 
+    std::vector< int > pizeroMotherIndex;
+    int nPhotons = 0;
     for(int i = 0; i < mc->NParticles(); ++i){
       simb::MCParticle part(mc->GetParticle(i));
-      if(part.StatusCode()== 1)
+      if(part.StatusCode()== 1 && abs(part.PdgCode()) < 100000000 
+	 && abs(part.PdgCode()) != 12 && abs(part.PdgCode()) != 14 && abs(part.PdgCode()) != 16){       
+
 	finalstateparticles.push_back(part.PdgCode());
+
+	//This is to hack around a possible bug in GENIE that doesn't report the direct parent
+	//   of final state photons which appear to come from internuclear pion charge exchange
+	//   processes.
+	if(part.PdgCode() == 22){
+	  nPhotons++;
+	  pizeroDecayIndex.push_back(finalstateparticles.size()-1); 	  
+	  pizeroMotherIndex.push_back(mc->GetParticle(part.Mother()).TrackId());	
+	  if(fDebug) std::cout << "\t \t \t :::  PHOTON with mother : " << mc->GetParticle(part.Mother()).PdgCode() << std::endl; 
+	}
+      }
     }
+
+    //This is to hack around a possible bug in GENIE that doesn't report the direct parent
+    //   of final state photons which appear to come from internuclear pion charge exchange
+    //   processes.
+    
+    std::vector< int > IndicesToRemove;  
+    if(nPhotons >= 2){    
+      for(unsigned int i = 0; i < pizeroDecayIndex.size(); i++){
+	for(unsigned int j = 0; j < pizeroDecayIndex.size(); j++){
+	  if(i == j) continue; // don't want to check same elements 
+	  if(j < 1) continue;  // avoids double counting matches...I think...
+	  if(pizeroMotherIndex[i] == pizeroMotherIndex[j]){
+	  
+	    finalstateparticles.at(pizeroDecayIndex[i]) = -39; //Yes, that is a negative Graviton, safest thing I could think of
+	    finalstateparticles.at(pizeroDecayIndex[j]) = -39; //Yes, that is a negative Graviton, safest thing I could think of
+	    finalstateparticles.push_back(111);
+	  
+	    std::cout << " ::: I CHANGED ONE OF YOUR PARTICLES!!! " << std::endl;
+
+	  }
+	}
+      }
+      finalstateparticles.erase(std::remove(finalstateparticles.begin(), finalstateparticles.end(), -39), finalstateparticles.end());
+
+    }
+
 
     if(isSubset(fPDG, fPDGCount, fPDGCountExclusive, finalstateparticles,fInclusive)){
       fSelectedEvents->Fill(1);
-      std::cout << "this is a selected event" << std::endl;
+      if(fDebug) std::cout << "this is a selected event" << std::endl;
     }
 
     // returns true if the user-defined fPDG exist(s) in the final state particles
@@ -149,8 +193,6 @@ namespace filt{
   
   bool FinalStateSelectFilter::isSubset(std::vector<int>& a, std::vector<int>& aN, std::vector<bool> aNex, std::vector<int>& b, bool IsInclusive)
   {
-    bool end;
-
     // check if the analyzer wants an includive final state
     if(IsInclusive){
       // Sweet, OK, so things get a bit annoying because we want this 
@@ -170,8 +212,9 @@ namespace filt{
       //  to what we have in the final state (vecotr b). 
       for(unsigned int i = 0; i < a.size(); i++){
 	if(std::find(b.begin(), b.end(), a[i]) != b.end()){
-	  counts[i] += 1;
-	}	       	
+	  counts[i] = std::count(b.begin(), b.end(), a[i]);
+	}
+	else{counts[i] = 0;}
       }
       
       //Verify we have the final state we want
@@ -179,14 +222,17 @@ namespace filt{
       //  as many particles we wanted, also check the exclusivity
       if(aN.size() != 0){
 	for(unsigned int i = 0; i < a.size(); i++){
-	  if(counts[i] <= aN[i]){
-	    end = false;
-	    break;
+	  /// Check this...
+	  if(aNex[i] == true && counts[i] != aN[i]){
+	    return false;
 	  }
-	  if(aNex[i] = true && counts[i] != aN[i]){
-	    end = false;
-	    break;
+	  else if(aNex[i] == false && counts[i] < aN[i]){
+	    return false;
 	  }
+	  else if(aNex[i] == false && counts[i] == 0 && aN[i] == 0){
+            return false;
+          }
+
 	}
       }
       // If the count vector size is zero then the user was being lazy...
@@ -195,28 +241,42 @@ namespace filt{
       // ANY NUMBER of the requested PDG. If this isn't true then the user
       // should specify all the arguments
       else{
-
 	for(unsigned int i = 0; i < a.size(); i++){
 	  if(std::find(b.begin(), b.end(), a[i]) == b.end()){
-	    end = false;
-	    break;
+	    return false;
 	  }
 	}		
       }
-      // if things didn't break then things went well.
-      end = true;
+    
+      if(fDebug) std::cout << "INCLUSIVE " << std::endl;
+      if(fDebug){
+	std::cout << "Particle List Selected : " << std::endl; 
+	for(unsigned int i = 0; i < b.size(); i++)
+	  {std::cout << "\t\t PDG : " << b[i] << std::endl;}
+      }
+      return true;
     }
     /// else it is exclusive
     else{
       //Exclusive filter is fine too, though I am less excited.
 
-      std::vector< int > counts(a.size());
+
+
+      //Verify that all the final state particles in the final state
+      //  are what we requested.
+      for(unsigned int i = 0; i < b.size(); i++){
+	if(std::find(a.begin(), a.end(), b[i]) == a.end()){
+	  return false;
+	}
+      }
 
       //Particle Checking
       //  Iterate through all the wanted PDGs (vector a) and compare
       //  to what we have in the final state (vecotr b). Need to count
       //  how many matches we since this is supposed to be the exclusive
       //  portion of the code. 
+      std::vector< int > counts(a.size());
+
       for(unsigned int i = 0; i < a.size(); i++){
 	
 	//Search in b vector is there is the wanted PDG!
@@ -225,32 +285,33 @@ namespace filt{
 	//   PDG we want isn't in the final state (vector b) then
 	//   we want to ditch the event! 
 	if(std::find(b.begin(), b.end(), a[i]) != b.end()){
-	  counts[i] += 1;
+	  counts[i] = std::count(b.begin(), b.end(), a[i]);
 	}
 	// else, ditch the event
 	else{
 	  return false;
 	}
       }
-      
-      
+            
       // Exclusive Check
       //   iterate through the count vectors and make sure they 
       //   are the same, I am sure there is a smart computer-ing
       //   way to do this but I wrote it this way, if it turns out
       //   to be too slow we can address this. 
-      bool AllGood = true; 
       for(unsigned int i = 0; i < aN.size(); i++){	
+	if(fDebug) std::cout<< "For: " << a[i] << " Requested N : " << aN[i] << " and found N : " << counts[i] << std::endl; 
 	if(aN[i] != counts[i]){
-	  AllGood = false;
-	  break;
+	  return false;
 	}
+      }    
+      if(fDebug)      std::cout << "EXCLUSIVE " << std::endl;
+      if(fDebug){
+	std::cout << "Particle List Selected : " << std::endl; 
+	for(unsigned int i = 0; i < b.size(); i++)
+	  {std::cout << "\t\t PDG : " << b[i] << std::endl;}
       }
-   
-      //Make the final return what I think the final exclusive check is 
-      end = AllGood; 
-    }          
-    return end;
+      return true;
+    }
   }
 }
 
