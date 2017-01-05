@@ -52,13 +52,12 @@ namespace filt {
   private: 
  
     std::string fGenieModuleLabel;
-    bool fDebug;
-    bool fInclusive;      /// Returns events which contain AT LEAST the listed particles
-    std::vector<int> fPDG;     /// List of particle PDGs we want to keep 
+    bool fDebug;                  /// Controls the verbosity
+    bool fInclusive;             /// Returns events which contain AT LEAST the listed particles
+    std::vector<int> fPDG;      /// List of particle PDGs we want to keep 
     std::vector<int> fPDGCount;/// List of N's for the particle PDGs  
     std::vector<bool> fPDGCountExclusive;/// If true:  Only select events with EXACTLY  that number of particles
                                          /// If false:      select events with AT LEAST that number of particles  
-    std::vector<int> fStatusCode;
     TH1D* fSelectedEvents;
     TH1D* fTotalEvents;
 
@@ -107,9 +106,7 @@ namespace filt{
   //-------------------------------------------------
   bool FinalStateSelectFilter::filter(art::Event &evt)
   { 
-    
-    //const TDatabasePDG* databasePDG = TDatabasePDG::Instance();
-    
+        
     art::Handle< std::vector<simb::MCTruth> > mclist;
     evt.getByLabel(fGenieModuleLabel,mclist);
     art::Ptr<simb::MCTruth> mc(mclist,0);
@@ -141,7 +138,7 @@ namespace filt{
 
 	finalstateparticles.push_back(part.PdgCode());
 
-	//This is to address when GENIE doesn't report the direct parent of final state photons 
+	//This is to address when GENIE doesn't report the direct parent of multiple final state photons 
 	if(part.PdgCode() == 22){
 	  nPhotons++;
 	  pizeroDecayIndex.push_back(finalstateparticles.size()-1); 	  
@@ -221,7 +218,7 @@ namespace filt{
       //  as many particles we wanted, also check the exclusivity
       if(aN.size() != 0){
 	for(unsigned int i = 0; i < a.size(); i++){
-	  /// Check this...
+
 	  if(aNex[i] == true && counts[i] != aN[i]){
 	    return false;
 	  }
@@ -258,8 +255,6 @@ namespace filt{
     /// else it is exclusive
     else{
       //Exclusive filter is fine too, though I am less excited.
-
-
 
       //Verify that all the final state particles in the final state
       //  are what we requested.
