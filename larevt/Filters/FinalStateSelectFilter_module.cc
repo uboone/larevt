@@ -132,6 +132,7 @@ namespace filt{
     //get a vector of final state particles   
     std::vector< int > pizeroDecayIndex; 
     std::vector< int > pizeroMotherIndex;
+    std::vector< int > pizeroMotherPdg;
     int nPhotons = 0;
     for(int i = 0; i < mc->NParticles(); ++i){
       simb::MCParticle part(mc->GetParticle(i));
@@ -140,22 +141,20 @@ namespace filt{
 
 	finalstateparticles.push_back(part.PdgCode());
 
-	//This is to hack around a possible bug in GENIE that doesn't report the direct parent
-	//   of final state photons which appear to come from internuclear pion charge exchange
-	//   processes.
+	//This is to address when GENIE doesn't report the direct parent of final state photons 
 	if(part.PdgCode() == 22){
 	  nPhotons++;
 	  pizeroDecayIndex.push_back(finalstateparticles.size()-1); 	  
 	  pizeroMotherIndex.push_back(mc->GetParticle(part.Mother()).TrackId());	
+	  pizeroMotherPdg.push_back(mc->GetParticle(part.Mother()).PdgCode());	
 	  if(fDebug) std::cout << "\t \t \t :::  PHOTON with mother : " << mc->GetParticle(part.Mother()).PdgCode() << std::endl; 
 	}
       }
     }
 
-    //This is to hack around a possible bug in GENIE that doesn't report the direct parent
-    //   of final state photons which appear to come from internuclear pion charge exchange
-    //   processes.
-    
+    //This is to address when GENIE doesn't report the direct parent of final state photons 
+    //   We rewrite the PDG of the outcoming photons are the resonance that created them! Just to keep 
+    //   things consistent     
     std::vector< int > IndicesToRemove;  
     if(nPhotons >= 2){    
       for(unsigned int i = 0; i < pizeroDecayIndex.size(); i++){
@@ -166,7 +165,7 @@ namespace filt{
 	  
 	    finalstateparticles.at(pizeroDecayIndex[i]) = -39; //Yes, that is a negative Graviton, safest thing I could think of
 	    finalstateparticles.at(pizeroDecayIndex[j]) = -39; //Yes, that is a negative Graviton, safest thing I could think of
-	    finalstateparticles.push_back(111);
+	    finalstateparticles.push_back(pizeroMotherPdg[i]);
 	  
 	    std::cout << " ::: I CHANGED ONE OF YOUR PARTICLES!!! " << std::endl;
 
