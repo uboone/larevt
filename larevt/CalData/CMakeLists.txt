@@ -27,7 +27,7 @@ simple_plugin(CalWire "module"
                         larevt_Filters
                         lardataobj_RawData
                         lardataobj_RecoBase
-                        lardata_RecoBaseArt
+                        lardata_ArtDataHelper
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -51,7 +51,7 @@ simple_plugin(CalWireT962 "module"
                         larevt_Filters
                         lardataobj_RawData
                         lardataobj_RecoBase
-                        lardata_RecoBaseArt
+                        lardata_ArtDataHelper
                         larcore_Geometry_Geometry_service
                         larcore_Geometry
                         ${ART_FRAMEWORK_CORE}
