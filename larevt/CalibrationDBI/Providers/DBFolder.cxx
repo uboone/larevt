@@ -246,19 +246,14 @@ namespace lariov {
 
     //get new dataset
     int status = -1;
-    int tries = 0;
-    long int delay;
+    int delay = 0;
     srandom(getpid() * getppid());
-    while (status != 200 && tries < 2) { 
-      fCachedDataset = getData(fullurl.str().c_str(), NULL, &err);
+    for (int tries=0; status != 200 && tries < 2; ++tries) {
+      delay = random() % (5 * (1 << tries));
+      fCachedDataset = getDataWithTimeout(fullurl.str().c_str(), NULL, delay, &err);
       status = getHTTPstatus(fCachedDataset);
-      if ( status != 200) {
-	delay = random() % (5 * (1 << tries));
-	sleep(delay);
-      }
-      tries++;
     }
-
+    
     if (status != 200) {
       std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(fCachedDataset));
       throw WebError(msg);
@@ -266,6 +261,7 @@ namespace lariov {
 
     //update info about cached data
     fNRows = getNtuples(fCachedDataset) - kNUMBER_HEADER_ROWS;
+    //std::cout<<"Retrieved "<<fNRows<<" rows from "<<fullurl.str()<<std::endl;
     if (fNRows < 1) {
       std::stringstream msg;
       msg << "Time " << ts.DBStamp() << ": Data not found in database.";
