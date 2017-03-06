@@ -5,7 +5,7 @@ simple_plugin ( SimpleChannelStatusTest "module"
                     ${MF_MESSAGELOGGER}
                     ${MF_UTILITIES}
                     ${FHICLCPP}
-                    ${CETLIB}
+                    cetlib cetlib_except
                     ${ROOT_BASIC_LIB_LIST}
               )
 
