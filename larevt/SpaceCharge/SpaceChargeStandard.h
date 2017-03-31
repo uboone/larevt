@@ -11,6 +11,7 @@
 
 // LArSoft libraries
 #include "larevt/SpaceCharge/SpaceCharge.h"
+#include "larcoreobj/SimpleTypesAndConstants/geo_vectors.h"
 
 // FHiCL libraries
 #include "fhiclcpp/ParameterSet.h"
@@ -41,8 +42,8 @@ namespace spacecharge {
       bool EnableSimSpatialSCE() const override;
       bool EnableSimEfieldSCE() const override;
       bool EnableCorrSCE() const override;
-      std::vector<double> GetPosOffsets(double xVal, double yVal, double zVal) const override;
-      std::vector<double> GetEfieldOffsets(double xVal, double yVal, double zVal) const override;
+      geo::Vector_t GetPosOffsets(geo::Point_t const& point) const override;
+      geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const override;
  
     private:
     protected:

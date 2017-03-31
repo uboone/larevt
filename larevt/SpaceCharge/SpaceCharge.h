@@ -10,7 +10,7 @@
 #define SPACECHARGE_SPACECHARGE_H
 
 // C/C++ standard libraries
-#include <vector>
+#include "larcoreobj/SimpleTypesAndConstants/geo_vectors.h"
 
 
 namespace spacecharge{
@@ -27,8 +27,8 @@ namespace spacecharge{
       virtual bool EnableSimSpatialSCE() const = 0;
       virtual bool EnableSimEfieldSCE() const = 0;
       virtual bool EnableCorrSCE() const = 0;
-      virtual std::vector<double> GetPosOffsets(double xVal, double yVal, double zVal) const = 0;
-      virtual std::vector<double> GetEfieldOffsets(double xVal, double yVal, double zVal) const = 0;
+      virtual geo::Vector_t GetPosOffsets(geo::Point_t const& point) const = 0;
+      virtual geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const = 0;
 
     protected:
 

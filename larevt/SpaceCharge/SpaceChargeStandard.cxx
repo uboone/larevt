@@ -179,23 +179,23 @@ bool spacecharge::SpaceChargeStandard::EnableCorrSCE() const
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
 /// used in ionization electron drift
-std::vector<double> spacecharge::SpaceChargeStandard::GetPosOffsets(double xVal, double yVal, double zVal) const
+geo::Vector_t spacecharge::SpaceChargeStandard::GetPosOffsets(geo::Point_t const& point) const
 {
   std::vector<double> thePosOffsets;
 
-  if(IsInsideBoundaries(xVal,yVal,zVal) == false)
+  if(IsInsideBoundaries(point.X(), point.Y(), point.Z()) == false)
   {
     thePosOffsets.resize(3,0.0);
   }
   else
   {
     if(fRepresentationType == "Parametric")
-      thePosOffsets = GetPosOffsetsParametric(xVal,yVal,zVal);
+      thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
     else
       thePosOffsets.resize(3,0.0);
   }
 
-  return thePosOffsets;
+  return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
 //----------------------------------------------------------------------------
@@ -338,20 +338,16 @@ double spacecharge::SpaceChargeStandard::GetOnePosOffsetParametric(double xValNe
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
 /// used in charge/light yield calculation (e.g.)
-std::vector<double> spacecharge::SpaceChargeStandard::GetEfieldOffsets(double xVal, double yVal, double zVal) const
+geo::Vector_t spacecharge::SpaceChargeStandard::GetEfieldOffsets(geo::Point_t const& point) const
 {
   std::vector<double> theEfieldOffsets;
 
   if(fRepresentationType == "Parametric")
-    theEfieldOffsets = GetEfieldOffsetsParametric(xVal,yVal,zVal);
+    theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
   else
     theEfieldOffsets.resize(3,0.0);
 
-  theEfieldOffsets.at(0) = -1.0*theEfieldOffsets.at(0);
-  theEfieldOffsets.at(1) = -1.0*theEfieldOffsets.at(1);
-  theEfieldOffsets.at(2) = -1.0*theEfieldOffsets.at(2);
-
-  return theEfieldOffsets;
+  return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
 }
 
 //----------------------------------------------------------------------------
