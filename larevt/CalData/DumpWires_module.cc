@@ -189,6 +189,7 @@ namespace caldata {
           case geo::kV:       out << " on V plane"; break;
           case geo::kZ:       out << " on Z plane"; break;
           case geo::kY:       out << " on Y plane"; break;
+          case geo::kX:       out << " on X plane"; break;
           case geo::k3D:      out << " in space"; break;
           case geo::kUnknown: out << " in hyperspace"; break;
         } // switch view
