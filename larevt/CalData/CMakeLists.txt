@@ -76,18 +76,6 @@ simple_plugin(CalWireT962 "module"
                
 )
 
-simple_plugin(DumpWires "module"
-                        larevt_Filters
-	                lardataobj_RawData
-	                lardataobj_RecoBase
-                        ${ART_FRAMEWORK_CORE}
-			${ART_FRAMEWORK_PRINCIPAL}
-			${MF_MESSAGELOGGER}
-	                ${FHICLCPP}
-			cetlib cetlib_except
-              
-)
-
 
 install_headers()
 install_fhicl()
