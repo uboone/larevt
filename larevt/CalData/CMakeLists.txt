@@ -9,13 +9,14 @@ simple_plugin(CalWireAna "module"
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-			art_Persistency_Common canvas_Persistency_Common
-			art_Persistency_Provenance canvas_Persistency_Provenance
-			art_Utilities canvas_Utilities
+			art_Persistency_Common
+			art_Persistency_Provenance
+			art_Utilities
+                        canvas
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
 	                ${FHICLCPP}
-			${CETLIB}
+			cetlib cetlib_except
                         ${ROOT_GEOM}
                         ${ROOT_XMLIO}
                         ${ROOT_GDML}
@@ -33,13 +34,14 @@ simple_plugin(CalWire "module"
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-			art_Persistency_Common canvas_Persistency_Common
-			art_Persistency_Provenance canvas_Persistency_Provenance
-			art_Utilities canvas_Utilities
+			art_Persistency_Common
+			art_Persistency_Provenance
+			art_Utilities
+                        canvas
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
 	                ${FHICLCPP}
-			${CETLIB}
+			cetlib cetlib_except
                         ${ROOT_GEOM}
                         ${ROOT_XMLIO}
                         ${ROOT_GDML}
@@ -59,30 +61,19 @@ simple_plugin(CalWireT962 "module"
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-			art_Persistency_Common canvas_Persistency_Common
-			art_Persistency_Provenance canvas_Persistency_Provenance
-			art_Utilities canvas_Utilities
+			art_Persistency_Common
+			art_Persistency_Provenance
+			art_Utilities
+                        canvas
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
 	                ${FHICLCPP}
-			${CETLIB}
+			cetlib cetlib_except
                         ${ROOT_GEOM}
                         ${ROOT_XMLIO}
                         ${ROOT_GDML}
 			${ROOT_BASIC_LIB_LIST}
                
-)
-
-simple_plugin(DumpWires "module"
-                        larevt_Filters
-	                lardataobj_RawData
-	                lardataobj_RecoBase
-                        ${ART_FRAMEWORK_CORE}
-			${ART_FRAMEWORK_PRINCIPAL}
-			${MF_MESSAGELOGGER}
-	                ${FHICLCPP}
-			${CETLIB}
-              
 )
 
 

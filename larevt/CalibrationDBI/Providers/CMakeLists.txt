@@ -7,13 +7,13 @@ art_make(
 			larevt_CalibrationDBI_IOVData
 			${LIBWDA}
 	                ${FHICLCPP}
-			${CETLIB}
+			cetlib cetlib_except
 			larcore_Geometry
 			larcore_Geometry_Geometry_service
                         ${Boost_SYSTEM_LIBRARY}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ROOT_BASIC_LIB_LIST}
-			art_Utilities canvas_Utilities
+			art_Utilities canvas
         )
 
 install_headers()
