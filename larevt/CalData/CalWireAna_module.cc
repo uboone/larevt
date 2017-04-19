@@ -1,5 +1,4 @@
 ////////////////////////////////////////////////////////////////////////
-// $Id: CalWireAna.cxx,v 1.22 2010/04/23 20:30:53 seligman Exp $
 //
 // CalWireAna class designed to make histos.
 //
