@@ -106,16 +106,16 @@ namespace lariov {
       while (std::getline(file, line)) {
         size_t current_comma = line.find(',');
         DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));	
-	float ped = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float ped     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-	float rms = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float rms     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-	float ped_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float ped_err = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-	float rms_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float rms_err = std::stof( line.substr(current_comma+1) );
 
 	dp.SetChannel(ch);
 	dp.SetPedMean(ped);

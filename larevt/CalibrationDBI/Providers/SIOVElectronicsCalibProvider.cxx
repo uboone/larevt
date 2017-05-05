@@ -76,16 +76,16 @@ namespace lariov {
       while (std::getline(file, line)) {
         size_t current_comma = line.find(',');
         DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));     
-        float gain = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        float gain             = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
         
         current_comma = line.find(',',current_comma+1);
-        float gain_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        float gain_err         = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-        float shaping_time = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        float shaping_time     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-        float shaping_time_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        float shaping_time_err = std::stof( line.substr(current_comma+1) );
 
         CalibrationExtraInfo info("ElectronicsCalib");
 
