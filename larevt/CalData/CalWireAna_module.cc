@@ -25,7 +25,7 @@
 
 // LArSoft includes
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/PlaneGeo.h"
+#include "larcorealg/Geometry/PlaneGeo.h"
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardataobj/RecoBase/Wire.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"

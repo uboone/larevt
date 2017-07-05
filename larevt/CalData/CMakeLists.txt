@@ -55,7 +55,7 @@ simple_plugin(CalWireT962 "module"
                         lardataobj_RecoBase
                         lardata_ArtDataHelper
                         larcore_Geometry_Geometry_service
-                        larcore_Geometry
+                        larcorealg_Geometry
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}

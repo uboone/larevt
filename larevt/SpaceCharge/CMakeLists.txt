@@ -1,7 +1,7 @@
 art_make( NO_PLUGINS
           
           LIB_LIBRARIES lardata_Utilities
-	                larcore_Geometry
+	                larcorealg_Geometry
 	                nusimdata_SimulationBase
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}

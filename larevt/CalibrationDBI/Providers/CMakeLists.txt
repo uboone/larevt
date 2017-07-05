@@ -8,7 +8,7 @@ art_make(
 			${LIBWDA}
 	                ${FHICLCPP}
 			cetlib cetlib_except
-			larcore_Geometry
+			larcorealg_Geometry
 			larcore_Geometry_Geometry_service
                         ${Boost_SYSTEM_LIBRARY}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}

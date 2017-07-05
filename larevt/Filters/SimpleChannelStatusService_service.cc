@@ -11,7 +11,7 @@
 
 // LArSoft libraries
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/GeometryCore.h"
+#include "larcorealg/Geometry/GeometryCore.h"
 
 // Framework libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h"
