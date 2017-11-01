@@ -42,20 +42,17 @@ cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
 find_ups_product( larcoreobj )
-find_ups_product( larcore v1_00_00 )
+find_ups_product( larcorealg )
+find_ups_product( larcore )
 find_ups_product( lardataobj )
-find_ups_product( lardata v1_00_00 )
-find_ups_product( nutools v1_00_00 )
-find_ups_product( art v1_09_00 )
-find_ups_product( messagefacility v1_10_00 )
-find_ups_product( cetbuildtools v4_09_00 )
-find_ups_root( root v5_34_00 )
-find_ups_product( postgresql v9_1_5 )
-find_ups_product( libwda v2_21_0 )
-
-# include search path
-# notice use of ENV to invoke an external variable
-include_directories ( $ENV{NUTOOLS_INC} )
+find_ups_product( lardata )
+find_ups_product( nutools )
+find_ups_product( art )
+find_ups_product( messagefacility )
+find_ups_root()
+find_ups_product( postgresql )
+find_ups_product( libwda )
+find_ups_product( cetbuildtools )
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)
