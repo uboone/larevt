@@ -1,19 +1,22 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	larevt	v06_17_01
-defaultqual	e14
+parent	larevt	v06_18_00
+defaultqual	e15
 #
 fcldir product_dir job
 #
 product         version
-lardata		v06_38_00
+lardata		v06_39_00
 libwda          v2_24_0
 cetbuildtools	v6_01_01	-	only_for_build
 end_product_list
 
   
-# e14  - with gcc 6.3.0 and -std=c++14
+# e15  - with gcc 6.4.0 and -std=c++14
 qualifier       lardata         libwda	notes
+e15:debug       e15:debug       -nq-
+e15:opt         e15:opt         -nq-
+e15:prof        e15:prof        -nq-
 e14:debug       e14:debug       -nq-
 e14:opt         e14:opt         -nq-
 e14:prof        e14:prof        -nq-
