@@ -27,7 +27,7 @@ namespace spacecharge{
       
       SpaceChargeServiceStandard(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
 
-      virtual void   reconfigure(fhicl::ParameterSet const& pset) override;
+      virtual void   reconfigure(fhicl::ParameterSet const& pset) ;
       void   preBeginRun(const art::Run& run);
 
       virtual const  provider_type* provider() const override { return fProp.get();}
