@@ -120,7 +120,7 @@ DECLARE_ART_SERVICE_INTERFACE(lariov::ChannelStatusService, LEGACY)
 
 
 // check that the requirements for lariov::ChannelStatusService are satisfied
-template class lar::details::ServiceRequirementsChecker<lariov::ChannelStatusService>;
+template struct lar::details::ServiceRequirementsChecker<lariov::ChannelStatusService>;
 
 
 #endif // CHANNELSTATUSSERVICE_H
