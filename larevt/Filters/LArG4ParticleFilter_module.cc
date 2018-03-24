@@ -50,8 +50,9 @@ namespace filt{
       std::vector<double> fParticleMaxMomentum;
       std::vector<int> fStartInTPC;
       std::vector<int> fStopInTPC;
-
       std::vector<double> fParticleMinTPCLength;
+      bool fRequireAllInterestingParticles;
+
       std::vector<bool> fFoundInterestingParticles;
 
   };
@@ -70,6 +71,7 @@ namespace filt{
     fParticleMaxMomentum = pset.get<std::vector<double> >("ParticleMaxMomentum");
     fStopInTPC = pset.get<std::vector<int> >("StopInTPC");
     fParticleMinTPCLength = pset.get<std::vector<double> >("ParticleMinTPCLength");
+    fRequireAllInterestingParticles = pset.get<bool>("RequireAllInterestingParticles");
     return;
   }
 
@@ -92,6 +94,7 @@ namespace filt{
       //Loop over the list of particles we want and compare it with the particle we are looking it
       for (unsigned int interest_i = 0; interest_i < fInterestingPDGs.size(); interest_i++){
         if (IsInterestingParticle(particle,interest_i)) {
+          if (!fRequireAllInterestingParticles) return true; //If we only require at least one of the particles be found then we have already done our job
           fFoundInterestingParticles[interest_i] = true;
           bool foundThemAll = true;
           for (unsigned int found_i = 0; found_i < fFoundInterestingParticles.size(); found_i++){
