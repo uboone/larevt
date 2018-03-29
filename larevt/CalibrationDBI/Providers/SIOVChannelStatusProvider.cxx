@@ -176,7 +176,9 @@ namespace lariov {
   //----------------------------------------------------------------------------
   void SIOVChannelStatusProvider::AddNoisyChannel(raw::ChannelID_t ch) {
     
-    register DBChannelID_t const dbch = rawToDBChannel(ch);
+    // for c2: ISO C++17 does not allow 'register' storage class specifier
+    //register DBChannelID_t const dbch = rawToDBChannel(ch);
+    DBChannelID_t const dbch = rawToDBChannel(ch);
     if (!this->IsBad(dbch) && this->IsPresent(dbch)) {
       ChannelStatus cs(dbch);
       cs.SetStatus(kNOISY);
