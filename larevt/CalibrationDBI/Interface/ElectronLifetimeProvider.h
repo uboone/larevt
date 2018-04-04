@@ -9,6 +9,7 @@
 #ifndef ELECTRONLIFETIMEPROVIDER_H
 #define ELECTRONLIFETIMEPROVIDER_H
 
+#include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
 
 namespace lariov {
 
@@ -17,7 +18,7 @@ namespace lariov {
      Pure abstract interface class for retrieving electron lifetimes.
      
   */
-  class ElectronLifetimeProvider {
+  class ElectronLifetimeProvider: private lar::UncopiableAndUnmovableClass {
   
     public:
     

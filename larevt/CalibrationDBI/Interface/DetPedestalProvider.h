@@ -10,6 +10,7 @@
 #define DETPEDESTALPROVIDER_H
 
 // LArSoft libraries
+#include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 
 
@@ -21,7 +22,7 @@ namespace lariov {
      Includes a feature to encourage database use: an Update method that can be used to update 
      an implementation's local state to ensure that the correct information is retrieved
   */
-  class DetPedestalProvider {
+  class DetPedestalProvider: private lar::UncopiableAndUnmovableClass {
   
     public:
     

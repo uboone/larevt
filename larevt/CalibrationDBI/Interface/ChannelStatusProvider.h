@@ -21,6 +21,7 @@
 #include <limits> // std::numeric_limits<>
 
 // LArSoft libraries
+#include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 
 
@@ -45,7 +46,7 @@ namespace lariov {
    * interested in.
    * 
    */
-  class ChannelStatusProvider {
+  class ChannelStatusProvider: private lar::UncopiableAndUnmovableClass {
     
     public:
       
