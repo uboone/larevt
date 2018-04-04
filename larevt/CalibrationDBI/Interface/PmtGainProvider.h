@@ -10,6 +10,7 @@
 #define PMTGAINPROVIDER_H
 
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
+#include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
 #include "larevt/CalibrationDBI/IOVData/CalibrationExtraInfo.h"
 
 namespace lariov {
@@ -20,7 +21,7 @@ namespace lariov {
    * - pmt gain and its error
    * - pmt extra info, related to procedure that determines gain
    */
-  class PmtGainProvider {
+  class PmtGainProvider: private lar::UncopiableAndUnmovableClass {
   
     public:
     

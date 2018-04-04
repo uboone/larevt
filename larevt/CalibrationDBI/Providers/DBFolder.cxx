@@ -118,7 +118,9 @@ namespace lariov {
     double buf[kBUFFER_SIZE];
     
     DataRec *dataRec = (DataRec *)tup;
-    if (col < 0 || col >= dataRec->ncolumns) {
+    // for c2: col is an unsigned int and cannot be less than 0
+    // if (col < 0 || col >= dataRec->ncolumns) {
+    if (col >= dataRec->ncolumns) {
       err=-1;
       return err;
     }

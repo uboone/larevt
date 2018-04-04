@@ -35,5 +35,4 @@ namespace lariov {
 
 DECLARE_ART_SERVICE_INTERFACE(lariov::ElectronLifetimeService, LEGACY)
 
-template class lar::details::ServiceRequirementsChecker<lariov::ElectronLifetimeService>;
 #endif

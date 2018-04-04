@@ -41,7 +41,4 @@ namespace lariov{
 DECLARE_ART_SERVICE_INTERFACE(lariov::DetPedestalService, LEGACY)
 
 
-// check that the requirements for lariov::ChannelStatusService are satisfied
-template class lar::details::ServiceRequirementsChecker<lariov::DetPedestalService>;
-
 #endif

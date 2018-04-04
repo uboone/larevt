@@ -10,6 +10,7 @@
 #define ELECTRONICSCALIBPROVIDER_H
 
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
+#include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
 #include "larevt/CalibrationDBI/IOVData/CalibrationExtraInfo.h"
 
 namespace lariov {
@@ -21,7 +22,7 @@ namespace lariov {
    * - electronics shaping time and its error
    * - electronics extra info, related to procedure that determines the gain and shaping time
    */
-  class ElectronicsCalibProvider {
+  class ElectronicsCalibProvider: private lar::UncopiableAndUnmovableClass {
   
     public:
     

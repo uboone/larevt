@@ -60,7 +60,8 @@ namespace caldata {
     
     std::string  fResponseFile;      ///< response file containing transformed 
                                      ///< shape histograms and decay constants
-    int          fDataSize;          ///< size of raw data on one wire
+    // for c2: fDataSize is not used
+    // int          fDataSize;          ///< size of raw data on one wire
     int          fExpEndBins;        ///< number of end bins to consider for tail fit    
     int          fPostsample;        ///< number of postsample bins
     std::string  fDigitModuleLabel;  ///< module that made digits
