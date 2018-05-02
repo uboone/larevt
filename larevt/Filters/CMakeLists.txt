@@ -16,7 +16,7 @@ art_make(
                         art_Utilities
                         canvas
                         ${MF_MESSAGELOGGER}
-                        ${MF_UTILITIES}
+                        
                         ${FHICLCPP}
                         cetlib cetlib_except
                         ${ROOT_BASIC_LIB_LIST}
@@ -28,7 +28,7 @@ art_make(
                             ${ART_FRAMEWORK_PRINCIPAL}
                             ${ART_FRAMEWORK_SERVICES_REGISTRY}
                             ${MF_MESSAGELOGGER}
-                            ${MF_UTILITIES}
+                            
                             ${FHICLCPP}
                             cetlib cetlib_except
                             ${ROOT_BASIC_LIB_LIST}
