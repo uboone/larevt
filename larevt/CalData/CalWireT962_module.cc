@@ -13,7 +13,7 @@
 // Framework includes
 #include "messagefacility/MessageLogger/MessageLogger.h" 
 #include "fhiclcpp/ParameterSet.h" 
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "cetlib/search_path.h"
 #include "art/Framework/Core/ModuleMacros.h" 
 #include "art/Framework/Principal/Event.h" 
@@ -118,7 +118,9 @@ namespace caldata{
   void CalWireT962::beginJob()
   {  
     
-    LOG_DEBUG("CalWireT962") << "CalWireT962_module: Opening  Electronics Response File: " 
+// workaround for #19851
+//    LOG_DEBUG("CalWireT962") << "CalWireT962_module: Opening  Electronics Response File: " 
+    mf::LogDebug("CalWireT962") << "CalWireT962_module: Opening  Electronics Response File: " 
 			     << fResponseFile.c_str();
     
     TFile f(fResponseFile.c_str());
