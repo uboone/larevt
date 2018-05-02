@@ -8,7 +8,7 @@
 // art/LArSoft libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "larcore/Geometry/Geometry.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 
 //C/C++
 #include <fstream>
