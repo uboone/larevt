@@ -47,6 +47,7 @@ namespace lariov {
       std::string fURL;
       std::string fFolderName;
       std::string fTag;
+      int         fMaximumTimeout;
       
       Dataset                  fCachedDataset;   
       int                      fNRows;         //Number of channels in cached dataset

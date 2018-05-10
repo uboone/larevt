@@ -38,6 +38,8 @@ namespace lariov {
     fTypes.clear();
     fCachedRow = -1;
     fCachedChannel = 0;
+    
+    fMaximumTimeout = 4*60; //4 minutes
   }
   
   DBFolder::~DBFolder() {
@@ -246,13 +248,13 @@ namespace lariov {
 
     //get new dataset
     int status = -1;
-    int delay = 0;
-    srandom(getpid() * getppid());
-    for (int tries=0; status != 200 && tries < 2; ++tries) {
-      delay = random() % (5 * (1 << tries));
-      fCachedDataset = getDataWithTimeout(fullurl.str().c_str(), NULL, delay, &err);
-      status = getHTTPstatus(fCachedDataset);
-    }
+    fCachedDataset = getDataWithTimeout(fullurl.str().c_str(), NULL, fMaximumTimeout, &err);
+    status = getHTTPstatus(fCachedDataset);
+    
+    //Can add some more queries here if we get http error 504
+    /*if (status == 504) {
+      //try again
+    }*/
     
     if (status != 200) {
       std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(fCachedDataset));
