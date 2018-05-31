@@ -13,7 +13,7 @@
 // Framework includes
 #include "messagefacility/MessageLogger/MessageLogger.h" 
 #include "fhiclcpp/ParameterSet.h" 
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "cetlib/search_path.h"
 #include "art/Framework/Core/ModuleMacros.h" 
 #include "art/Framework/Principal/Event.h" 

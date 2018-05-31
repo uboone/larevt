@@ -14,7 +14,7 @@ simple_plugin(CalWireAna "module"
 			art_Utilities
                         canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
                         ${ROOT_GEOM}
@@ -39,7 +39,7 @@ simple_plugin(CalWire "module"
 			art_Utilities
                         canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
                         ${ROOT_GEOM}
@@ -66,7 +66,7 @@ simple_plugin(CalWireT962 "module"
 			art_Utilities
                         canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
                         ${ROOT_GEOM}
