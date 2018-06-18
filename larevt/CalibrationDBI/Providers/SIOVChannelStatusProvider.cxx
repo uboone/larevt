@@ -47,16 +47,7 @@ namespace lariov {
     
     if (fDataSource == DataSource::Default) {
       std::cout << "Using default channel status value: "<<kGOOD<<"\n";
-      ChannelStatus cs(0);
-      cs.SetStatus(kGOOD);
-      
-      art::ServiceHandle<geo::Geometry> geo;
-      geo::wire_id_iterator itW = geo->begin_wire_id();
-      for ( ; itW != geo->end_wire_id(); ++itW) {
-        DBChannelID_t ch = geo->PlaneWireToChannel(*itW);
-	cs.SetChannel(ch);
-	fData.AddOrReplaceRow(cs);
-      }
+      fDefault.SetStatus(kGOOD);
     } 
     else if (fDataSource == DataSource::File) {
       cet::search_path sp("FW_SEARCH_PATH");
@@ -112,6 +103,10 @@ namespace lariov {
   
   //----------------------------------------------------------------------------
   const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(raw::ChannelID_t ch) const {
+    if (fDataSource == DataSource::Default) {
+      return fDefault;
+    }
+    
     if (fNewNoisy.HasChannel(rawToDBChannel(ch))) {
       return fNewNoisy.GetRow(rawToDBChannel(ch));
     }
