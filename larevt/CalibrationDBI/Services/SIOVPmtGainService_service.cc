@@ -4,6 +4,7 @@
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
+#include "art/Persistency/Provenance/ScheduleContext.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/PmtGainService.h"
 #include "larevt/CalibrationDBI/Providers/SIOVPmtGainProvider.h"
@@ -23,7 +24,7 @@ namespace lariov{
       SIOVPmtGainService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
       ~SIOVPmtGainService(){}
       
-      void PreProcessEvent(const art::Event& evt) {
+      void PreProcessEvent(const art::Event& evt, art::ScheduleContext) {
         fProvider.Update(evt.time().value());
       }
      
