@@ -8,13 +8,7 @@
 // - A filter to select events between given start and end dates and times.
 //    - Dates should be passed in the form YYYYMMDD
 //    - Times should be passes in the form HHMMSS
-//    - All times should be in UTC
-
-// WARNING: For dates before epoch (Jan 1, 1970 00:00:00 UTC) this module will 
-//          not do quite what you expect, it will be off by one day relative to
-//          what you give it. This should only ever be relevant for MC and I see
-//          no reason why you would want to use this module in that case but you
-//          have been warned.
+//    - All dates and times should be in UTC
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -130,7 +124,7 @@ bool filter::EventTimeFilter::filter(art::Event &evt) {
 	art::Timestamp evtTime = evt.time();
 	TTimeStamp * evtTTS;
 	if (evtTime.timeHigh() == 0) { evtTTS = new TTimeStamp(evtTime.timeLow()); }
-	else { evtTTS = new TTimeStamp(evtTime.timeLow(), evtTime.timeHigh()); }
+	else { evtTTS = new TTimeStamp(evtTime.timeHigh(), evtTime.timeLow()); }
 
 	std::cout << "Event time:  " << evtTTS -> AsString() << std::endl;
 
