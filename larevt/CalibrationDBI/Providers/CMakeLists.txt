@@ -6,6 +6,8 @@ art_make(
           LIB_LIBRARIES
 			larevt_CalibrationDBI_IOVData
 			${LIBWDA}
+                        ${MF_MESSAGELOGGER}
+                        ${MF_UTILITIES}
 	                ${FHICLCPP}
 			cetlib cetlib_except
 			larcorealg_Geometry
