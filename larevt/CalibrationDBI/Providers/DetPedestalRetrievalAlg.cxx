@@ -9,6 +9,7 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "larcore/Geometry/Geometry.h"
 #include "cetlib/exception.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 //C/C++
 #include <fstream>
@@ -20,6 +21,8 @@ namespace lariov {
       			      			   const std::string& url, 
 			      			   const std::string& tag /*=""*/) : 
     DatabaseRetrievalAlg(foldername, url, tag),
+    fEventTimeStamp(0),
+    fCurrentTimeStamp(0),
     fDataSource(DataSource::Database) {
     
     fData.Clear();
@@ -131,40 +134,74 @@ namespace lariov {
   }
 
 
+  // This method saves the time stamp of the latest event.
+
+  void DetPedestalRetrievalAlg::UpdateTimeStamp(DBTimeStamp_t ts) {
+    mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::UpdateTimeStamp called.";
+    fEventTimeStamp = ts;
+  }
+
+  // Maybe update method cached data (public non-const version).
+
   bool DetPedestalRetrievalAlg::Update(DBTimeStamp_t ts) {
     
-    if (fDataSource != DataSource::Database) return false;
+    fEventTimeStamp = ts;
+    return DBUpdate(ts);
+  }
+
+  // Maybe update method cached data (private const version using current event time).
+
+  bool DetPedestalRetrievalAlg::DBUpdate() const {
+    return DBUpdate(fEventTimeStamp);
+  }
+
+  // Maybe update method cached data (private const version).
+  // This is the function that does the actual work of updating data from database.
+
+  bool DetPedestalRetrievalAlg::DBUpdate(DBTimeStamp_t ts) const {
+
+    bool result = false;
+    if(fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
       
-    if (!this->UpdateFolder(ts)) return false;
+      mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::DBUpdate called with new timestamp.";
+      fCurrentTimeStamp = ts;     
 
-    //DBFolder was updated, so now update the Snapshot
-    fData.Clear();
-    fData.SetIoV(this->Begin(), this->End());
+      // Call non-const base class method.
 
-    std::vector<DBChannelID_t> channels;
-    fFolder->GetChannelList(channels);
-    for (auto it = channels.begin(); it != channels.end(); ++it) {
+      result = const_cast<DetPedestalRetrievalAlg*>(this)->UpdateFolder(ts);
+      if(result) {
 
-      double mean, mean_err, rms, rms_err;
-      fFolder->GetNamedChannelData(*it, "mean",     mean);
-      fFolder->GetNamedChannelData(*it, "mean_err", mean_err);
-      fFolder->GetNamedChannelData(*it, "rms",      rms);
-      fFolder->GetNamedChannelData(*it, "rms_err",  rms_err);
+	//DBFolder was updated, so now update the Snapshot
+	fData.Clear();
+	fData.SetIoV(this->Begin(), this->End());
 
-      DetPedestal pd(*it);
-      pd.SetPedMean( (float)mean );
-      pd.SetPedMeanErr( (float)mean_err );
-      pd.SetPedRms( (float)rms );
-      pd.SetPedRmsErr( (float)rms_err );
+	std::vector<DBChannelID_t> channels;
+	fFolder->GetChannelList(channels);
+	for (auto it = channels.begin(); it != channels.end(); ++it) {
 
-      fData.AddOrReplaceRow(pd);
+	  double mean, mean_err, rms, rms_err;
+	  fFolder->GetNamedChannelData(*it, "mean",     mean);
+	  fFolder->GetNamedChannelData(*it, "mean_err", mean_err);
+	  fFolder->GetNamedChannelData(*it, "rms",      rms);
+	  fFolder->GetNamedChannelData(*it, "rms_err",  rms_err);
+
+	  DetPedestal pd(*it);
+	  pd.SetPedMean( (float)mean );
+	  pd.SetPedMeanErr( (float)mean_err );
+	  pd.SetPedRms( (float)rms );
+	  pd.SetPedRmsErr( (float)rms_err );
+
+	  fData.AddOrReplaceRow(pd);
+	}
+      }
     }
 
-    return true;
+    return result;
 
   }
   
-  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBChannelID_t ch) const {     
+  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBChannelID_t ch) const {
+    DBUpdate();
     return fData.GetRow(ch);
   }
       

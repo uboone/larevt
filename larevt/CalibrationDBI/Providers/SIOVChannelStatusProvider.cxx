@@ -17,6 +17,7 @@
 #include "larcore/Geometry/Geometry.h"
 #include "WebError.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 // C/C++ standard libraries
 #include <vector>
@@ -32,6 +33,8 @@ namespace lariov {
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::SIOVChannelStatusProvider(fhicl::ParameterSet const& pset)
     : DatabaseRetrievalAlg(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
+    , fEventTimeStamp(0)
+    , fCurrentTimeStamp(0)
     , fDefault(0)
   {
 
@@ -84,34 +87,70 @@ namespace lariov {
     }
   }
   
+  // This method saves the time stamp of the latest event.
+
+  void SIOVChannelStatusProvider::UpdateTimeStamp(DBTimeStamp_t ts) {
+    mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::UpdateTimeStamp called.";
+    fNewNoisy.Clear();
+    fEventTimeStamp = ts;
+  }
+
+  // Maybe update method cached data (public non-const version).
+
   bool SIOVChannelStatusProvider::Update(DBTimeStamp_t ts) {
     
+    fEventTimeStamp = ts;
     fNewNoisy.Clear();
-    if (fDataSource != DataSource::Database) return false;
-    if (!this->UpdateFolder(ts)) return false;
-    
-    //DBFolder was updated, so now update the Snapshot
-    fData.Clear();
-    fData.SetIoV(this->Begin(), this->End());
+    return DBUpdate(ts);
+  }
 
-    std::vector<DBChannelID_t> channels;
-    fFolder->GetChannelList(channels);
-    for (auto it = channels.begin(); it != channels.end(); ++it) {
+  // Maybe update method cached data (private const version using current event time).
 
-      long status;
-      fFolder->GetNamedChannelData(*it, "status", status);
+  bool SIOVChannelStatusProvider::DBUpdate() const {
+    return DBUpdate(fEventTimeStamp);
+  }
 
-      ChannelStatus cs(*it);
-      cs.SetStatus( ChannelStatus::GetStatusFromInt((int)status) );
+  // Maybe update method cached data (private const version).
+  // This is the function that does the actual work of updating data from database.
 
-      fData.AddOrReplaceRow(cs);
+  bool SIOVChannelStatusProvider::DBUpdate(DBTimeStamp_t ts) const {
+
+    bool result = false;
+    if(fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
+
+      mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::DBUpdate called with new timestamp.";
+
+      fCurrentTimeStamp = ts;     
+
+      // Call non-const base class method.
+
+      result = const_cast<SIOVChannelStatusProvider*>(this)->UpdateFolder(ts);
+      if(result) {
+	//DBFolder was updated, so now update the Snapshot
+	fData.Clear();
+	fData.SetIoV(this->Begin(), this->End());
+
+	std::vector<DBChannelID_t> channels;
+	fFolder->GetChannelList(channels);
+	for (auto it = channels.begin(); it != channels.end(); ++it) {
+
+	  long status;
+	  fFolder->GetNamedChannelData(*it, "status", status);
+
+	  ChannelStatus cs(*it);
+	  cs.SetStatus( ChannelStatus::GetStatusFromInt((int)status) );
+
+	  fData.AddOrReplaceRow(cs);
+	}
+      }
     }
-    return true;
+    return result;
   }   
   
   
   //----------------------------------------------------------------------------
   const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(raw::ChannelID_t ch) const {
+    DBUpdate();
     if (fNewNoisy.HasChannel(rawToDBChannel(ch))) {
       return fNewNoisy.GetRow(rawToDBChannel(ch));
     }
