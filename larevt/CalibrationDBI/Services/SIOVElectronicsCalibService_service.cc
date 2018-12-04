@@ -25,7 +25,7 @@ namespace lariov{
       ~SIOVElectronicsCalibService(){}
       
       void PreProcessEvent(const art::Event& evt, art::ScheduleContext) {
-        fProvider.Update(evt.time().value());
+        fProvider.UpdateTimeStamp(evt.time().value());
       }
      
     private:

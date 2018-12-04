@@ -7,7 +7,7 @@
 // art/LArSoft libraries
 #include "cetlib_except/exception.h"
 #include "larcore/Geometry/Geometry.h"
-
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include <fstream>
 
@@ -15,7 +15,9 @@ namespace lariov {
 
   //constructor      
   SIOVElectronicsCalibProvider::SIOVElectronicsCalibProvider(fhicl::ParameterSet const& p) :
-    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")) {	
+    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
+    fEventTimeStamp(0),
+    fCurrentTimeStamp(0) {
     
     this->Reconfigure(p);
   }
@@ -104,41 +106,75 @@ namespace lariov {
     }
   }
 
+  // This method saves the time stamp of the latest event.
+
+  void SIOVElectronicsCalibProvider::UpdateTimeStamp(DBTimeStamp_t ts) {
+    mf::LogInfo("SIOVElectronicsCalibProvider") << "SIOVElectronicsCalibProvider::UpdateTimeStamp called.";
+    fEventTimeStamp = ts;
+  }
+
+  // Maybe update method cached data (public non-const version).
+
   bool SIOVElectronicsCalibProvider::Update(DBTimeStamp_t ts) {
     
-    if (fDataSource != DataSource::Database) return false;
+    fEventTimeStamp = ts;
+    return DBUpdate(ts);
+  }
+
+  // Maybe update method cached data (private const version using current event time).
+
+  bool SIOVElectronicsCalibProvider::DBUpdate() const {
+    return DBUpdate(fEventTimeStamp);
+  }
+
+  // Maybe update method cached data (private const version).
+  // This is the function that does the actual work of updating data from database.
+
+  bool SIOVElectronicsCalibProvider::DBUpdate(DBTimeStamp_t ts) const {
+
+    bool result = false;
+    if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
       
-    if (!this->UpdateFolder(ts)) return false;
+      mf::LogInfo("SIOVElectronicsCalibProvider") << "SIOVElectronicsCalibProvider::DBUpdate called with new timestamp.";
 
-    //DBFolder was updated, so now update the Snapshot
-    fData.Clear();
-    fData.SetIoV(this->Begin(), this->End());
+      fCurrentTimeStamp = ts;     
 
-    std::vector<DBChannelID_t> channels;
-    fFolder->GetChannelList(channels);
-    for (auto it = channels.begin(); it != channels.end(); ++it) {
+      // Call non-const base class method.
 
-      double gain, gain_err, shaping_time, shaping_time_err;
-      fFolder->GetNamedChannelData(*it, "gain",     gain);
-      fFolder->GetNamedChannelData(*it, "gain_err", gain_err); 
-      fFolder->GetNamedChannelData(*it, "shaping_time",     shaping_time);
-      fFolder->GetNamedChannelData(*it, "shaping_time_err", shaping_time_err); 
+      result = const_cast<SIOVElectronicsCalibProvider*>(this)->UpdateFolder(ts);
+      if(result) {
+	//DBFolder was updated, so now update the Snapshot
+	fData.Clear();
+	fData.SetIoV(this->Begin(), this->End());
+
+	std::vector<DBChannelID_t> channels;
+	fFolder->GetChannelList(channels);
+	for (auto it = channels.begin(); it != channels.end(); ++it) {
+
+	  double gain, gain_err, shaping_time, shaping_time_err;
+	  fFolder->GetNamedChannelData(*it, "gain",     gain);
+	  fFolder->GetNamedChannelData(*it, "gain_err", gain_err); 
+	  fFolder->GetNamedChannelData(*it, "shaping_time",     shaping_time);
+	  fFolder->GetNamedChannelData(*it, "shaping_time_err", shaping_time_err); 
       
 
-      ElectronicsCalib pg(*it);
-      pg.SetGain( (float)gain );
-      pg.SetGainErr( (float)gain_err );
-      pg.SetShapingTime( (float)shaping_time );
-      pg.SetShapingTimeErr( (float)shaping_time_err );
-      pg.SetExtraInfo(CalibrationExtraInfo("ElectronicsCalib"));
+	  ElectronicsCalib pg(*it);
+	  pg.SetGain( (float)gain );
+	  pg.SetGainErr( (float)gain_err );
+	  pg.SetShapingTime( (float)shaping_time );
+	  pg.SetShapingTimeErr( (float)shaping_time_err );
+	  pg.SetExtraInfo(CalibrationExtraInfo("ElectronicsCalib"));
 
-      fData.AddOrReplaceRow(pg);
+	  fData.AddOrReplaceRow(pg);
+	}
+      }
     }
 
-    return true;
+    return result;
   }
   
   const ElectronicsCalib& SIOVElectronicsCalibProvider::ElectronicsCalibObject(DBChannelID_t ch) const { 
+    DBUpdate();
     return fData.GetRow(ch);
   }
       
