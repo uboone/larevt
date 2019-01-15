@@ -118,7 +118,7 @@ namespace caldata{
   void CalWireT962::beginJob()
   {  
     
-    LOG_DEBUG("CalWireT962") << "CalWireT962_module: Opening  Electronics Response File: " 
+    MF_LOG_DEBUG("CalWireT962") << "CalWireT962_module: Opening  Electronics Response File: " 
 			     << fResponseFile.c_str();
     
     TFile f(fResponseFile.c_str());

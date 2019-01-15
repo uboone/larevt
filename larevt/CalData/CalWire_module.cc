@@ -114,7 +114,7 @@ namespace caldata{
   void CalWire::beginJob()
   {  
     
-    LOG_DEBUG("CalWire") << "CalWire_plugin: Opening  Electronics Response File: " 
+    MF_LOG_DEBUG("CalWire") << "CalWire_plugin: Opening  Electronics Response File: " 
 			 << fResponseFile.c_str();
     
     TFile f(fResponseFile.c_str());

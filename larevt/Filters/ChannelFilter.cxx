@@ -46,13 +46,13 @@ filter::ChannelFilter::ChannelFilter() try:
   provider(art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider())
 {
   
-  LOG_ERROR("ChannelFilter") << "ChannelFilter is now deprecated."
+  MF_LOG_ERROR("ChannelFilter") << "ChannelFilter is now deprecated."
     " Replace it with ChannelStatusService";
   
 } // function try
 catch (art::Exception& e) { // automatic rethrow happens at end of block
   if (e.categoryCode() == art::errors::ServiceNotFound) {
-    LOG_SYSTEM("ChannelFilter") <<
+    MF_LOG_SYSTEM("ChannelFilter") <<
       "Failed to obtain an instance of ChannelStatusService service;"
       " you should update your configuration, *and* update the code using"
       " ChannelFilter, that is deprecated."
