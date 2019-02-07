@@ -200,7 +200,7 @@ namespace caldata{
         if (RawDigitsFromWire.at(wd) == rdvec[rd]){
           std::vector<float> wirSig = wvec[wd]->Signal();
           if(wirSig.size() > signal.size()) {
-            LOG_DEBUG("CalWireAna")<<"Incompatible vector size "<<wirSig.size()
+            MF_LOG_DEBUG("CalWireAna")<<"Incompatible vector size "<<wirSig.size()
               <<" "<<signal.size();
             return;
           }
@@ -210,7 +210,7 @@ namespace caldata{
 	  break;
 	}
 	if (wd == (wvec.size()-1) ){
-	  LOG_DEBUG("CalWireAna") << "caldata::CalWireAna:Big problem! No matching Wire for RawDigit. Bailing." << rd;
+	  MF_LOG_DEBUG("CalWireAna") << "caldata::CalWireAna:Big problem! No matching Wire for RawDigit. Bailing." << rd;
 	  return;
 	}
       }
@@ -273,13 +273,13 @@ namespace caldata{
 	sigMin = TMath::MinElement(signalSize,&adc[0]);
 	tmin = std::max(indMax-window,0);
 	tmax = std::min(indMin+window,(int)signalSize-1);
-	LOG_DEBUG("CalWireAna") << "Induction channel, indMin,tmin,tmax " 
+	MF_LOG_DEBUG("CalWireAna") << "Induction channel, indMin,tmin,tmax " 
 				   << rd<< " " << indMin<< " " << tmin << " " << tmax;
       } 
       else if (sigMax>=pulseHeight){
 	tmin = std::max(indMax-window,0);
 	tmax = std::min(indMax+window,(int)signalSize-1);
-	LOG_DEBUG("CalWireAna") << "Collection channel, tmin,tmax "<< rd<< " " << tmin << " " << tmax;
+	MF_LOG_DEBUG("CalWireAna") << "Collection channel, tmin,tmax "<< rd<< " " << tmin << " " << tmax;
       }
       
       fMin->Fill(sigMin);
@@ -306,7 +306,7 @@ namespace caldata{
 	}
       }               
 
-      LOG_DEBUG("CalWireAna") << "on channel " << rdvec[rd]->Channel();
+      MF_LOG_DEBUG("CalWireAna") << "on channel " << rdvec[rd]->Channel();
       // TMath::Mean with iterators doesn't work. EC,23-Sep-2010.
       double tmp = TMath::Mean(winDiffs.size(),&winDiffs[0]);
       double tmp2 = TMath::RMS(winDiffs.size(),&winDiffs[0]);

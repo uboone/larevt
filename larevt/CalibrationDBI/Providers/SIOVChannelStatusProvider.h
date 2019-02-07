@@ -92,6 +92,9 @@ namespace lariov {
       /// @}
 
 
+      /// Update event time stamp.
+      void UpdateTimeStamp(DBTimeStamp_t ts);
+
       /// @name Configuration functions
       /// @{
       /// Prepares the object to provide information about the specified time
@@ -109,9 +112,19 @@ namespace lariov {
       
     private:
     
+      /// Do actual database updates.
+
+      bool DBUpdate() const;                    // Uses current event time.
+      bool DBUpdate(DBTimeStamp_t ts) const;
+
+      // Time stamps.
+
+      DBTimeStamp_t fEventTimeStamp;            // Most recently seen time stamp.
+      mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
+
       DataSource::ds fDataSource;
-      Snapshot<ChannelStatus> fData;
-      Snapshot<ChannelStatus> fNewNoisy;
+      mutable Snapshot<ChannelStatus> fData;    // Lazily updated once per IOV.
+      Snapshot<ChannelStatus> fNewNoisy;        // Updated once per event.
       ChannelStatus fDefault;
       
       ChannelSet_t GetChannelsWithStatus(chStatus status) const;

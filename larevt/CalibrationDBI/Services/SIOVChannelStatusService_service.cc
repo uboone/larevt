@@ -4,6 +4,7 @@
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
+#include "art/Persistency/Provenance/ScheduleContext.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Providers/SIOVChannelStatusProvider.h"
@@ -22,7 +23,7 @@ namespace lariov{
     
       SIOVChannelStatusService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
       
-      void PreProcessEvent(const art::Event& evt); 
+      void PreProcessEvent(const art::Event& evt, art::ScheduleContext);
      
     private:
     
@@ -53,10 +54,10 @@ namespace lariov{
   }
   
   
-  void SIOVChannelStatusService::PreProcessEvent(const art::Event& evt) {
+  void SIOVChannelStatusService::PreProcessEvent(const art::Event& evt, art::ScheduleContext) {
     
     //First grab an update from the database
-    fProvider.Update(evt.time().value());
+    fProvider.UpdateTimeStamp(evt.time().value());
   } 
 
 }//end namespace lariov
