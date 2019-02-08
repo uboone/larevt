@@ -10,9 +10,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef FINALSTATESELECTFILTER_H
-#define FINALSTATESELECTFILTER_H
-
 //Framework Includes
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Core/ModuleMacros.h" 
@@ -41,15 +38,12 @@ namespace filt {
   public:
     
     explicit FinalStateSelectFilter(fhicl::ParameterSet const& ); 
-    virtual ~FinalStateSelectFilter();
-         
-    
-    bool filter(art::Event& evt);
-    void reconfigure(fhicl::ParameterSet const& p);
-    void beginJob();
    
 
   private: 
+    bool filter(art::Event& evt) override;
+    void reconfigure(fhicl::ParameterSet const& p);
+    void beginJob() override;
  
     std::string fGenieModuleLabel;
     bool fDebug;                  /// Controls the verbosity
@@ -61,8 +55,6 @@ namespace filt {
     TH1D* fSelectedEvents;
     TH1D* fTotalEvents;
 
-  protected: 
-
     bool isSubset(std::vector<int>& a, std::vector<int>& aN, std::vector<bool> aNex, std::vector<int>& b, bool IsInclusive);
     
   }; // class FinalStateSelectFilter
@@ -73,15 +65,11 @@ namespace filt{
 
   //-------------------------------------------------
   FinalStateSelectFilter::FinalStateSelectFilter(fhicl::ParameterSet const & pset)  
+    : EDFilter{pset}
   {   
     this->reconfigure(pset);
   }
 
-  //-------------------------------------------------
-  FinalStateSelectFilter::~FinalStateSelectFilter()
-  {
-  }
-  
   //-------------------------------------------------
   void FinalStateSelectFilter::reconfigure(fhicl::ParameterSet const& p)
   {
@@ -91,8 +79,6 @@ namespace filt{
     fInclusive         = p.get< bool >("isInclusive");        
     fPDGCount          = p.get< std::vector<int> >("PDGCount");
     fPDGCountExclusive = p.get< std::vector<bool> >("PDGCountExclusivity");
-
-
   } 
 
   //-------------------------------------------------
@@ -316,5 +302,3 @@ namespace filt {
   DEFINE_ART_MODULE(FinalStateSelectFilter)
 
 } //namespace filt
-
-#endif // FINALSTATEPARTICLEFILTER_H

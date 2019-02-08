@@ -39,45 +39,28 @@ namespace filter {
    public:
     
       explicit ADCFilter(fhicl::ParameterSet const& ); 
-      virtual ~ADCFilter();
-         
     
+   private:
       bool filter(art::Event& evt);
       void reconfigure(fhicl::ParameterSet const& p);
-      void beginJob();
-   
-
-   private: 
  
       std::string fDigitModuleLabel;
       double      fMinADC;  
- 
-   protected: 
-    
    }; // class ADCFilter
 
    //-------------------------------------------------
    ADCFilter::ADCFilter(fhicl::ParameterSet const & pset)  
+     : EDFilter{pset}
    {   
       this->reconfigure(pset);
    }
 
-   //-------------------------------------------------
-   ADCFilter::~ADCFilter()
-   {
-   }
-  
    //-------------------------------------------------
    void ADCFilter::reconfigure(fhicl::ParameterSet const& p)
    {
       fDigitModuleLabel = p.get< std::string > ("DigitModuleLabel"); 
       fMinADC           = p.get< double      > ("MinADC");         
    } 
-
-   //-------------------------------------------------
-   void ADCFilter::beginJob()
-   {
-   }
 
    //-------------------------------------------------
    bool ADCFilter::filter(art::Event &evt)

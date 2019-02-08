@@ -25,10 +25,8 @@ namespace filt{
   class LArG4ParticleFilter : public art::EDFilter {
     public:
       explicit LArG4ParticleFilter(fhicl::ParameterSet const & pset);
-      virtual ~LArG4ParticleFilter() {};
       virtual bool filter(art::Event& e);
       void reconfigure(fhicl::ParameterSet const& pset);
-      void beginJob() ;
 
     private:
 
@@ -58,6 +56,7 @@ namespace filt{
   };
 
   LArG4ParticleFilter::LArG4ParticleFilter::LArG4ParticleFilter(fhicl::ParameterSet const & pset)
+    : EDFilter{pset}
   {
     this->reconfigure(pset);
     for (unsigned int i = 0; i < fInterestingPDGs.size(); i++){
@@ -72,7 +71,6 @@ namespace filt{
     fStopInTPC = pset.get<std::vector<int> >("StopInTPC");
     fParticleMinTPCLength = pset.get<std::vector<double> >("ParticleMinTPCLength");
     fRequireAllInterestingParticles = pset.get<bool>("RequireAllInterestingParticles");
-    return;
   }
 
   bool LArG4ParticleFilter::filter(art::Event & e){
@@ -112,11 +110,6 @@ namespace filt{
 
     //Assume that the event is not worth saving
     return false;
-  }
-
-  void LArG4ParticleFilter::beginJob() {
-
-    return;
   }
 
   bool LArG4ParticleFilter::IsInterestingParticle(const art::Ptr<simb::MCParticle> particle, int index){

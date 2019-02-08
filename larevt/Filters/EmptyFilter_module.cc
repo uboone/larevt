@@ -7,8 +7,6 @@
 // pagebri3@msu.edu
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef EMPTYFILTER_H
-#define EMPTYFILTER_H
 
 /// Framework includes
 #include "art/Framework/Core/ModuleMacros.h"
@@ -46,8 +44,6 @@ namespace filt {
   public:
     
     explicit EmptyFilter(fhicl::ParameterSet const& ); 
-    virtual ~EmptyFilter();
-         
     
     bool filter(art::Event& evt);
     void reconfigure(fhicl::ParameterSet const& p);
@@ -73,15 +69,11 @@ namespace filt {
 
   //-------------------------------------------------
   EmptyFilter::EmptyFilter(fhicl::ParameterSet const & pset)  
+    : EDFilter{pset}
   {   
     this->reconfigure(pset);
   }
 
-  //-------------------------------------------------
-  EmptyFilter::~EmptyFilter()
-  {
-  }
-  
   //-------------------------------------------------
   void EmptyFilter::reconfigure(fhicl::ParameterSet const& p)
   {
@@ -176,5 +168,3 @@ namespace filt {
   DEFINE_ART_MODULE(EmptyFilter)
 
 } //namespace filt
-
-#endif // EMPTYFILTER_H

@@ -47,11 +47,8 @@ namespace filter {
 	public:
 
 		explicit EventTimeFilter(fhicl::ParameterSet const& ); 
-		virtual ~EventTimeFilter();      
 		
 		bool filter(art::Event& evt);
-		void beginJob();
-		void endJob();
 		void reconfigure(fhicl::ParameterSet const& p);
 
 	private:
@@ -65,10 +62,6 @@ namespace filter {
 
 }
 
-void filter::EventTimeFilter::beginJob() { }
-
-void filter::EventTimeFilter::endJob() { }
-
 void filter::EventTimeFilter::reconfigure(fhicl::ParameterSet const& p) {
 
 	fDateRangeLow   = p.get<UInt_t>("DateRangeLow", 0);   // YYYYMMDD
@@ -78,11 +71,11 @@ void filter::EventTimeFilter::reconfigure(fhicl::ParameterSet const& p) {
 
 }
 
-filter::EventTimeFilter::EventTimeFilter(fhicl::ParameterSet const& pset) {
+filter::EventTimeFilter::EventTimeFilter(fhicl::ParameterSet const& pset)
+  : EDFilter{pset}
+{
 	this->reconfigure(pset);
 }
-
-filter::EventTimeFilter::~EventTimeFilter() { }
 
 bool filter::EventTimeFilter::filter(art::Event &evt) {   
 

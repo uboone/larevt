@@ -49,11 +49,9 @@ namespace caldata {
     // create calibrated signals on wires. this class runs 
     // an fft to remove the electronics shaping.     
     explicit CalWire(fhicl::ParameterSet const& pset); 
-    virtual ~CalWire();
     
     void produce(art::Event& evt); 
     void beginJob(); 
-    void endJob();                 
     void reconfigure(fhicl::ParameterSet const& p);
  
   private:
@@ -87,6 +85,7 @@ namespace caldata{
 
   //-------------------------------------------------
   CalWire::CalWire(fhicl::ParameterSet const& pset)
+    : EDProducer{pset}
   {
     this->reconfigure(pset);
     
@@ -95,11 +94,6 @@ namespace caldata{
     
   }
   
-  //-------------------------------------------------
-  CalWire::~CalWire()
-  {
-  }
-
   //////////////////////////////////////////////////////
   void CalWire::reconfigure(fhicl::ParameterSet const& p)
   {
@@ -172,11 +166,6 @@ namespace caldata{
     f.Close();
   }
 
-  //////////////////////////////////////////////////////
-  void CalWire::endJob()
-  {  
-  }
-  
   //////////////////////////////////////////////////////
   void CalWire::produce(art::Event& evt)
   {
@@ -324,5 +313,3 @@ namespace caldata{
 
 
 #endif // CALWIRE_H
-
-

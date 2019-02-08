@@ -7,8 +7,6 @@
 // saima@ksu.edu
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef FINALSTATEPARTICLEFILTER_H
-#define FINALSTATEPARTICLEFILTER_H
 
 //Framework Includes
 #include "art/Framework/Core/EDFilter.h"
@@ -38,8 +36,6 @@ namespace filt {
   public:
     
     explicit FinalStateParticleFilter(fhicl::ParameterSet const& ); 
-    virtual ~FinalStateParticleFilter();
-         
     
     bool filter(art::Event& evt);
     void reconfigure(fhicl::ParameterSet const& p);
@@ -54,8 +50,6 @@ namespace filt {
     TH1D* fSelectedEvents;
     TH1D* fTotalEvents;
 
-  protected: 
-
     bool isSubset(std::vector<int>& a, std::vector<int>& b);
     
   }; // class FinalStateParticleFilter
@@ -66,15 +60,11 @@ namespace filt{
 
   //-------------------------------------------------
   FinalStateParticleFilter::FinalStateParticleFilter(fhicl::ParameterSet const & pset)  
+    : EDFilter{pset}
   {   
     this->reconfigure(pset);
   }
 
-  //-------------------------------------------------
-  FinalStateParticleFilter::~FinalStateParticleFilter()
-  {
-  }
-  
   //-------------------------------------------------
   void FinalStateParticleFilter::reconfigure(fhicl::ParameterSet const& p)
   {
@@ -149,5 +139,3 @@ namespace filt {
   DEFINE_ART_MODULE(FinalStateParticleFilter)
 
 } //namespace filt
-
-#endif // FINALSTATEPARTICLEFILTER_H

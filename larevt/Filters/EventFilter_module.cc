@@ -33,11 +33,8 @@ namespace filter {
   public:
     
     explicit EventFilter(fhicl::ParameterSet const& ); 
-    virtual ~EventFilter();      
     
-    bool filter(art::Event& evt);
-    void beginJob();
-    void endJob();
+    bool filter(art::Event& evt) override;
     void reconfigure(fhicl::ParameterSet const& p);
 
     
@@ -59,15 +56,6 @@ namespace filter {
                                     
 
   }; //class EventFilter
-}
-
-void filter::EventFilter::beginJob()
-{
-}
-
-//-------------------------------------------------
-void filter::EventFilter::endJob()
-{
 }
 
 ///////////////////////////////////////////////////////
@@ -99,12 +87,9 @@ void filter::EventFilter::reconfigure(fhicl::ParameterSet const& p)
 
 
 filter::EventFilter::EventFilter(fhicl::ParameterSet const& pset)
+  : EDFilter{pset}
 {
   this->reconfigure(pset);
-}
-
-filter::EventFilter::~EventFilter()
-{
 }
 
 bool filter::EventFilter::filter(art::Event &evt)

@@ -5,8 +5,6 @@
 // brebel@fnal.gov
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef CALWIRET962_H
-#define CALWIRET962_H
 
 #include <stdint.h>
 
@@ -51,11 +49,9 @@ namespace caldata {
     // create calibrated signals on wires. this class runs 
     // an fft to remove the electronics shaping.     
     explicit CalWireT962(fhicl::ParameterSet const& pset); 
-    virtual ~CalWireT962();
     
     void produce(art::Event& evt); 
     void beginJob(); 
-    void endJob();                 
     void reconfigure(fhicl::ParameterSet const& p);
  
   private:
@@ -89,6 +85,7 @@ namespace caldata{
 
   //-------------------------------------------------
   CalWireT962::CalWireT962(fhicl::ParameterSet const& pset)
+    : EDProducer{pset}
   {
     this->reconfigure(pset);
 
@@ -97,11 +94,6 @@ namespace caldata{
     
   }
   
-  //-------------------------------------------------
-  CalWireT962::~CalWireT962()
-  {
-  }
-
   //////////////////////////////////////////////////////
   void CalWireT962::reconfigure(fhicl::ParameterSet const& p)
   {
@@ -176,11 +168,6 @@ namespace caldata{
     f.Close();
   }
 
-  //////////////////////////////////////////////////////
-  void CalWireT962::endJob()
-  {  
-  }
-  
   //////////////////////////////////////////////////////
   void CalWireT962::produce(art::Event& evt)
   {
@@ -316,7 +303,3 @@ namespace caldata{
   DEFINE_ART_MODULE(CalWireT962)
   
 } // end namespace caldata
-
-#endif // CALWIRET962_H
-
-

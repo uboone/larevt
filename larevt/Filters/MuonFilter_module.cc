@@ -55,17 +55,10 @@ namespace filter {
   public:
     
     explicit MuonFilter(fhicl::ParameterSet const& ); 
-    virtual ~MuonFilter();      
-    
-    bool filter(art::Event& evt);
-    void beginJob();
-    void endJob();
-
-    void reconfigure(fhicl::ParameterSet const& p);
 
   private:  
-   
-  protected:
+    bool filter(art::Event& evt) override;
+    void reconfigure(fhicl::ParameterSet const& p);
  
     std::string fClusterModuleLabel;
     std::string fLineModuleLabel;
@@ -81,13 +74,9 @@ namespace filter {
 
   //-------------------------------------------------
   MuonFilter::MuonFilter(fhicl::ParameterSet const & pset) 
+    : EDFilter{pset}
   {
     this->reconfigure(pset);   
-  }
-
-  //-------------------------------------------------
-  MuonFilter::~MuonFilter()
-  {
   }
 
   //------------------------------------------------
@@ -102,16 +91,6 @@ namespace filter {
     fIonFactor          = p.get< double                    >("IonFactor");          
     fCuts               = p.get< std::vector<double> >("Cuts");
     fDeltaWire          = p.get< int                 >("DeltaWire");
-  }
-
-  //-------------------------------------------------
-  void MuonFilter::beginJob()
-  {
-  }
-
-  //-------------------------------------------------
-  void MuonFilter::endJob()
-  {
   }
 
   //-------------------------------------------------

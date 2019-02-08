@@ -41,9 +41,7 @@ namespace cluster {
 
     /**METHODS global*/
     explicit SmallClusterFilter(fhicl::ParameterSet const& pset);
-    virtual ~SmallClusterFilter();                               
     void beginJob();                                     
-    bool beginRun(art::Run& run);
     void reconfigure(fhicl::ParameterSet const& pset);
     /**Routine that finds the cluster and sets the dTdW of the 2D shower*/
     bool filter(art::Event& evt);                       
@@ -77,6 +75,7 @@ namespace cluster {
 }
 
 cluster::SmallClusterFilter::SmallClusterFilter(fhicl::ParameterSet const& pset)
+  : EDFilter{pset}
 {
   this->reconfigure(pset);  
 }
@@ -94,19 +93,6 @@ void cluster::SmallClusterFilter::reconfigure(fhicl::ParameterSet const& pset)
   //max hits total checks against the sum of all hits found.
 }
 
-// ***************** //
-cluster::SmallClusterFilter::~SmallClusterFilter()
-{
-  //Nothing to do in the destructor
-}
-
-//____________________________________________________________________________
-bool cluster::SmallClusterFilter::beginRun(art::Run& /* run */)
-{
-  //nothing to do at beginRun()
-  return true;
-}
-
 //-----------------------------------------------
 
 // ***************** //
@@ -114,11 +100,6 @@ void cluster::SmallClusterFilter::beginJob()
 {
   // this will not change on a run per run basis.
   fNPlanes = geom->Nplanes(); 				//get the number of planes in the TPC
- 	
-  /**Get TFileService and define output Histograms*/
-  art::ServiceHandle<art::TFileService> tfs;
-
-  return;
 }
 
 
