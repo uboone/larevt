@@ -6,6 +6,7 @@ standard_spacecharge:
   EnableSimEfieldSCE:        false
   EnableCalSpatialSCE:       false
   EnableCalEfieldSCE:        false
+  EnableCorrSCE:			 false
   RepresentationType:       "Parametric"
   InputFilename:            "SCEoffsets.root"
   CalibrationInputFilename: "SCEoffsets.root"
