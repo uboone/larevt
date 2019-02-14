@@ -2,12 +2,15 @@ BEGIN_PROLOG
 
 standard_spacecharge:
 {
-  EnableSimSpatialSCE:    false
-  EnableSimEfieldSCE:    false
-  EnableCorrSCE:   false
-  RepresentationType:     "Parametric"
-  InputFilename:          "SCEoffsets.root"
-  service_provider:       SpaceChargeServiceStandard
+  EnableSimSpatialSCE:       false
+  EnableSimEfieldSCE:        false
+  EnableCalSpatialSCE:       false
+  EnableCalEfieldSCE:        false
+  EnableCorrSCE:			 false
+  RepresentationType:       "Parametric"
+  InputFilename:            "SCEoffsets.root"
+  CalibrationInputFilename: "SCEoffsets.root"
+  service_provider:          SpaceChargeServiceStandard
 }
 
 bo_spacecharge:         @local::standard_spacecharge

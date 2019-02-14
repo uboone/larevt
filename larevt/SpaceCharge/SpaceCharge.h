@@ -27,8 +27,13 @@ namespace spacecharge{
       virtual bool EnableSimSpatialSCE() const = 0;
       virtual bool EnableSimEfieldSCE() const = 0;
       virtual bool EnableCorrSCE() const = 0;
+      virtual bool EnableCalSpatialSCE() const = 0;
+      virtual bool EnableCalEfieldSCE() const = 0;
+      
       virtual geo::Vector_t GetPosOffsets(geo::Point_t const& point) const = 0;
       virtual geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const = 0;
+	  virtual geo::Vector_t GetCalPosOffsets(geo::Point_t const& point) const = 0;
+	  virtual geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point) const = 0;
 
     protected:
 
