@@ -27,8 +27,7 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/coding.h"
 
-// Boost libraries
-#include <boost/any.hpp>
+#include <any> // std::any replaces boost::any
 
 // C/C++ standard library
 #include <iostream>
@@ -46,7 +45,7 @@ namespace std {
     fhicl::detail::ps_sequence_t result;
     result.reserve(s.size());
     std::transform(s.begin(), s.end(), std::inserter(result, result.end()),
-      [](T const& value) { return boost::any(fhicl::detail::encode(value)); }
+      [](T const& value) { return std::any(fhicl::detail::encode(value)); }
       );
     return result;
   } // encode(set<T>)
@@ -94,7 +93,7 @@ class StatusConfiguration {
   fhicl::ParameterSet CreateConfiguration() const {
     fhicl::ParameterSet cfg;
     
-    boost::any any {fhicl::detail::encode(fNoisyChannels)};
+    std::any any {fhicl::detail::encode(fNoisyChannels)};
     cfg.put("NoisyChannels", fNoisyChannels);
     cfg.put("BadChannels", fBadChannels);
     
