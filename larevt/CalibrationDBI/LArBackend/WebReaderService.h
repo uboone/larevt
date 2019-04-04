@@ -16,7 +16,7 @@
 #include "art/Framework/Principal/Handle.h"
 #include "canvas/Persistency/Common/Ptr.h"
 #include "canvas/Persistency/Common/PtrVector.h"
-#include "art/Framework/IO/Root/RootDB/SQLite3Wrapper.h"
+#include "art_root_io/RootDB/SQLite3Wrapper.h"
 
 #include "larevt/CalibrationDBI/WebDBI/WebReader.h"
 
