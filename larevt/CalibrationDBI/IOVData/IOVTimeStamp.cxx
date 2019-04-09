@@ -11,9 +11,6 @@
 /** \addtogroup IOVData
 
     @{*/
-#ifndef IOVDATA_IOVTIMESTAMP_CXX
-#define IOVDATA_IOVTIMESTAMP_CXX
-
 #include "IOVTimeStamp.h"
 #include "IOVDataError.h"
 #include "IOVDataConstants.h"
@@ -107,4 +104,3 @@ namespace lariov {
     else return false;
   }
 }
-#endif

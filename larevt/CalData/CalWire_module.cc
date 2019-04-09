@@ -5,8 +5,6 @@
 // brebel@fnal.gov
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef CALWIRE_H
-#define CALWIRE_H
 
 // ROOT includes
 #include <TFile.h>
@@ -310,6 +308,3 @@ namespace caldata{
   DEFINE_ART_MODULE(CalWire)
   
 } // end namespace caldata
-
-
-#endif // CALWIRE_H

@@ -1,6 +1,3 @@
-#ifndef SIOVELECTRONICSCALIBPROVIDER_CXX
-#define SIOVELECTRONICSCALIBPROVIDER_CXX
-
 #include "SIOVElectronicsCalibProvider.h"
 #include "WebError.h"
 
@@ -200,6 +197,3 @@ namespace lariov {
 
 
 }//end namespace lariov
-	
-#endif
-        

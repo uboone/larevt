@@ -7,8 +7,6 @@
 // msoderbe@syr.edu
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef ADCFILTER_H
-#define ADCFILTER_H
 
 #include <algorithm>
 #include <vector>
@@ -93,5 +91,3 @@ namespace filter {
    DEFINE_ART_MODULE(ADCFilter)
 
 } //namespace filter
-
-#endif // ADCFILTER_H

@@ -1,6 +1,3 @@
-#ifndef DATABASERETRIEVALALG_CXX
-#define DATABASERETRIEVALALG_CXX 1
-
 #include "DatabaseRetrievalAlg.h"
 
 namespace lariov {
@@ -14,4 +11,3 @@ namespace lariov {
     fFolder.reset(new DBFolder(foldername, url, tag));
   }
 }
-#endif

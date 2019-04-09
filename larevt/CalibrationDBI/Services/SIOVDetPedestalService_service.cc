@@ -1,6 +1,3 @@
-#ifndef SIOVDETPEDESTALSERVICE_CC
-#define SIOVDETPEDESTALSERVICE_CC
-
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
@@ -54,5 +51,3 @@ namespace lariov{
 }//end namespace lariov
 
 DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService, lariov::DetPedestalService)
-
-#endif

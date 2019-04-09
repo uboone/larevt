@@ -53,7 +53,7 @@ bool spacecharge::SpaceChargeStandard::Configure(fhicl::ParameterSet const& pset
     cet::search_path sp("FW_SEARCH_PATH");
     sp.find_file(fInputFilename,fname);
 
-    std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
+    auto infile = std::make_unique<TFile>(fname.c_str(), "READ");
     if(!infile->IsOpen()) throw art::Exception(art::errors::Configuration) << "Could not find the space charge effect file '" << fname << "'!\n";
 
     if(fRepresentationType == "Parametric")

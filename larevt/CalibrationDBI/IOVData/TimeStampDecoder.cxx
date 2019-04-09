@@ -1,6 +1,3 @@
-#ifndef TIMESTAMPDECODER_CXX
-#define TIMESTAMPDECODER_CXX
-
 #include <string>
 #include "TimeStampDecoder.h"
 #include "IOVDataConstants.h"
@@ -36,5 +33,3 @@ namespace lariov {
     } 
   }
 }//end namespace lariov
-
-#endif

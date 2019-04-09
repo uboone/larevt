@@ -1,6 +1,3 @@
-#ifndef SIOVPMTGAINPROVIDER_CXX
-#define SIOVPMTGAINPROVIDER_CXX
-
 #include "SIOVPmtGainProvider.h"
 #include "WebError.h"
 
@@ -176,6 +173,3 @@ namespace lariov {
 
 
 }//end namespace lariov
-	
-#endif
-        

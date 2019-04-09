@@ -6,9 +6,6 @@
  * @see    SIOVChannelStatusProvider.h
  */
 
-#ifndef SIOVCHANNELSTATUSPROVIDER_CXX
-#define SIOVCHANNELSTATUSPROVIDER_CXX 1
-
 // Our header
 #include "SIOVChannelStatusProvider.h"
 
@@ -224,5 +221,3 @@ namespace lariov {
   //----------------------------------------------------------------------------
   
 } // namespace lariov
-
-#endif

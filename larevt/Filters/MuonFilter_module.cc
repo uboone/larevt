@@ -8,9 +8,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef MUONFILTER_H
-#define MUONFILTER_H
-
 #include "TH2D.h"
 
 
@@ -324,5 +321,3 @@ namespace filter {
   DEFINE_ART_MODULE(MuonFilter)
 
 } //namespace filt
-
-#endif // MUONFILTER_H

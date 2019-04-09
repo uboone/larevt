@@ -1,6 +1,3 @@
-#ifndef DBFOLDER_CXX 
-#define DBFOLDER_CXX 1
-
 #include "DBFolder.h"
 #include "WebDBIConstants.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
@@ -313,8 +310,3 @@ namespace lariov {
   }
 
 }//end namespace lariov
-  
-#endif  
-  
-  
-  

@@ -1,6 +1,3 @@
-#ifndef SIOVPMTGAINSERVICE_CC
-#define SIOVPMTGAINSERVICE_CC
-
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
@@ -57,5 +54,3 @@ namespace lariov{
 }//end namespace lariov
 
 DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVPmtGainService, lariov::PmtGainService)
-
-#endif

@@ -1,6 +1,3 @@
-#ifndef WEBDB_DETPEDESTALRETRIEVALALG_CXX
-#define WEBDB_DETPEDESTALRETRIEVALALG_CXX
-
 #include "DetPedestalRetrievalAlg.h"
 #include "WebError.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
@@ -224,6 +221,3 @@ namespace lariov {
 
 
 }//end namespace lariov
-	
-#endif
-        

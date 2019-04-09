@@ -1,7 +1,3 @@
-
-#ifndef WEBREADERSERVICE_CXX
-#define WEBREADERSERVICE_CXX
-
 #include "WebReaderService.h"
 
 namespace lariov {
@@ -16,5 +12,3 @@ namespace lariov {
   DEFINE_ART_SERVICE(WebReaderService)
 
 }
-
-#endif
