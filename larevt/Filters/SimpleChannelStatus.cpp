@@ -13,15 +13,14 @@
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::isValidChannelID()
 
 // Framework libraries
+#include "cetlib/container_algorithms.h"
 #include "cetlib_except/exception.h"
 
 
 // C/C++ standard libraries
 #include <vector>
-#include <algorithm> // std::copy()
 #include <iterator> // std::inserter()
 #include <utility> // std::pair<>
-
 
 namespace lariov {
   
@@ -31,24 +30,17 @@ namespace lariov {
     : fMaxChannel(raw::InvalidChannelID)
     , fMaxPresentChannel(raw::InvalidChannelID)
   {
-    
     using chan_vect_t = std::vector<raw::ChannelID_t>;
     
     // Read the bad channels as a vector, then convert it into a set
-    chan_vect_t BadChannels
-      = pset.get<chan_vect_t>("BadChannels", chan_vect_t());
-    std::copy(
-      BadChannels.begin(), BadChannels.end(),
-      std::inserter(fBadChannels, fBadChannels.begin())
-      );
+    auto BadChannels = pset.get<chan_vect_t>("BadChannels", {});
+    cet::copy_all(BadChannels,
+                  std::inserter(fBadChannels, fBadChannels.begin()));
     
     // Read the noise channels as a vector, then convert it into a set
-    chan_vect_t NoisyChannels
-      = pset.get<chan_vect_t>("NoisyChannels", chan_vect_t());
-    std::copy(
-      NoisyChannels.begin(), NoisyChannels.end(),
-      std::inserter(fNoisyChannels, fNoisyChannels.begin())
-      );
+    auto NoisyChannels = pset.get<chan_vect_t>("NoisyChannels", {});
+    cet::copy_all(NoisyChannels,
+                  std::inserter(fNoisyChannels, fNoisyChannels.begin()));
     
   } // SimpleChannelStatus::SimpleChannelStatus()
   

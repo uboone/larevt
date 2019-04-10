@@ -18,13 +18,10 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-
-
 namespace lariov {
 
   //----------------------------------------------------------------------------
-  SimpleChannelStatusService::SimpleChannelStatusService
-    (fhicl::ParameterSet const& pset, art::ActivityRegistry&)
+  SimpleChannelStatusService::SimpleChannelStatusService(fhicl::ParameterSet const& pset)
   {
     SimpleChannelStatus* simple_filter = new SimpleChannelStatus(pset);
     

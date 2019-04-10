@@ -49,8 +49,7 @@ namespace lariov {
       public:
     
     /// Constructor: reads the channel IDs from the configuration
-    SimpleChannelStatusService
-      (fhicl::ParameterSet const& pset, art::ActivityRegistry&);
+    SimpleChannelStatusService(fhicl::ParameterSet const& pset);
     
     
       private:

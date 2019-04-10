@@ -23,7 +23,6 @@
 // include the proper bit of the framework
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDFilter.h" 
-#include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Optional/TFileService.h" 
 #include "art/Framework/Principal/Event.h" 
 #include "messagefacility/MessageLogger/MessageLogger.h"

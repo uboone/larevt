@@ -2,7 +2,7 @@
 
 namespace lariov {
 
-  WebReaderService::WebReaderService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg)
+  WebReaderService::WebReaderService(fhicl::ParameterSet const& pset)
     : _server  ( pset.get< std::string  >( "WDA_SERVER"  ) )
     , _port    ( pset.get< std::string  >( "WDA_PORT"    ) )
     , _db      ( pset.get< std::string  >( "WDA_DBNAME"  ) )
