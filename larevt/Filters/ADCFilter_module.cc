@@ -70,7 +70,7 @@ namespace filter {
       if(!rawdigitView.size()) return false;
       
       lariov::ChannelStatusProvider const& channelFilter
-        = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
+        = art::ServiceHandle<lariov::ChannelStatusService const>()->GetProvider();
 
       // look through the good channels
 //      for(const raw::RawDigit* digit: filter::SelectGoodChannels(rawdigitView))

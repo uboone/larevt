@@ -85,7 +85,7 @@ namespace filt {
   //-------------------------------------------------
   void EmptyFilter::beginJob()
   {
-    art::ServiceHandle<art::TFileService> tfs;
+    art::ServiceHandle<art::TFileService const> tfs;
     totHitHist = tfs->make<TH1I>("totHitHist","Hit Number Per Event",750,0,1500);
     totIonSelHist = tfs->make<TH2D>("totIonSelHist","Ionization Per selected Event",500,0,20000,500,0,20000);
     totIonRejHist = tfs->make<TH2D>("totIonRejHist","Ionization Per rejected Event",500,0,20000,500,0,20000);
@@ -105,7 +105,7 @@ namespace filt {
     double indIon(0.0), colIon(0.0);
     int event = evt.id().event();
     
-    art::ServiceHandle<geo::Geometry> geom;
+    art::ServiceHandle<geo::Geometry const> geom;
     art::Handle< std::vector<recob::Hit> > hitHandle;
     evt.getByLabel(fHitsModuleLabel,hitHandle);
     art::PtrVector<recob::Hit> hitvec;

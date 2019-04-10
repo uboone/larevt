@@ -83,7 +83,7 @@ void WebReaderTest::analyze(art::Event const & e)
     TTimeStamp now   (start);
 
     // Now create DBI instance and loop over sampling points
-    art::ServiceHandle<lariov::WebReaderService> db_handle;
+    art::ServiceHandle<lariov::WebReaderService const> db_handle;
     auto& db = db_handle->GetWebReader<double>();
 
     int period = (int)( (end.GetSec() - start.GetSec()) / (double)(npoints) );
@@ -120,7 +120,7 @@ void WebReaderTest::analyze(art::Event const & e)
 
     // Plot in TGraph
     // Store in a histogram
-    art::ServiceHandle<art::TFileService> fs;
+    art::ServiceHandle<art::TFileService const> fs;
     gPed = fs->make<TGraph>(npoints,&xarray[0],&yarray[0]);
     gPed->SetName("gPed");
     gPed->SetTitle("Pedestal Mean Value Over Time; ;Pedestal Mean");

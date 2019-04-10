@@ -174,7 +174,7 @@ namespace caldata{
     
       
     // get the geometry
-    art::ServiceHandle<geo::Geometry> geom;
+    art::ServiceHandle<geo::Geometry const> geom;
 
     std::vector<double> decayConsts;  
     std::vector<int> kernMap;
@@ -217,7 +217,7 @@ namespace caldata{
     unsigned int bin(0);     // time bin loop variable
     
     lariov::ChannelStatusProvider const& channelStatus
-      = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
+      = art::ServiceHandle<lariov::ChannelStatusService const>()->GetProvider();
 
     double decayConst = 0.;  // exponential decay constant of electronics shaping
     double fitAmplitude    = 0.;  //This is the seed value for the amplitude in the exponential tail fit 

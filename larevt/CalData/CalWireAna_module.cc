@@ -114,7 +114,7 @@ namespace caldata{
   void CalWireAna::beginJob() 
   {
     // get access to the TFile service
-    art::ServiceHandle<art::TFileService> tfs;
+    art::ServiceHandle<art::TFileService const> tfs;
 
     fDiffsR          = tfs->make<TH1F>("One timestamp diffs in RawDigits", ";#Delta ADC;",        40,   -19.5,  20.5);
     fDiffsW          = tfs->make<TH1F>("One timestamp diffs in Wires", ";#Delta ADC;",        20,   -9.5,  10.5);
@@ -159,7 +159,7 @@ namespace caldata{
     // loop over the raw digits and get the adc vector for each, then compress it and uncompress it
 
     lariov::ChannelStatusProvider const& channelStatus
-      = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
+      = art::ServiceHandle<lariov::ChannelStatusService const>()->GetProvider();
     art::Handle< std::vector<raw::RawDigit> > rdHandle;
     evt.getByLabel(fDetSimModuleLabel,rdHandle);
     art::Handle< std::vector<recob::Wire> > wHandle;
@@ -180,7 +180,7 @@ namespace caldata{
       rdvec.push_back(r);
     }
 
-    art::ServiceHandle<geo::Geometry> geom;
+    art::ServiceHandle<geo::Geometry const> geom;
     art::ServiceHandle<util::LArFFT> fft;
     double pedestal = rdvec[0]->GetPedestal();
     double threshold = 9.0;

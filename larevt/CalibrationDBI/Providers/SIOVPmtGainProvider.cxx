@@ -47,7 +47,7 @@ namespace lariov {
       defaultGain.SetGainErr(default_gain_err);
       defaultGain.SetExtraInfo(CalibrationExtraInfo("PmtGain"));
       
-      art::ServiceHandle<geo::Geometry> geo;
+      art::ServiceHandle<geo::Geometry const> geo;
       for (unsigned int od=0; od!=geo->NOpDets(); ++od) {
         if (geo->IsValidOpChannel(od)) {
 	  defaultGain.SetChannel(od);

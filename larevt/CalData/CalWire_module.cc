@@ -170,7 +170,7 @@ namespace caldata{
     
       
     // get the geometry
-    art::ServiceHandle<geo::Geometry> geom;
+    art::ServiceHandle<geo::Geometry const> geom;
 
     std::vector<double> decayConsts;  
     std::vector<int> kernMap;

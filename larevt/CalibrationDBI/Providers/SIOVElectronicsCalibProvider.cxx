@@ -51,7 +51,7 @@ namespace lariov {
       defaultCalib.SetShapingTimeErr(default_st_err);
       defaultCalib.SetExtraInfo(CalibrationExtraInfo("ElectronicsCalib"));
       
-      art::ServiceHandle<geo::Geometry> geo;
+      art::ServiceHandle<geo::Geometry const> geo;
       geo::wire_id_iterator itW = geo->begin_wire_id();
       for (; itW != geo->end_wire_id(); ++itW) {
 	DBChannelID_t ch = geo->PlaneWireToChannel(*itW);

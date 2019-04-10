@@ -116,7 +116,7 @@ namespace lariov {
     //---
     mf::LogVerbatim("SimpleChannelStatusTest")
       << "\nTesting service interface...";
-    art::ServiceHandle<lariov::ChannelStatusService> StatusSrvHandle;
+    art::ServiceHandle<lariov::ChannelStatusService const> StatusSrvHandle;
   /* // since the service does not share the interface of the provider,
      // this test can't be
     const lariov::ChannelStatusService* pStatusSrv = &*StatusSrvHandle;

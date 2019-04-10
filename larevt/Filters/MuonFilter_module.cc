@@ -93,9 +93,9 @@ namespace filter {
   //-------------------------------------------------
   bool MuonFilter::filter(art::Event &evt)
   { 
-    art::ServiceHandle<geo::Geometry> geom;
-    //    art::ServiceHandle<detinfo::LArPropertiesService> larprop_s;
-    //    art::ServiceHandle<detinfo::DetectorPropertiesService> detprop_s;
+    art::ServiceHandle<geo::Geometry const> geom;
+    //    art::ServiceHandle<detinfo::LArPropertiesService const> larprop_s;
+    //    art::ServiceHandle<detinfo::DetectorPropertiesService const> detprop_s;
     auto const * detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
     
     //Drift Velocity in cm/us Sampling rate in ns

@@ -26,7 +26,7 @@ namespace lariov {
     SimpleChannelStatus* simple_filter = new SimpleChannelStatus(pset);
     
     raw::ChannelID_t MaxChannel
-      = raw::ChannelID_t(art::ServiceHandle<geo::Geometry>()->Nchannels() - 1);
+      = raw::ChannelID_t(art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1);
     
     simple_filter->Setup(MaxChannel);
     

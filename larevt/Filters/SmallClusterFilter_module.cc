@@ -56,7 +56,7 @@ namespace cluster {
 			unsigned int &t,
 			unsigned int &w);
     
-    art::ServiceHandle<geo::Geometry>            geom; ///< handle to geometry service
+    art::ServiceHandle<geo::Geometry const>            geom; ///< handle to geometry service
     const detinfo::DetectorProperties* detp = lar::providerFrom<detinfo::DetectorPropertiesService>(); ///< const ptr to det properties data provider
     util::GeometryUtilities                      gser; ///< geometry utilities   
     std::vector< unsigned int >fNWires;		       ///< Number of wires on each plane

@@ -47,13 +47,13 @@ namespace lariov {
    *      
    * to
    *      
-   *      art::ServiceHandle<lariov::ChannelStatusService> chanFilt;
+   *      art::ServiceHandle<lariov::ChannelStatusService const> chanFilt;
    *      
    * (include files CalibrationDBI/Interface/ChannelStatusService.h instead of
    * Filters/ChannelFilter.h) or
    *      
    *      lariov::ChannelStatusProvider const& chanFilt
-   *        = art::ServiceHandle<lariov::ChannelStatusService>()
+   *        = art::ServiceHandle<lariov::ChannelStatusService const>()
    *          ->GetProvider();
    *      
    * (include files CalibrationDBI/Interface/ChannelStatusService.h and

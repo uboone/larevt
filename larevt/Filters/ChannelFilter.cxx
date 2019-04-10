@@ -43,7 +43,7 @@
 // often don't have enough.
 //
 filter::ChannelFilter::ChannelFilter() try:
-  provider(art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider())
+  provider(art::ServiceHandle<lariov::ChannelStatusService const>()->GetProvider())
 {
   
   MF_LOG_ERROR("ChannelFilter") << "ChannelFilter is now deprecated."

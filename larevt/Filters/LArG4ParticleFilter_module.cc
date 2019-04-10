@@ -40,7 +40,7 @@ namespace filt{
 
       double CalculateLength(const std::vector<TVector3> &position_segment);
 
-      art::ServiceHandle<geo::Geometry> fGeom;
+      art::ServiceHandle<geo::Geometry const> fGeom;
 
 
       std::vector<int> fInterestingPDGs;
@@ -75,7 +75,7 @@ namespace filt{
 
   bool LArG4ParticleFilter::filter(art::Event & e){
 
-    //art::ServiceHandle<geo::Geometry> geom;
+    //art::ServiceHandle<geo::Geometry const> geom;
 
     //Reset the found vector
     for (unsigned int i = 0; i < fFoundInterestingParticles.size(); i++){

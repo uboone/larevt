@@ -75,7 +75,7 @@ namespace lariov {
       DefaultInd.SetPedRms(default_indrms);
       DefaultInd.SetPedRmsErr(default_rms_err);
       
-      art::ServiceHandle<geo::Geometry> geo;
+      art::ServiceHandle<geo::Geometry const> geo;
       geo::wire_id_iterator itW = geo->begin_wire_id();
       for ( ; itW != geo->end_wire_id(); ++itW) {
         DBChannelID_t ch = geo->PlaneWireToChannel(*itW);
