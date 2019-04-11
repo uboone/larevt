@@ -6,8 +6,6 @@
  */
 
 // C/C++ standard library
-#include <vector>
-#include <string>
 
 // Framework includes
 #include "fhiclcpp/ParameterSet.h"

@@ -18,7 +18,6 @@
 
 
 // C/C++ standard libraries
-#include <vector>
 #include <iterator> // std::inserter()
 #include <utility> // std::pair<>
 

@@ -9,7 +9,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
-#include <vector>
 #include <stdint.h>
 
 //Framework Includes
@@ -21,7 +20,6 @@
 #include "art/Framework/Principal/Handle.h" 
 #include "art/Framework/Principal/View.h" 
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "canvas/Persistency/Common/Ptr.h" 
 
 //Larsoft Includes
 #include "lardataobj/RawData/raw.h"

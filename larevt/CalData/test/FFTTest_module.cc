@@ -5,7 +5,6 @@
 //
 // Created:  29-Aug-2011  H. Greenlee
 
-#include <vector>
 #include <iostream>
 #include <cmath>
 

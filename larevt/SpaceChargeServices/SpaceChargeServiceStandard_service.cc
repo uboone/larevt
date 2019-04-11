@@ -8,7 +8,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 // C++ language includes
-#include <iostream>
 
 // LArSoft includes
 #include "larevt/SpaceChargeServices/SpaceChargeServiceStandard.h"

@@ -26,7 +26,6 @@
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
-#include <iostream>
 
 
 //

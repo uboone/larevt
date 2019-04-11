@@ -4,9 +4,7 @@
 //The user can ask for events which contain multiple types of interesting particles, each with their own requirements.
 
 //STL
-#include <iostream>
 #include <utility>
-#include <set>
 
 //ART
 #include "art/Framework/Core/EDFilter.h" 

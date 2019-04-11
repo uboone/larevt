@@ -34,7 +34,6 @@
 #include <iostream>
 #include <ostream>
 #include <set>
-#include <string>
 #include <memory> // std::unique_ptr<>
 #include <algorithm> // std::equal(), std::transform()
 
