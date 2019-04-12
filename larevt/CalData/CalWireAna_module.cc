@@ -51,7 +51,6 @@ namespace caldata {
   public:
 
     explicit CalWireAna(fhicl::ParameterSet const& pset);
-    virtual ~CalWireAna();
 
     /// read/write access to event
     void analyze (const art::Event& evt);
@@ -102,11 +101,6 @@ namespace caldata{
     , fDetSimModuleLabel (pset.get< std::string >("DetSimModuleLabel"))
   {
 
-  }
-
-  //-------------------------------------------------
-  CalWireAna::~CalWireAna()
-  {
   }
 
   //-------------------------------------------------
