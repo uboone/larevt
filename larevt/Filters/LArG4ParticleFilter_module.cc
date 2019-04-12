@@ -7,9 +7,9 @@
 #include <utility>
 
 //ART
-#include "art/Framework/Core/EDFilter.h" 
-#include "art/Framework/Core/ModuleMacros.h" 
-#include "art/Framework/Principal/Event.h" 
+#include "art/Framework/Core/EDFilter.h"
+#include "art/Framework/Core/ModuleMacros.h"
+#include "art/Framework/Principal/Event.h"
 
 //LArSoft
 #include "larcore/Geometry/Geometry.h"

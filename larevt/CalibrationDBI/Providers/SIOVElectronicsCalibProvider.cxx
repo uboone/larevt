@@ -10,17 +10,17 @@
 
 namespace lariov {
 
-  //constructor      
+  //constructor
   SIOVElectronicsCalibProvider::SIOVElectronicsCalibProvider(fhicl::ParameterSet const& p) :
     DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
     fEventTimeStamp(0),
     fCurrentTimeStamp(0) {
-    
+
     this->Reconfigure(p);
   }
-      
+
   void SIOVElectronicsCalibProvider::Reconfigure(fhicl::ParameterSet const& p) {
-    
+
     this->DatabaseRetrievalAlg::Reconfigure(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"));
     fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
@@ -50,7 +50,7 @@ namespace lariov {
       defaultCalib.SetShapingTime(default_st);
       defaultCalib.SetShapingTimeErr(default_st_err);
       defaultCalib.SetExtraInfo(CalibrationExtraInfo("ElectronicsCalib"));
-      
+
       art::ServiceHandle<geo::Geometry const> geo;
       geo::wire_id_iterator itW = geo->begin_wire_id();
       for (; itW != geo->end_wire_id(); ++itW) {
@@ -58,7 +58,7 @@ namespace lariov {
 	defaultCalib.SetChannel(ch);
 	fData.AddOrReplaceRow(defaultCalib);
       }
-      
+
     }
     else if (fDataSource == DataSource::File) {
       cet::search_path sp("FW_SEARCH_PATH");
@@ -69,20 +69,20 @@ namespace lariov {
         throw cet::exception("SIOVElectronicsCalibProvider")
           << "File "<<abs_fp<<" is not found.";
       }
-      
+
       std::string line;
       ElectronicsCalib dp(0);
       while (std::getline(file, line)) {
         size_t current_comma = line.find(',');
-        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));     
+        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));
         float gain             = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
-        
+
         current_comma = line.find(',',current_comma+1);
         float gain_err         = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
-	
+
 	current_comma = line.find(',',current_comma+1);
         float shaping_time     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
-	
+
 	current_comma = line.find(',',current_comma+1);
         float shaping_time_err = std::stof( line.substr(current_comma+1) );
 
@@ -94,7 +94,7 @@ namespace lariov {
 	dp.SetShapingTime(shaping_time);
         dp.SetShapingTimeErr(shaping_time_err);
 	dp.SetExtraInfo(info);
-        
+
         fData.AddOrReplaceRow(dp);
       }
     }
@@ -113,7 +113,7 @@ namespace lariov {
   // Maybe update method cached data (public non-const version).
 
   bool SIOVElectronicsCalibProvider::Update(DBTimeStamp_t ts) {
-    
+
     fEventTimeStamp = ts;
     return DBUpdate(ts);
   }
@@ -131,10 +131,10 @@ namespace lariov {
 
     bool result = false;
     if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
-      
+
       mf::LogInfo("SIOVElectronicsCalibProvider") << "SIOVElectronicsCalibProvider::DBUpdate called with new timestamp.";
 
-      fCurrentTimeStamp = ts;     
+      fCurrentTimeStamp = ts;
 
       // Call non-const base class method.
 
@@ -150,10 +150,10 @@ namespace lariov {
 
 	  double gain, gain_err, shaping_time, shaping_time_err;
 	  fFolder->GetNamedChannelData(*it, "gain",     gain);
-	  fFolder->GetNamedChannelData(*it, "gain_err", gain_err); 
+	  fFolder->GetNamedChannelData(*it, "gain_err", gain_err);
 	  fFolder->GetNamedChannelData(*it, "shaping_time",     shaping_time);
-	  fFolder->GetNamedChannelData(*it, "shaping_time_err", shaping_time_err); 
-      
+	  fFolder->GetNamedChannelData(*it, "shaping_time_err", shaping_time_err);
+
 
 	  ElectronicsCalib pg(*it);
 	  pg.SetGain( (float)gain );
@@ -169,28 +169,28 @@ namespace lariov {
 
     return result;
   }
-  
-  const ElectronicsCalib& SIOVElectronicsCalibProvider::ElectronicsCalibObject(DBChannelID_t ch) const { 
+
+  const ElectronicsCalib& SIOVElectronicsCalibProvider::ElectronicsCalibObject(DBChannelID_t ch) const {
     DBUpdate();
     return fData.GetRow(ch);
   }
-      
+
   float SIOVElectronicsCalibProvider::Gain(DBChannelID_t ch) const {
     return this->ElectronicsCalibObject(ch).Gain();
   }
-  
+
   float SIOVElectronicsCalibProvider::GainErr(DBChannelID_t ch) const {
     return this->ElectronicsCalibObject(ch).GainErr();
   }
-  
+
   float SIOVElectronicsCalibProvider::ShapingTime(DBChannelID_t ch) const {
     return this->ElectronicsCalibObject(ch).ShapingTime();
   }
-  
+
   float SIOVElectronicsCalibProvider::ShapingTimeErr(DBChannelID_t ch) const {
     return this->ElectronicsCalibObject(ch).ShapingTimeErr();
   }
-  
+
   CalibrationExtraInfo const& SIOVElectronicsCalibProvider::ExtraInfo(DBChannelID_t ch) const {
     return this->ElectronicsCalibObject(ch).ExtraInfo();
   }

@@ -2,7 +2,7 @@
  * \file ChData.h
  *
  * \ingroup IOVData
- * 
+ *
  * \brief Class def header for a class ChData
  *
  * @author kterao
@@ -21,7 +21,7 @@ namespace lariov {
      \class ChData
   */
   class ChData {
-    
+
     public:
 
       /// Constructor
@@ -42,7 +42,7 @@ namespace lariov {
     protected:
 
       unsigned int fChannel;
-    
+
   };
 }
 
@@ -58,5 +58,5 @@ namespace std {
 
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

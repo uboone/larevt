@@ -34,41 +34,41 @@ namespace lariov {
    * this interface.
    * The simplest implementation is provided in LArSoft:
    * SimpleChannelStatusService.
-   * 
+   *
    * Currently, the service provides interface for the following information:
    * - goodness of the channel: good or bad (dead or unusable)
    * - noisiness of the channel: good or noisy (or compromised in some way)
    * - presence of the channel: connected to a wire or not
-   * 
+   *
    * The use of this service replaces the deprecated ChannelFilter class.
    * An algorithm that used to use ChannelFilter class can be updated. From:
-   *      
+   *
    *      filter::ChannelFilter* chanFilt = new filter::ChannelFilter();
-   *      
+   *
    * to
-   *      
+   *
    *      art::ServiceHandle<lariov::ChannelStatusService const> chanFilt;
-   *      
+   *
    * (include files CalibrationDBI/Interface/ChannelStatusService.h instead of
    * Filters/ChannelFilter.h) or
-   *      
+   *
    *      lariov::ChannelStatusProvider const& chanFilt
    *        = art::ServiceHandle<lariov::ChannelStatusService const>()
    *          ->GetProvider();
-   *      
+   *
    * (include files CalibrationDBI/Interface/ChannelStatusService.h and
    * CalibrationDBI/Interface/ChannelStatusProvider.h instead of
    * Filters/ChannelFilter.h).
    * The latter object can in principle be passed to algorithms that are not
    * art-aware.
-   * 
+   *
    */
   class ChannelStatusService {
-    
+
     public:
-      
+
       using provider_type = ChannelStatusProvider;
-      
+
       /// Destructor
       virtual ~ChannelStatusService() = default;
 
@@ -92,27 +92,27 @@ namespace lariov {
       ChannelStatusProvider const* GetFilterPtr() const
         { return GetProviderPtr(); }
       //@}
-      
-      
+
+
       ChannelStatusProvider const* provider() const
         { return GetProviderPtr(); }
-      
+
       //
       // end of interface
       //
-    
+
     private:
-    
-      /// Returns a pointer to the service provider 
+
+      /// Returns a pointer to the service provider
       virtual ChannelStatusProvider const* DoGetProviderPtr() const = 0;
 
       /// Returns a reference to the service provider
       virtual ChannelStatusProvider const& DoGetProvider() const = 0;
-    
-    
-    
+
+
+
   }; // class ChannelStatusService
-  
+
 } // namespace lariov
 
 

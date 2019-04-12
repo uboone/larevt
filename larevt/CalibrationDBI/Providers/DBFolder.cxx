@@ -35,16 +35,16 @@ namespace lariov {
     fTypes.clear();
     fCachedRow = -1;
     fCachedChannel = 0;
-    
+
     fMaximumTimeout = 4*60; //4 minutes
   }
-  
+
   DBFolder::~DBFolder() {
     if (fCachedDataset) releaseDataset(fCachedDataset);
   }
 
   int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, bool& data) {
-  
+
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
     int err=0;
@@ -58,17 +58,17 @@ namespace lariov {
       data = false;
     }
     else std::cout<<"(DBFolder) ERROR: Can't identify data: "<<std::string(buf, str_size)<<" as boolean!"<<std::endl;
-    
+
     releaseTuple(tup);
     return err;
   }
-  
+
   int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, long& data) {
 
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
     int err=0;
-    
+
     //first handle special case that the db data is boolean, but user mistakenly used long version of this function
     char buf[kBUFFER_SIZE];
     int str_size = getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
@@ -78,7 +78,7 @@ namespace lariov {
     else if (std::string(buf, str_size)=="False") {
       data = 0;
     }
-    else { //ok, we really have a long (hopefully)   
+    else { //ok, we really have a long (hopefully)
       data = getLongValue(tup, col, &err);
     }
     releaseTuple(tup);
@@ -106,16 +106,16 @@ namespace lariov {
     releaseTuple(tup);
     return err;
   }
-  
+
   int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::vector<double>& data) {
-    
+
     data.clear();
-    
+
     Tuple tup;
     size_t col = this->GetTupleColumn(channel, name, tup);
     int err=0;
     double buf[kBUFFER_SIZE];
-    
+
     DataRec *dataRec = (DataRec *)tup;
     // for c2: col is an unsigned int and cannot be less than 0
     // if (col < 0 || col >= dataRec->ncolumns) {
@@ -123,14 +123,14 @@ namespace lariov {
       err=-1;
       return err;
     }
-    
+
     char* sptr = dataRec->columns[col];
     if ( *sptr == '[') sptr +=1;  //expect an initial bracket and skip it
     else {
       err=-2;
       return err;
     }
-    
+
     char* eptr;
     double val;
     unsigned int array_size=0;
@@ -138,30 +138,30 @@ namespace lariov {
       val = strtod(sptr, &eptr); //Try to convert
       if (sptr==eptr) break;     //conversion failed
       if (*sptr=='\0') break;    //end loop if buffer ends
-      
+
       buf[array_size++] = val;
-      
+
       if ( *eptr == ']') break;  //found the closing bracket, we're done
       else sptr = eptr+1;        //point to the next value
     }
-    
+
     data.insert(data.begin(), buf, buf + array_size);
     releaseTuple(tup);
     return err;
   }
-  
+
   int DBFolder::GetChannelList( std::vector<DBChannelID_t>& channels ) const {
-    
+
     channels.clear();
     if (!fCachedDataset) return 1;
-    
+
     Tuple tup;
     int err=0;
     for ( int row = 0; row != fNRows; ++row) {
       tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS);
       channels.push_back( (DBChannelID_t)getLongValue(tup,0,&err) );
       releaseTuple(tup);
-    }  
+    }
     return err;
   }
 
@@ -180,7 +180,7 @@ namespace lariov {
     }
 
     //if cached row is not valid, find the new row
-    if (row == -1) {   
+    if (row == -1) {
 //std::cout<<"Channel "<<channel<<" not cached"<<std::endl;
       //binary search for channel
       DBChannelID_t val;
@@ -193,26 +193,26 @@ namespace lariov {
 	releaseTuple(tup);
 
 	if (val == channel ) break;
-	  
+
 	if (val > channel) h = row - 1;
 	else            l = row + 1;
 
 	row = (l + h)/2;
       }
-      
+
       //get the tuple to be returned, check that the found row matches the requested channel
-      tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS); 
+      tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS);
       if ( channel != (DBChannelID_t)getLongValue(tup, 0, &err) ) {
         releaseTuple(tup);
 	std::string msg = "Channel " + std::to_string(channel) + " is not found in database!";
 	throw WebError(msg);
       }
-      
-      
+
+
       //update caching info
       fCachedChannel = channel;
       fCachedRow = row;
-    
+
     }
 
     //get the column corresponding to input string name and return
@@ -227,7 +227,7 @@ namespace lariov {
 
   //returns true if an Update is performed, false if not
   bool DBFolder::UpdateData( DBTimeStamp_t raw_time) {
-  
+
     //convert to IOVTimeStamp
     IOVTimeStamp ts = TimeStampDecoder::DecodeTimeStamp(raw_time);
 
@@ -249,12 +249,12 @@ namespace lariov {
     int status = -1;
     fCachedDataset = getDataWithTimeout(fullurl.str().c_str(), NULL, fMaximumTimeout, &err);
     status = getHTTPstatus(fCachedDataset);
-    
+
     //Can add some more queries here if we get http error 504
     /*if (status == 504) {
       //try again
     }*/
-    
+
     if (status != 200) {
       std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(fCachedDataset));
       throw WebError(msg);
@@ -272,7 +272,7 @@ namespace lariov {
 
     //start and end times
     Tuple tup;
-    tup = getTuple(fCachedDataset, 0);   
+    tup = getTuple(fCachedDataset, 0);
     char buf[kBUFFER_SIZE];
     getStringValue(tup,0, buf, kBUFFER_SIZE, &err);
     fCachedStart = IOVTimeStamp::GetFromString(std::string(buf));

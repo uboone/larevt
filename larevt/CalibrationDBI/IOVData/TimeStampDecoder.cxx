@@ -8,7 +8,7 @@ namespace lariov {
   //Do NOT change the following code without very good reason!
   //MicroBooNE and other experiments depend on it!
   IOVTimeStamp TimeStampDecoder::DecodeTimeStamp(DBTimeStamp_t ts) {
-        
+
     std::string time = std::to_string(ts);
 
     //microboone stores timestamp as ns from epoch, so there should be 19 digits.
@@ -30,6 +30,6 @@ namespace lariov {
     else {
       std::string msg = "TimeStampDecoder: I do not know how to convert this timestamp: " + time;
       throw IOVDataError(msg);
-    } 
+    }
   }
 }//end namespace lariov

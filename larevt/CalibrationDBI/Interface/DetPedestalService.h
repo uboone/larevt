@@ -17,7 +17,7 @@ namespace lariov{
      art service interface for detector pedestal conditions retrieval
   */
   class DetPedestalService {
-  
+
     public:
       using provider_type = DetPedestalProvider;
 
@@ -27,13 +27,13 @@ namespace lariov{
       const DetPedestalProvider& GetPedestalProvider() const {
         return this->DoGetPedestalProvider();
       }
-      
+
       DetPedestalProvider const* provider() const
         { return &DoGetPedestalProvider(); }
-      
-      
+
+
     private:
-      
+
       virtual const DetPedestalProvider& DoGetPedestalProvider() const = 0;
   };
 }//end namespace lariov

@@ -2,7 +2,7 @@
  * \file IOVDataError.h
  *
  * \ingroup IOVData
- * 
+ *
  * \brief Collection of exception classes for IOVData
  *
  * @author kterao
@@ -32,7 +32,7 @@ namespace lariov {
       fMsg += msg;
       fMsg += "\033[00m";
     }
-    
+
     virtual ~IOVDataError() throw(){};
     virtual const char* what() const throw()
     { return fMsg.c_str(); }
@@ -44,5 +44,5 @@ namespace lariov {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

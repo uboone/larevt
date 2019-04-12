@@ -23,15 +23,15 @@ extern "C" {
 //Framework Includes
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDFilter.h"
-#include "art/Framework/Principal/Event.h" 
-#include "fhiclcpp/ParameterSet.h" 
-#include "art/Framework/Principal/Handle.h" 
-#include "canvas/Persistency/Common/Ptr.h" 
-#include "canvas/Persistency/Common/PtrVector.h" 
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Framework/Services/Optional/TFileService.h" 
-#include "art/Framework/Services/Optional/TFileDirectory.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h" 
+#include "art/Framework/Principal/Event.h"
+#include "fhiclcpp/ParameterSet.h"
+#include "art/Framework/Principal/Handle.h"
+#include "canvas/Persistency/Common/Ptr.h"
+#include "canvas/Persistency/Common/PtrVector.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "art/Framework/Services/Optional/TFileDirectory.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 
 //Larsoft Includes
@@ -42,65 +42,65 @@ extern "C" {
 #include "larcorealg/Geometry/WireGeo.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/Utilities/AssociationUtil.h"
- 
+
 
 namespace filter {
 
  class MuonFilter : public art::EDFilter  {
-    
-  public:
-    
-    explicit MuonFilter(fhicl::ParameterSet const& ); 
 
-  private:  
+  public:
+
+    explicit MuonFilter(fhicl::ParameterSet const& );
+
+  private:
     bool filter(art::Event& evt) override;
     void reconfigure(fhicl::ParameterSet const& p);
- 
+
     std::string fClusterModuleLabel;
     std::string fLineModuleLabel;
-    std::vector<double>  fCuts; 
-    double fDCenter; 
+    std::vector<double>  fCuts;
+    double fDCenter;
     double fDelay;
     double fTolerance;
     double fMaxIon;
     double fIonFactor;
     int    fDeltaWire; ///< allowed differences in wire number between 2 planes
-  
+
   }; // class MuonFilter
 
   //-------------------------------------------------
-  MuonFilter::MuonFilter(fhicl::ParameterSet const & pset) 
+  MuonFilter::MuonFilter(fhicl::ParameterSet const & pset)
     : EDFilter{pset}
   {
-    this->reconfigure(pset);   
+    this->reconfigure(pset);
   }
 
   //------------------------------------------------
   void MuonFilter::reconfigure(fhicl::ParameterSet const& p)
   {
-    fClusterModuleLabel = p.get< std::string         >("ClusterModuleLabel"); 
-    fLineModuleLabel    = p.get< std::string               >("LineModuleLabel");    
-    fTolerance          = p.get< double                    >("Tolerance");               
-    fDelay              = p.get< double                    >("Delay");               
-    fDCenter            = p.get< double                    >("DCenter");               
-    fMaxIon             = p.get< double                    >("MaxIon");               
-    fIonFactor          = p.get< double                    >("IonFactor");          
+    fClusterModuleLabel = p.get< std::string         >("ClusterModuleLabel");
+    fLineModuleLabel    = p.get< std::string               >("LineModuleLabel");
+    fTolerance          = p.get< double                    >("Tolerance");
+    fDelay              = p.get< double                    >("Delay");
+    fDCenter            = p.get< double                    >("DCenter");
+    fMaxIon             = p.get< double                    >("MaxIon");
+    fIonFactor          = p.get< double                    >("IonFactor");
     fCuts               = p.get< std::vector<double> >("Cuts");
     fDeltaWire          = p.get< int                 >("DeltaWire");
   }
 
   //-------------------------------------------------
   bool MuonFilter::filter(art::Event &evt)
-  { 
+  {
     art::ServiceHandle<geo::Geometry const> geom;
     //    art::ServiceHandle<detinfo::LArPropertiesService const> larprop_s;
     //    art::ServiceHandle<detinfo::DetectorPropertiesService const> detprop_s;
     auto const * detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-    
-    //Drift Velocity in cm/us Sampling rate in ns
-    double drift = detprop->DriftVelocity(detprop->Efield(), detprop->Temperature())*detprop->SamplingRate()/1000.0; 
 
-    //This code only works comparing 2 planes so for now these are the 
+    //Drift Velocity in cm/us Sampling rate in ns
+    double drift = detprop->DriftVelocity(detprop->Efield(), detprop->Temperature())*detprop->SamplingRate()/1000.0;
+
+    //This code only works comparing 2 planes so for now these are the
     // last induction plane and collection plane
     int vPlane = geom->Nplanes() - 1;
     geo::View_t vView = geom->Plane(vPlane).View();
@@ -150,45 +150,45 @@ namespace filter {
       if (hits.size()>0 && clusters[cl]->View()==uView)
         inductionSegments.push_back(clusters[cl]);
       else if(hits.size()>0 && clusters[cl]->View() == vView) collectionSegments.push_back(clusters[cl]);
-    } 
-    
+    }
+
     art::FindManyP<recob::Hit> fmhi(inductionSegments,  evt, fClusterModuleLabel);
     art::FindManyP<recob::Hit> fmhc(collectionSegments, evt, fClusterModuleLabel);
 
-    if(inductionSegments.size() == 0 || collectionSegments.size() == 0) { 
+    if(inductionSegments.size() == 0 || collectionSegments.size() == 0) {
       mf::LogInfo("MuonFilter") << "At least one plane with no track";
     }
-    else {  
+    else {
 
-      for(unsigned int i = 0; i < inductionSegments.size(); i++) { 
+      for(unsigned int i = 0; i < inductionSegments.size(); i++) {
         if(indMap[i]) continue;
         for(unsigned int j = 0; j < collectionSegments.size(); j++) {
-          if(colMap[j]) continue;        
+          if(colMap[j]) continue;
 
           art::Ptr<recob::Cluster>  indSeg = inductionSegments[i];
           art::Ptr<recob::Cluster>  colSeg = collectionSegments[j];
 
           std::vector< art::Ptr<recob::Hit> > indHits = fmhi.at(i);
-          
+
           std::vector< art::Ptr<recob::Hit> > colHits = fmhc.at(j);
-          
+
           double trk1Start = indSeg->StartTick()+fDelay;
           double trk1End = indSeg->EndTick()+fDelay;
           double trk2Start =colSeg->StartTick();
           double trk2End =colSeg->EndTick();
-          
+
           int uPos1 = indSeg->StartWire();
-          int uPos2 = indSeg->EndWire(); 
+          int uPos2 = indSeg->EndWire();
           int const vPos1 = colSeg->StartWire();
           int const vPos2 = colSeg->EndWire();
           mf::LogInfo("MuonFilter") << "I J " << i <<" " << j ;
-          mf::LogInfo("MuonFilter") << "Start/end " << indSeg->StartWire() 
-                                    <<" "<< colSeg->StartWire() 
-                                    <<" "<< indSeg->EndWire() 
+          mf::LogInfo("MuonFilter") << "Start/end " << indSeg->StartWire()
+                                    <<" "<< colSeg->StartWire()
+                                    <<" "<< indSeg->EndWire()
                                     <<" "<< colSeg->EndWire() ;
-          mf::LogInfo("MuonFilter")<<"U's "<< uPos1 <<" " << uPos2 
-                                   <<"V's "<< vPos1 <<" " << vPos2 
-                                   << " times " << trk1End <<" "<< trk2End 
+          mf::LogInfo("MuonFilter")<<"U's "<< uPos1 <<" " << uPos2
+                                   <<"V's "<< vPos1 <<" " << vPos2
+                                   << " times " << trk1End <<" "<< trk2End
                                    <<" "<< trk1Start <<" "<< trk2Start ;
           //need to have the corresponding endpoints matched
           //check if they match in this order else switch
@@ -200,8 +200,8 @@ namespace filter {
             mf::LogInfo("MuonFilter") << "Swapped1" ;
             std::swap(uPos1,uPos2);
           }
-          //check for time tolerance 
-          if((TMath::Abs(trk1Start-trk2Start) > fTolerance && TMath::Abs(trk1End-trk2End) > fTolerance) &&  
+          //check for time tolerance
+          if((TMath::Abs(trk1Start-trk2Start) > fTolerance && TMath::Abs(trk1End-trk2End) > fTolerance) &&
              (TMath::Abs(trk1Start-trk2End) < fTolerance && TMath::Abs(trk1End-trk2Start) < fTolerance)) {
             std::swap(trk1Start,trk1End);
             std::swap(uPos1,uPos2);
@@ -209,24 +209,24 @@ namespace filter {
           }
           mf::LogInfo("MuonFilter") << "Times: " << trk1Start <<" "<< trk2Start <<" "<<trk1End <<" "<<trk2End;
           //again needs to be fixed
-          ///\todo: the delta wire numbers seem a bit magic, 
+          ///\todo: the delta wire numbers seem a bit magic,
           ///\todo: should also change to using Geometry::ChannelsIntersect method
-          if((TMath::Abs(trk1Start-trk2Start) < fTolerance && TMath::Abs(trk1End-trk2End) < fTolerance)    && 
+          if((TMath::Abs(trk1Start-trk2Start) < fTolerance && TMath::Abs(trk1End-trk2End) < fTolerance)    &&
              (TMath::Abs(uPos1-vPos1) <=fDeltaWire+2 && TMath::Abs(uPos2-vPos2) <= fDeltaWire+2))
           {
             geo::WireID u_wID1(indSeg->Plane(), uPos1);
             geo::WireID u_wID2(indSeg->Plane(), uPos2);
             geo::WireID v_wID1(colSeg->Plane(), vPos1);
             geo::WireID v_wID2(colSeg->Plane(), vPos2);
-            
+
             double y1, y2, z1, z2;
             geom->IntersectionPoint(u_wID1, v_wID1, y1, z1);
             geom->IntersectionPoint(u_wID2, v_wID2, y2, z2);
-            
+
             double const x1 = (trk1Start+trk2Start)/2.0*drift-fDCenter;
             double const x2 = (trk1End+trk2End)/2.0*drift-fDCenter;
-            mf::LogInfo("MuonFilter") <<"Match " << matchNum 
-                                      <<" " << x1 << " " << y1 << " " << z1 
+            mf::LogInfo("MuonFilter") <<"Match " << matchNum
+                                      <<" " << x1 << " " << y1 << " " << z1
                                       <<" " << x2 << " " << y2 << " " << z2;
             bool x1edge,x2edge,y1edge, y2edge,z1edge,z2edge;
             indMap[i]=matchNum;
@@ -237,7 +237,7 @@ namespace filter {
             pointTemp[2]=z1;
             pointTemp[3]=x2;
             pointTemp[4]=y2;
-            pointTemp[5]=z2;        
+            pointTemp[5]=z2;
             x1edge =(TMath::Abs(x1) -fCuts[0] > 0);
             x2edge =(TMath::Abs(x2) -fCuts[0] > 0);
             y1edge =(TMath::Abs(y1) -fCuts[1] > 0);
@@ -246,7 +246,7 @@ namespace filter {
             z2edge =(TMath::Abs(z2) -fCuts[2] > 0);
             if((x1edge||y1edge||z1edge) && (x2edge||y2edge||z2edge)) {
               tGoing.push_back(pointTemp);
-              mf::LogInfo("MuonFilter") << "outside   Removed induction ion: ";          
+              mf::LogInfo("MuonFilter") << "outside   Removed induction ion: ";
 
               for(size_t h = 0; h < indHits.size(); h++){
                 mf::LogInfo("MuonFilter") << indHits[h]->PeakAmplitude() << " ";
@@ -254,23 +254,23 @@ namespace filter {
               }
               mf::LogInfo("MuonFilter")  <<"Removed collection ion: ";
 
-              for(size_t h = 0; h < colHits.size(); h++){ 
+              for(size_t h = 0; h < colHits.size(); h++){
                     mf::LogInfo("MuonFilter") << colHits[h]->PeakAmplitude() << " ";
                     colIon -= colHits[h]->PeakAmplitude();
               }
-              mf::LogInfo("MuonFilter")<<"Ionization outside track I/C: " << indIon << " "<<colIon;         
+              mf::LogInfo("MuonFilter")<<"Ionization outside track I/C: " << indIon << " "<<colIon;
             }
-            else if((x1edge || y1edge || z1edge)  && 
-                    !(x2edge || y2edge || z2edge) && 
+            else if((x1edge || y1edge || z1edge)  &&
+                    !(x2edge || y2edge || z2edge) &&
                     (z2-z1)>1.2){
               tGoing.push_back(pointTemp);
-              mf::LogInfo("MuonFilter") << "stopping   Removed induction ion: ";          
+              mf::LogInfo("MuonFilter") << "stopping   Removed induction ion: ";
               for(size_t h = 0; h < indHits.size(); h++){
                 mf::LogInfo("MuonFilter") <<indHits[h]->PeakAmplitude() << " ";
                 indIon -= indHits[h]->PeakAmplitude();
               }
               mf::LogInfo("MuonFilter")  <<"Removed collection ion: ";
-              for(size_t h = 0; h < colHits.size(); h++){ 
+              for(size_t h = 0; h < colHits.size(); h++){
                 mf::LogInfo("MuonFilter") << colHits[h]->PeakAmplitude()<< " ";
                 colIon -= colHits[h]->PeakAmplitude();
               }
@@ -278,41 +278,41 @@ namespace filter {
             }
             else {
               pairTemp = std::make_pair(i,j);
-              mf::LogInfo("MuonFilter") << "rLook matchnum " <<matchNum << " "<<i << " "<<j ; 
+              mf::LogInfo("MuonFilter") << "rLook matchnum " <<matchNum << " "<<i << " "<<j ;
               rLook.push_back(pairTemp);
-              matched.push_back(pointTemp);  
+              matched.push_back(pointTemp);
             }
-            break;  //advances i, makes j=0;                    
+            break;  //advances i, makes j=0;
           }
         }
       }
     }
     //after all matches are made, remove deltas
     double distance=0;
-    for(unsigned int i = 0; i < tGoing.size(); i++) 
+    for(unsigned int i = 0; i < tGoing.size(); i++)
       for(unsigned int j = 0; j < matched.size();j++){
         mf::LogInfo("MuonFilter") << tGoing.size() <<" " << matched.size() << " " << i << " " << j;
-        //test if one is contained within the other in the z-direction 
-        if((tGoing[i][2] <= matched[j][2]) && 
-           (tGoing[i][5] >= matched[j][5])) { 
+        //test if one is contained within the other in the z-direction
+        if((tGoing[i][2] <= matched[j][2]) &&
+           (tGoing[i][5] >= matched[j][5])) {
           TVector3 a1(&tGoing[i][0]);
           TVector3 a2(&tGoing[i][3]);
           TVector3 b1(&matched[j][0]);
           distance = TMath::Abs((((a1-a2).Cross((a1-a2).Cross(a1-b1))).Unit()).Dot(a1-b1));
           mf::LogInfo("MuonFilter") <<"distance "<< distance;
-          if(distance < 6){ 
+          if(distance < 6){
             mf::LogInfo("MuonFilter") <<"Removing delta ion "<<rLook.size()<<" "<<rLook[j].first<<" "<<matchNum;
             std::vector< art::Ptr<recob::Hit> > temp = fmhi.at(rLook[j].first);
-            for(unsigned int h = 0; h < temp.size();h++)         
+            for(unsigned int h = 0; h < temp.size();h++)
               indIon -= temp[h]->PeakAmplitude();
             temp = fmhc.at(rLook[j].second);
-            for(unsigned int h = 0; h < temp.size();h++)           
-              colIon -= temp[h]->PeakAmplitude();   
+            for(unsigned int h = 0; h < temp.size();h++)
+              colIon -= temp[h]->PeakAmplitude();
           }
         }
-      } 
+      }
     mf::LogInfo("MuonFilter") <<"indIon "<<indIon*fIonFactor <<" colIon " << colIon ;
-    if((indIon*fIonFactor > fMaxIon) && (colIon > fMaxIon)) 
+    if((indIon*fIonFactor > fMaxIon) && (colIon > fMaxIon))
       return true;
     else return false;
   }

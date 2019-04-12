@@ -4,7 +4,7 @@
 // \brief pure virtual service interface for space charge distortions
 //
 // \author mrmooney@bnl.gov
-// 
+//
 ////////////////////////////////////////////////////////////////////////
 #ifndef SPACECHARGESERVICE_H
 #define SPACECHARGESERVICE_H
@@ -22,10 +22,10 @@ namespace spacecharge{
 
     public:
       virtual ~SpaceChargeService() = default;
-      
+
       virtual void   reconfigure(fhicl::ParameterSet const& pset) = 0;
       virtual const  spacecharge::SpaceCharge* provider() const = 0;
-            
+
     }; // class SpaceChargeService
 } //namespace spacecharge
 DECLARE_ART_SERVICE_INTERFACE(spacecharge::SpaceChargeService, LEGACY)

@@ -2,7 +2,7 @@
 //
 // FinalStateParticleFilter class:
 // Algoritm to produce a filtered event file having
-// events with user-defined final state particles 
+// events with user-defined final state particles
 //
 // saima@ksu.edu
 //
@@ -10,16 +10,16 @@
 
 //Framework Includes
 #include "art/Framework/Core/EDFilter.h"
-#include "art/Framework/Core/ModuleMacros.h" 
-#include "art/Framework/Principal/Event.h" 
-#include "fhiclcpp/ParameterSet.h" 
-#include "art/Framework/Principal/Handle.h" 
-#include "canvas/Persistency/Common/Ptr.h" 
-#include "canvas/Persistency/Common/PtrVector.h" 
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Framework/Services/Optional/TFileService.h" 
-#include "art/Framework/Services/Optional/TFileDirectory.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h" 
+#include "art/Framework/Core/ModuleMacros.h"
+#include "art/Framework/Principal/Event.h"
+#include "fhiclcpp/ParameterSet.h"
+#include "art/Framework/Principal/Handle.h"
+#include "canvas/Persistency/Common/Ptr.h"
+#include "canvas/Persistency/Common/PtrVector.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "art/Framework/Services/Optional/TFileDirectory.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 
 //Larsoft Includes
@@ -32,26 +32,26 @@
 namespace filt {
 
   class FinalStateParticleFilter : public art::EDFilter  {
-    
+
   public:
-    
-    explicit FinalStateParticleFilter(fhicl::ParameterSet const& ); 
-    
+
+    explicit FinalStateParticleFilter(fhicl::ParameterSet const& );
+
     bool filter(art::Event& evt);
     void reconfigure(fhicl::ParameterSet const& p);
     void beginJob();
-   
 
-  private: 
- 
+
+  private:
+
     std::string fGenieModuleLabel;
-    std::vector<int> fPDG;  
+    std::vector<int> fPDG;
     std::vector<int> fStatusCode;
     TH1D* fSelectedEvents;
     TH1D* fTotalEvents;
 
     bool isSubset(std::vector<int>& a, std::vector<int>& b);
-    
+
   }; // class FinalStateParticleFilter
 
 }
@@ -59,9 +59,9 @@ namespace filt {
 namespace filt{
 
   //-------------------------------------------------
-  FinalStateParticleFilter::FinalStateParticleFilter(fhicl::ParameterSet const & pset)  
+  FinalStateParticleFilter::FinalStateParticleFilter(fhicl::ParameterSet const & pset)
     : EDFilter{pset}
-  {   
+  {
     this->reconfigure(pset);
   }
 
@@ -70,31 +70,31 @@ namespace filt{
   {
     fGenieModuleLabel = p.get< std::string      >("GenieModuleLabel");
     fPDG              = p.get< std::vector<int> >("PDG");
-  } 
+  }
 
   //-------------------------------------------------
   void FinalStateParticleFilter::beginJob()
   {
     art::ServiceHandle<art::TFileService const> tfs;
-    fSelectedEvents = tfs->make<TH1D>("fSelectedEvents", "Number of Selected Events", 3, 0, 3); //counts the number of selected events 
+    fSelectedEvents = tfs->make<TH1D>("fSelectedEvents", "Number of Selected Events", 3, 0, 3); //counts the number of selected events
     fTotalEvents = tfs->make<TH1D>("fTotalEvents", "Total Events", 3, 0, 3); //counts the initial number of events in the unfiltered root input file
   }
 
   //-------------------------------------------------
   bool FinalStateParticleFilter::filter(art::Event &evt)
-  { 
-    
+  {
+
     //const TDatabasePDG* databasePDG = TDatabasePDG::Instance();
-    
+
     art::Handle< std::vector<simb::MCTruth> > mclist;
     evt.getByLabel(fGenieModuleLabel,mclist);
     art::Ptr<simb::MCTruth> mc(mclist,0);
-    
+
     fTotalEvents->Fill(1);
 
     std::vector<int> finalstateparticles;
 
-    //get a vector of final state particles   
+    //get a vector of final state particles
     for(int i = 0; i < mc->NParticles(); ++i){
       simb::MCParticle part(mc->GetParticle(i));
       if(part.StatusCode()== 1)
@@ -108,10 +108,10 @@ namespace filt{
 
     return isSubset(fPDG, finalstateparticles); // returns true if the user-defined fPDG exist(s) in the final state particles
 
-  } // bool  
+  } // bool
   //} // namespace
-    
-//------------------------------------------------   
+
+//------------------------------------------------
 
 bool FinalStateParticleFilter::isSubset(std::vector<int>& a, std::vector<int>& b)
 {
@@ -123,7 +123,7 @@ bool FinalStateParticleFilter::isSubset(std::vector<int>& a, std::vector<int>& b
 	break;
       }
     }
-      
+
     if (!found){
       return false;
     }

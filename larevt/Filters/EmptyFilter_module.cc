@@ -11,17 +11,17 @@
 /// Framework includes
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDFilter.h"
-#include "art/Framework/Principal/Event.h" 
-#include "fhiclcpp/ParameterSet.h" 
-#include "art/Framework/Principal/Handle.h" 
-#include "canvas/Persistency/Common/Ptr.h" 
-#include "canvas/Persistency/Common/PtrVector.h" 
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Framework/Services/Optional/TFileService.h" 
-#include "art/Framework/Services/Optional/TFileDirectory.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h" 
+#include "art/Framework/Principal/Event.h"
+#include "fhiclcpp/ParameterSet.h"
+#include "art/Framework/Principal/Handle.h"
+#include "canvas/Persistency/Common/Ptr.h"
+#include "canvas/Persistency/Common/PtrVector.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "art/Framework/Services/Optional/TFileDirectory.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
- 
+
 // LArSoft includes"
 #include "lardataobj/RecoBase/Hit.h"
 #include "larcore/Geometry/Geometry.h"
@@ -40,20 +40,20 @@
 namespace filt {
 
   class EmptyFilter : public art::EDFilter  {
-    
+
   public:
-    
-    explicit EmptyFilter(fhicl::ParameterSet const& ); 
-    
+
+    explicit EmptyFilter(fhicl::ParameterSet const& );
+
     bool filter(art::Event& evt);
     void reconfigure(fhicl::ParameterSet const& p);
     void beginJob();
-   
 
-  private: 
- 
+
+  private:
+
     std::string fHitsModuleLabel;
-    double  fMinIonization;  
+    double  fMinIonization;
     int fMinNumHits;
     TH1I * totHitHist;
     TH1I * selHitHist;
@@ -61,26 +61,26 @@ namespace filt {
     TH2D * totIonSelHist;
     TH2D * totIonRejHist;
     TH1I * numEventHist;
-    TH2I * resultTable;  
+    TH2I * resultTable;
 
-  protected: 
-    
+  protected:
+
   }; // class EmptyFilter
 
   //-------------------------------------------------
-  EmptyFilter::EmptyFilter(fhicl::ParameterSet const & pset)  
+  EmptyFilter::EmptyFilter(fhicl::ParameterSet const & pset)
     : EDFilter{pset}
-  {   
+  {
     this->reconfigure(pset);
   }
 
   //-------------------------------------------------
   void EmptyFilter::reconfigure(fhicl::ParameterSet const& p)
   {
-    fHitsModuleLabel = p.get< std::string > ("HitsModuleLabel"); 
-    fMinIonization =   p.get< double      > ("MinIonization"); 
-    fMinNumHits =      p.get< int         > ("MinHits");        
-  } 
+    fHitsModuleLabel = p.get< std::string > ("HitsModuleLabel");
+    fMinIonization =   p.get< double      > ("MinIonization");
+    fMinNumHits =      p.get< int         > ("MinHits");
+  }
 
   //-------------------------------------------------
   void EmptyFilter::beginJob()
@@ -93,18 +93,18 @@ namespace filt {
     rejHitHist= tfs->make<TH1I>("rejHitHist","Hit Number Per rejected Event",750, 0 ,1500);
     numEventHist = tfs->make<TH1I>("numEventHist","Number of Events Processed and Selected",2,0,2);
     resultTable = tfs->make<TH2I>("resultTable","Event number is x axis, y axis bins 0=selected,1= hit num, 2= one plane empty, 3= too little ionization",40000,0,40000,4,0,4);
- 
+
   }
 
   //-------------------------------------------------
   bool EmptyFilter::filter(art::Event &evt)
-  { 
+  {
 
     numEventHist->Fill(0);
     int failFlag = 0;
     double indIon(0.0), colIon(0.0);
     int event = evt.id().event();
-    
+
     art::ServiceHandle<geo::Geometry const> geom;
     art::Handle< std::vector<recob::Hit> > hitHandle;
     evt.getByLabel(fHitsModuleLabel,hitHandle);
@@ -119,17 +119,17 @@ namespace filt {
       totHitHist->Fill(numHits);
       if(numHits < fMinNumHits) {
 	mf::LogWarning("EmptyFilterModule") << "Too few hits: "<< numHits;
-	failFlag=1;  
-      }  
+	failFlag=1;
+      }
       if(failFlag==0) {
 	//Check to see if either plane is empty
 /* BB: This code section is broken.
-	if(geom->Cryostat(cs).TPC(tpc).Plane(plane).SignalType() == geo::kInduction){ 
+	if(geom->Cryostat(cs).TPC(tpc).Plane(plane).SignalType() == geo::kInduction){
 	  std::cout << "Induction empty." << std::endl;
 	  failFlag=2;
 	}
 */
-	unsigned int j(0);  
+	unsigned int j(0);
 	//advances j to collection plane
 	while(hitvec[j]->WireID().Plane == 0) {
 	  indIon+=hitvec[j]->Integral();
@@ -145,25 +145,25 @@ namespace filt {
 	double minIon=0;
 	if((1.92*indIon)>colIon) minIon = colIon;
 	else minIon=1.92*indIon;
-	mf::LogWarning("EmptyFilterModule") <<"min ionization " << minIon 
+	mf::LogWarning("EmptyFilterModule") <<"min ionization " << minIon
 					    << " " << fMinIonization;
 	if (minIon < fMinIonization) failFlag=3;
       }
     }
-    else failFlag = 1; 
-    resultTable->Fill(event,failFlag);   
+    else failFlag = 1;
+    resultTable->Fill(event,failFlag);
     if(failFlag>0){
       totIonRejHist->Fill(indIon,colIon);
-      rejHitHist->Fill(numHits); 
+      rejHitHist->Fill(numHits);
       return  false;
     }
     numEventHist->Fill(1);
     totIonSelHist->Fill(indIon,colIon);
     selHitHist->Fill(numHits);
-  
+
     return true;
   }
-  
+
 
   DEFINE_ART_MODULE(EmptyFilter)
 

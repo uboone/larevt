@@ -12,23 +12,23 @@ namespace lariov {
 namespace lariov {
 
   class ElectronLifetimeService {
-    
+
     public:
       using provider_type = ElectronLifetimeProvider;
-      
+
       virtual ~ElectronLifetimeService() = default;
-      
+
       //retrieve provider
       const ElectronLifetimeProvider& GetProvider() const {
         return this->DoGetProvider();
       }
-      
+
       ElectronLifetimeProvider const* provider() const {
         return &DoGetProvider();
       }
-      
+
     private:
-    
+
       virtual const ElectronLifetimeProvider& DoGetProvider() const = 0;
   };
 }//end namespace lariov

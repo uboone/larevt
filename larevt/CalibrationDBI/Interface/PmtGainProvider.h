@@ -1,6 +1,6 @@
 /**
  * \file PmtGainProvider
- * 
+ *
  * \brief Class def header for a class PmtGainProvider
  *
  * @author eberly@slac.stanford.edu
@@ -22,15 +22,15 @@ namespace lariov {
    * - pmt extra info, related to procedure that determines gain
    */
   class PmtGainProvider: private lar::UncopiableAndUnmovableClass {
-  
+
     public:
-    
+
       virtual ~PmtGainProvider() = default;
-       
-      /// Retrieve pmt gain information     
+
+      /// Retrieve pmt gain information
       virtual float Gain(raw::ChannelID_t ch) const = 0;
       virtual float GainErr(raw::ChannelID_t ch) const = 0;
-      
+
       virtual CalibrationExtraInfo const& ExtraInfo(raw::ChannelID_t ch) const = 0;
   };
 }//end namespace lariov

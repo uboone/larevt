@@ -1,13 +1,13 @@
 ///////////////////////////////////////////////////////
 //
 // ChannelFilter Class
-// 
+//
 // This class has been obsoleted and is now a deprecated interface for
 // ChannelStatusService.
-// 
+//
 // Please update your code to use the service directly.
-// 
-// 
+//
+//
 // Original class: pagebri3@msu.edu
 //
 ///////////////////////////////////////////////////////
@@ -18,8 +18,8 @@
 
 
 // Framework libraries
-#include "messagefacility/MessageLogger/MessageLogger.h" 
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
+#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "canvas/Utilities/Exception.h"
 
 // LArSoft libraries
@@ -44,10 +44,10 @@
 filter::ChannelFilter::ChannelFilter() try:
   provider(art::ServiceHandle<lariov::ChannelStatusService const>()->GetProvider())
 {
-  
+
   MF_LOG_ERROR("ChannelFilter") << "ChannelFilter is now deprecated."
     " Replace it with ChannelStatusService";
-  
+
 } // function try
 catch (art::Exception& e) { // automatic rethrow happens at end of block
   if (e.categoryCode() == art::errors::ServiceNotFound) {
@@ -84,7 +84,7 @@ std::set<uint32_t> filter::ChannelFilter::SetOfNoisyChannels() const {
 ///////////////////////////////////////////////////////
 filter::ChannelFilter::ChannelStatus filter::ChannelFilter::GetChannelStatus(uint32_t channel) const
 {
-  
+
   if (provider.IsGood(channel))          return GOOD;
   else if (!provider.IsPresent(channel)) return NOTPHYSICAL;
   else if (provider.IsBad(channel))      return DEAD;

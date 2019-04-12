@@ -27,10 +27,10 @@ namespace art { class Event; } // art::Event declaration
 namespace lariov {
   /**
    * @brief Tests an instanciation of the ChannelStatusService
-   * 
+   *
    * Configuration parameters
    * =========================
-   * 
+   *
    * - **TestBadChannels** (list of integers, default: empty): test singularly
    *   these channels and verify they are bad
    * - **TestGoodChannels** (list of integers, default: empty): test singularly
@@ -49,14 +49,14 @@ namespace lariov {
     std::vector<unsigned int> KnownGoodChannels;
     std::vector<unsigned int> KnownNoisyChannels;
     std::vector<unsigned int> KnownBadChannels;
-    
+
     template <typename Obj>
     unsigned int testObject(Obj const* pChStatus) const;
-    
-    
+
+
     static const std::vector<unsigned int> EmptyVect; ///< for initializations
   }; // class SimpleChannelStatusTest
-  
+
 } // namespace lariov
 
 
@@ -64,12 +64,12 @@ namespace lariov {
 
 
 namespace lariov {
-  
+
   const std::vector<unsigned int> SimpleChannelStatusTest::EmptyVect;
-  
+
   //......................................................................
   SimpleChannelStatusTest::SimpleChannelStatusTest
-    (fhicl::ParameterSet const& pset) 
+    (fhicl::ParameterSet const& pset)
     : EDAnalyzer(pset)
     , KnownGoodChannels
         (pset.get<std::vector<unsigned int>>("TestGoodChannels", EmptyVect))
@@ -79,38 +79,38 @@ namespace lariov {
         (pset.get<std::vector<unsigned int>>("TestBadChannels", EmptyVect))
   {
     mf::LogInfo log("SimpleChannelStatusTest");
-    
+
     log << "Channels known as good:  " << KnownGoodChannels.size();
     if (!KnownGoodChannels.empty()) {
       log << " (";
       for (unsigned int chId: KnownGoodChannels) log << " " << chId;
       log << ")";
     } // if known good channels
-    
+
     log << "\nChannels known as noisy: " << KnownNoisyChannels.size();
     if (!KnownNoisyChannels.empty()) {
       log << " (";
       for (unsigned int chId: KnownNoisyChannels) log << " " << chId;
       log << ")";
     } // if known noisy channels
-    
+
     log << "\nChannels known as bad:   " << KnownBadChannels.size();
     if (!KnownBadChannels.empty()) {
       log << " (";
       for (unsigned int chId: KnownBadChannels) log << " " << chId;
       log << ")";
     } // if known bad channels
-    
+
   } // SimpleChannelStatusTest::SimpleChannelStatusTest()
-  
-  
+
+
   //......................................................................
   void SimpleChannelStatusTest::beginRun(art::Run const& run) {
-    
+
     mf::LogInfo("SimpleChannelStatusTest") << "New run: " << run.run();
-    
+
     unsigned int nErrors = 0;
-    
+
     //---
     mf::LogVerbatim("SimpleChannelStatusTest")
       << "\nTesting service interface...";
@@ -124,7 +124,7 @@ namespace lariov {
         << nErrors << " errors while testing ChannelStatusService!";
     } // if errors
   */
-    
+
     //---
     mf::LogVerbatim("SimpleChannelStatusTest")
       << "\nTesting base interface...";
@@ -135,10 +135,10 @@ namespace lariov {
       throw art::Exception(art::errors::LogicError)
         << nErrors << " errors while testing ChannelStatusProvider!";
     } // if errors
-    
+
   } // SimpleChannelStatusTest::beginRun()
-  
-  
+
+
   //......................................................................
   template <typename Obj>
   unsigned int SimpleChannelStatusTest::testObject(Obj const* pChStatus) const
@@ -146,8 +146,8 @@ namespace lariov {
     // 1. print all the channels marked non-good
     {
       mf::LogInfo log("SimpleChannelStatusTest");
-      
-      
+
+
       // this is a copy of the list;
       // to avoid creating temporary objects, check channels one by one
       auto BadChannels = pChStatus->BadChannels();
@@ -157,7 +157,7 @@ namespace lariov {
         for (unsigned int chId: BadChannels) log << " " << chId;
         log << ")";
       } // if bad channels
-      
+
       auto NoisyChannels = pChStatus->NoisyChannels();
       log << "\nChannels marked as noisy: " << NoisyChannels.size();
       if (!NoisyChannels.empty()) {
@@ -166,7 +166,7 @@ namespace lariov {
         log << ")";
       } // if noisy channels
     } // print test
-    
+
     // 2. test the channels as in the configuration
     unsigned int nErrors = 0;
     for (const auto chId: KnownBadChannels) {
@@ -176,7 +176,7 @@ namespace lariov {
         ++nErrors;
       }
     } // for knwon bad channels
-    
+
     for (const auto chId: KnownNoisyChannels) {
       if (!pChStatus->IsNoisy(chId)) {
         mf::LogError("SimpleChannelStatusTest")
@@ -184,7 +184,7 @@ namespace lariov {
         ++nErrors;
       }
     } // for knwon noisy channels
-    
+
     for (const auto chId: KnownGoodChannels) {
       if (pChStatus->IsBad(chId)) {
         mf::LogError("SimpleChannelStatusTest")
@@ -197,11 +197,11 @@ namespace lariov {
         ++nErrors;
       }
     } // for knwon good channels
-    
+
     return nErrors;
   } // SimpleChannelStatusTest::testObject()
-  
-  
+
+
   DEFINE_ART_MODULE(SimpleChannelStatusTest)
-  
+
 } // namespace lariov

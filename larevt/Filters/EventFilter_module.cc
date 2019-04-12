@@ -15,13 +15,13 @@ extern "C" {
 /// Framework includes
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDFilter.h"
-#include "art/Framework/Principal/Event.h" 
-#include "fhiclcpp/ParameterSet.h" 
-#include "art/Framework/Principal/Handle.h" 
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Framework/Services/Optional/TFileService.h" 
-#include "art/Framework/Services/Optional/TFileDirectory.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h" 
+#include "art/Framework/Principal/Event.h"
+#include "fhiclcpp/ParameterSet.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "art/Framework/Services/Optional/TFileDirectory.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 ///filters for events, etc
 namespace filter {
@@ -29,18 +29,18 @@ namespace filter {
   class EventFilter : public art::EDFilter  {
 
   public:
-    
-    explicit EventFilter(fhicl::ParameterSet const& ); 
-    
+
+    explicit EventFilter(fhicl::ParameterSet const& );
+
     bool filter(art::Event& evt) override;
     void reconfigure(fhicl::ParameterSet const& p);
 
-    
+
     std::vector < unsigned int > SetOfBadEvents()   const { return fBadEvents;}
     std::vector < unsigned int > SetOfBadRuns()     const { return fBadRuns;  }
-    
+
   private:
-    
+
     std::vector < unsigned int >            fBadEvents; ///< list of bad events
     std::vector < unsigned int >            fBadRuns;   ///< list of bad runs
 
@@ -51,7 +51,7 @@ namespace filter {
     int         fSelection; //0: reject events based on input
                             //>0: accept events based on txt file
                             //<0: reject events based on txt file
-                                    
+
 
   }; //class EventFilter
 }
@@ -60,9 +60,9 @@ namespace filter {
 
 void filter::EventFilter::reconfigure(fhicl::ParameterSet const& p)
 {
-  fBadEvents  = p.get < std::vector <unsigned int> >("BadEvents");	       
-  fBadRuns    = p.get < std::vector <unsigned int> >("BadRuns");	
-  
+  fBadEvents  = p.get < std::vector <unsigned int> >("BadEvents");
+  fBadRuns    = p.get < std::vector <unsigned int> >("BadRuns");
+
   fSelection = p.get< int >("Selection");
   fEventList = p.get< std::string >("EventList");
   fSelEvents.clear();
@@ -80,7 +80,7 @@ void filter::EventFilter::reconfigure(fhicl::ParameterSet const& p)
     fSelEvents.push_back(n2);
   }
   in.close();
-       
+
 }
 
 
@@ -91,7 +91,7 @@ filter::EventFilter::EventFilter(fhicl::ParameterSet const& pset)
 }
 
 bool filter::EventFilter::filter(art::Event &evt)
-{   
+{
   unsigned int evtNo = (unsigned int) evt.id().event();
   unsigned int runNo = (unsigned int) evt.run();
   unsigned int subrunNo = (unsigned int) evt.subRun();
@@ -101,15 +101,15 @@ bool filter::EventFilter::filter(art::Event &evt)
     if (sobe.size() != sobr.size()) {
       throw cet::exception("EventFilter.cxx: ") << " BadEvent and BadRun list must be same length. Line " <<__LINE__ << ", " << __FILE__ << "\n";
     }
-    
+
     for (unsigned int ii=0; ii<sobe.size(); ++ii){
-      if(sobe.at(ii)==evtNo && sobr.at(ii)==runNo) 
+      if(sobe.at(ii)==evtNo && sobr.at(ii)==runNo)
 	{
 	  mf::LogInfo("EventFilter: ") << "\t\n Skipping run/event " << runNo <<"/"<< evtNo << " by request.\n";
 	  return false;
 	}
     }
-    return true;  
+    return true;
   }
   else{
     for (unsigned int ii = 0; ii<fSelRuns.size(); ii++){

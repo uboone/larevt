@@ -2,7 +2,7 @@
  * \file WebError.h
  *
  * \ingroup WebDBI
- * 
+ *
  * \brief Collection of exception classes for WebDBI
  *
  * @author kterao
@@ -32,11 +32,11 @@ namespace lariov {
       _msg += msg;
       _msg += "\033[00m";
     }
-    
+
     virtual ~WebError() throw(){};
     virtual const char* what() const throw()
     { return _msg.c_str(); }
-    
+
   private:
     std::string _msg;
   };
@@ -44,5 +44,5 @@ namespace lariov {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

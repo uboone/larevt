@@ -10,17 +10,17 @@
 
 namespace lariov {
 
-  //constructor      
+  //constructor
   SIOVPmtGainProvider::SIOVPmtGainProvider(fhicl::ParameterSet const& p) :
     DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
     fEventTimeStamp(0),
     fCurrentTimeStamp(0) {
-    
+
     this->Reconfigure(p);
   }
-      
+
   void SIOVPmtGainProvider::Reconfigure(fhicl::ParameterSet const& p) {
-    
+
     this->DatabaseRetrievalAlg::Reconfigure(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"));
     fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
@@ -46,7 +46,7 @@ namespace lariov {
       defaultGain.SetGain(default_gain);
       defaultGain.SetGainErr(default_gain_err);
       defaultGain.SetExtraInfo(CalibrationExtraInfo("PmtGain"));
-      
+
       art::ServiceHandle<geo::Geometry const> geo;
       for (unsigned int od=0; od!=geo->NOpDets(); ++od) {
         if (geo->IsValidOpChannel(od)) {
@@ -54,7 +54,7 @@ namespace lariov {
 	  fData.AddOrReplaceRow(defaultGain);
 	}
       }
-      
+
     }
     else if (fDataSource == DataSource::File) {
       cet::search_path sp("FW_SEARCH_PATH");
@@ -71,9 +71,9 @@ namespace lariov {
       while (std::getline(file, line)) {
         if (line[0] == '#') continue;
         size_t current_comma = line.find(',');
-        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));   
+        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));
         float gain     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
-        
+
         current_comma = line.find(',',current_comma+1);
         float gain_err = std::stof( line.substr(current_comma+1) );
 
@@ -83,7 +83,7 @@ namespace lariov {
         dp.SetGain(gain);
         dp.SetGainErr(gain_err);
 	dp.SetExtraInfo(info);
-        
+
         fData.AddOrReplaceRow(dp);
       }
     }
@@ -102,7 +102,7 @@ namespace lariov {
   // Maybe update method cached data (public non-const version).
 
   bool SIOVPmtGainProvider::Update(DBTimeStamp_t ts) {
-    
+
     fEventTimeStamp = ts;
     return DBUpdate(ts);
   }
@@ -120,10 +120,10 @@ namespace lariov {
 
     bool result = false;
     if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
-      
+
       mf::LogInfo("SIOVPmtGainProvider") << "SIOVPmtGainProvider::DBUpdate called with new timestamp.";
 
-      fCurrentTimeStamp = ts;     
+      fCurrentTimeStamp = ts;
 
       // Call non-const base class method.
 
@@ -139,7 +139,7 @@ namespace lariov {
 
 	  double gain, gain_err;
 	  fFolder->GetNamedChannelData(*it, "gain",     gain);
-	  fFolder->GetNamedChannelData(*it, "gain_sigma", gain_err); 
+	  fFolder->GetNamedChannelData(*it, "gain_sigma", gain_err);
 
 	  PmtGain pg(*it);
 	  pg.SetGain( (float)gain );
@@ -153,20 +153,20 @@ namespace lariov {
 
     return result;
   }
-  
-  const PmtGain& SIOVPmtGainProvider::PmtGainObject(DBChannelID_t ch) const { 
+
+  const PmtGain& SIOVPmtGainProvider::PmtGainObject(DBChannelID_t ch) const {
     DBUpdate();
     return fData.GetRow(ch);
   }
-      
+
   float SIOVPmtGainProvider::Gain(DBChannelID_t ch) const {
     return this->PmtGainObject(ch).Gain();
   }
-  
+
   float SIOVPmtGainProvider::GainErr(DBChannelID_t ch) const {
     return this->PmtGainObject(ch).GainErr();
   }
-  
+
   CalibrationExtraInfo const& SIOVPmtGainProvider::ExtraInfo(DBChannelID_t ch) const {
     return this->PmtGainObject(ch).ExtraInfo();
   }

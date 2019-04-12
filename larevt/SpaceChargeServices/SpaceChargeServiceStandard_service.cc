@@ -4,7 +4,7 @@
 // \brief implementation of class for storing/accessing space charge distortions
 //
 // \author mrmooney@bnl.gov
-// 
+//
 ////////////////////////////////////////////////////////////////////////
 
 // C++ language includes
@@ -36,7 +36,7 @@ void spacecharge::SpaceChargeServiceStandard::preBeginRun(const art::Run& run)
 //------------------------------------------------
 void spacecharge::SpaceChargeServiceStandard::reconfigure(fhicl::ParameterSet const& pset)
 {
-  fProp->Configure(pset);  
+  fProp->Configure(pset);
   return;
 }
 

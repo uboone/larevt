@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////
 //
 // EventTimeFilter class
-// 
+//
 // author: Aidan Reynolds
 // email: aidan.reynolds@physics.ox.ac.uk
 //
@@ -26,16 +26,16 @@ extern "C" {
 #include "TMath.h"
 #include "TTimeStamp.h"
 
-/// Framework 
+/// Framework
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDFilter.h"
-#include "art/Framework/Principal/Event.h" 
-#include "fhiclcpp/ParameterSet.h" 
-#include "art/Framework/Principal/Handle.h" 
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art/Framework/Services/Optional/TFileService.h" 
-#include "art/Framework/Services/Optional/TFileDirectory.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h" 
+#include "art/Framework/Principal/Event.h"
+#include "fhiclcpp/ParameterSet.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "art/Framework/Services/Optional/TFileDirectory.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 ///filters for events, etc
 namespace filter {
@@ -44,17 +44,17 @@ namespace filter {
 
 	public:
 
-		explicit EventTimeFilter(fhicl::ParameterSet const& ); 
-		
+		explicit EventTimeFilter(fhicl::ParameterSet const& );
+
 		bool filter(art::Event& evt);
 		void reconfigure(fhicl::ParameterSet const& p);
 
 	private:
 
-		UInt_t fDateRangeLow; 
-		UInt_t fTimeRangeLow; 
-		UInt_t fDateRangeHigh; 
-		UInt_t fTimeRangeHigh; 
+		UInt_t fDateRangeLow;
+		UInt_t fTimeRangeLow;
+		UInt_t fDateRangeHigh;
+		UInt_t fTimeRangeHigh;
 
 	}; //class EventTimeFilter
 
@@ -75,39 +75,39 @@ filter::EventTimeFilter::EventTimeFilter(fhicl::ParameterSet const& pset)
 	this->reconfigure(pset);
 }
 
-bool filter::EventTimeFilter::filter(art::Event &evt) {   
+bool filter::EventTimeFilter::filter(art::Event &evt) {
 
 	// Check that input date is in correct format
 	if (fDateRangeHigh > 99999999 || fDateRangeLow > 99999999) {
 		std::cout << "Warning: please provide date in format YYYYMMDD, event time "
-		          << "filter returning false." << std::endl; 
+		          << "filter returning false." << std::endl;
 		return false;
 	}
 	if (fDateRangeHigh > 0 && fDateRangeHigh < 10000000) {
 		std::cout << "Warning: please provide date in format YYYYMMDD, event time "
-		          << "filter returning false." << std::endl; 
+		          << "filter returning false." << std::endl;
 		return false;
 	}
 	if (fDateRangeLow > 0 && fDateRangeLow < 10000000) {
 		std::cout << "Warning: please provide date in format YYYYMMDD, event time "
-		          << "filter returning false." << std::endl; 
+		          << "filter returning false." << std::endl;
 		return false;
 	}
 
 	// Check that input times are in correct format
 	if (fTimeRangeHigh > 999999 || fTimeRangeLow > 999999) {
 		std::cout << "Warning: please provide time in format HHMMSS, event time "
-		          << "filter returning false." << std::endl; 
+		          << "filter returning false." << std::endl;
 		return false;
 	}
 	if (fTimeRangeHigh > 0 && fTimeRangeHigh < 100000) {
 		std::cout << "Warning: please provide time in format HHMMSS, event time "
-		          << "filter returning false." << std::endl; 
+		          << "filter returning false." << std::endl;
 		return false;
 	}
 	if (fTimeRangeLow > 0 && fTimeRangeLow < 100000) {
 		std::cout << "Warning: please provide time in format HHMMSS, event time "
-		          << "filter returning false." << std::endl; 
+		          << "filter returning false." << std::endl;
 		return false;
 	}
 
@@ -120,13 +120,13 @@ bool filter::EventTimeFilter::filter(art::Event &evt) {
 	std::cout << "Event time:  " << evtTTS -> AsString() << std::endl;
 
 	// Requested time range lower end
-	TTimeStamp * ttsLow(nullptr); 
+	TTimeStamp * ttsLow(nullptr);
 	if (fDateRangeLow != 0) {
-		if (fTimeRangeLow != 0) { 
-			ttsLow = new TTimeStamp(fDateRangeLow, fTimeRangeLow, 0u); 
+		if (fTimeRangeLow != 0) {
+			ttsLow = new TTimeStamp(fDateRangeLow, fTimeRangeLow, 0u);
 		}
-		else { 
-			ttsLow = new TTimeStamp(fDateRangeLow, 0u, 0u); 
+		else {
+			ttsLow = new TTimeStamp(fDateRangeLow, 0u, 0u);
 			std::cout << "Warning: No start time given for event time filter, "
 			          << "assuming 00:00:00" << std::endl;
 		}
@@ -135,13 +135,13 @@ bool filter::EventTimeFilter::filter(art::Event &evt) {
 	// Requested time range higher end
 	TTimeStamp * ttsHigh(nullptr);
 	if (fDateRangeHigh != 0) {
-		if (fTimeRangeHigh != 0) { 
-			ttsHigh = new TTimeStamp(fDateRangeHigh, fTimeRangeHigh, 0u); 
+		if (fTimeRangeHigh != 0) {
+			ttsHigh = new TTimeStamp(fDateRangeHigh, fTimeRangeHigh, 0u);
 		}
-		else { 
+		else {
 			std::cout << "Warning: No end time given for event time filter, assuming "
 			          << "23:59:59" << std::endl;
-			ttsHigh = new TTimeStamp(fDateRangeHigh, 235959u, 0u); 
+			ttsHigh = new TTimeStamp(fDateRangeHigh, 235959u, 0u);
 		}
 	}
 
@@ -150,23 +150,23 @@ bool filter::EventTimeFilter::filter(art::Event &evt) {
 		std::cout << "Warning: No date range requested for event time filter, "
 		          << "returning false." << std::endl;
 		return false;
-	} 
+	}
 	else if (ttsLow == nullptr) {
 		std::cout << "Warning: No lower limit requested for event time filter, "
-		          << "taking all events before " << ttsHigh -> AsString() 
+		          << "taking all events before " << ttsHigh -> AsString()
 		          << std::endl;
 		if (evtTTS -> GetSec() < ttsHigh -> GetSec()) { return true; }
 		else { return false;}
-	} 
+	}
 	else if (ttsHigh == nullptr) {
 		std::cout << "Warning: No lower limit requested for event time filter, "
-		          << "taking all events after " << ttsLow -> AsString() 
+		          << "taking all events after " << ttsLow -> AsString()
 		          << std::endl;
 		if (evtTTS -> GetSec() > ttsLow -> GetSec()) { return true; }
 		else { return false;}
-	} 
-	else { 
-		if (evtTTS -> GetSec() > ttsLow -> GetSec() && 
+	}
+	else {
+		if (evtTTS -> GetSec() > ttsLow -> GetSec() &&
 		    evtTTS -> GetSec() < ttsHigh -> GetSec()) { return true; }
 		else { return false; }
 	}

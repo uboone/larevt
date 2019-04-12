@@ -4,7 +4,7 @@
 // \brief header of service for storing/accessing space charge distortions
 //
 // \author mrmooney@bnl.gov
-// 
+//
 ////////////////////////////////////////////////////////////////////////
 #ifndef SPACECHARGESERVICESTANDARD_H
 #define SPACECHARGESERVICESTANDARD_H
@@ -21,10 +21,10 @@
 namespace spacecharge{
   class SpaceChargeServiceStandard : public SpaceChargeService {
     public:
-      
+
       // this enables art to print the configuration help:
       //using Parameters = art::ServiceTable<spacecharge::SpaceChargeStandard::ConfigurationParameters_t>;
-      
+
       SpaceChargeServiceStandard(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
 
       virtual void   reconfigure(fhicl::ParameterSet const& pset) override;

@@ -3,7 +3,7 @@
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 
 // art/LArSoft libraries
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
+#include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "larcore/Geometry/Geometry.h"
 #include "cetlib_except/exception.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
@@ -14,29 +14,29 @@
 namespace lariov {
 
   //constructors
-  DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(const std::string& foldername, 
-      			      			   const std::string& url, 
-			      			   const std::string& tag /*=""*/) : 
+  DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(const std::string& foldername,
+      			      			   const std::string& url,
+			      			   const std::string& tag /*=""*/) :
     DatabaseRetrievalAlg(foldername, url, tag),
     fEventTimeStamp(0),
     fCurrentTimeStamp(0),
     fDataSource(DataSource::Database) {
-    
+
     fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
     fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
   }
-	
-      
+
+
   DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(fhicl::ParameterSet const& p) :
-    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")) {	
-    
+    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")) {
+
     this->Reconfigure(p);
   }
-      
+
   void DetPedestalRetrievalAlg::Reconfigure(fhicl::ParameterSet const& p) {
-    
+
     this->DatabaseRetrievalAlg::Reconfigure(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"));
     fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
@@ -61,25 +61,25 @@ namespace lariov {
       float default_rms_err      = p.get<float>("DefaultRmsErr", 0.0);
       float default_indmean      = p.get<float>("DefaultIndMean", 2048.0);
       float default_indrms       = p.get<float>("DefaultIndRms", 0.3);
-      
+
       DetPedestal DefaultColl(0);
       DetPedestal DefaultInd(0);
-      
+
       DefaultColl.SetPedMean(default_collmean);
       DefaultColl.SetPedMeanErr(default_mean_err);
       DefaultColl.SetPedRms(default_collrms);
       DefaultColl.SetPedRmsErr(default_rms_err);
-      
+
       DefaultInd.SetPedMean(default_indmean);
       DefaultInd.SetPedMeanErr(default_mean_err);
       DefaultInd.SetPedRms(default_indrms);
       DefaultInd.SetPedRmsErr(default_rms_err);
-      
+
       art::ServiceHandle<geo::Geometry const> geo;
       geo::wire_id_iterator itW = geo->begin_wire_id();
       for ( ; itW != geo->end_wire_id(); ++itW) {
         DBChannelID_t ch = geo->PlaneWireToChannel(*itW);
-      
+
         if (geo->SignalType(ch) == geo::kCollection) {
 	  DefaultColl.SetChannel(ch);
 	  fData.AddOrReplaceRow(DefaultColl);
@@ -100,20 +100,20 @@ namespace lariov {
         throw cet::exception("DetPedestalRetrievalAlg")
 	  << "File "<<abs_fp<<" is not found.";
       }
-      
+
       std::string line;
       DetPedestal dp(0);
       while (std::getline(file, line)) {
         size_t current_comma = line.find(',');
-        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));	
+        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));
 	float ped     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
-	
+
 	current_comma = line.find(',',current_comma+1);
 	float rms     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
-	
+
 	current_comma = line.find(',',current_comma+1);
 	float ped_err = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
-	
+
 	current_comma = line.find(',',current_comma+1);
 	float rms_err = std::stof( line.substr(current_comma+1) );
 
@@ -125,7 +125,7 @@ namespace lariov {
 	fData.AddOrReplaceRow(dp);
       }
     } // if source from file
-    else { 
+    else {
       std::cout << "Using pedestals from conditions database\n";
     }
   }
@@ -141,7 +141,7 @@ namespace lariov {
   // Maybe update method cached data (public non-const version).
 
   bool DetPedestalRetrievalAlg::Update(DBTimeStamp_t ts) {
-    
+
     fEventTimeStamp = ts;
     return DBUpdate(ts);
   }
@@ -159,9 +159,9 @@ namespace lariov {
 
     bool result = false;
     if(fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
-      
+
       mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::DBUpdate called with new timestamp.";
-      fCurrentTimeStamp = ts;     
+      fCurrentTimeStamp = ts;
 
       // Call non-const base class method.
 
@@ -196,24 +196,24 @@ namespace lariov {
     return result;
 
   }
-  
+
   const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBChannelID_t ch) const {
     DBUpdate();
     return fData.GetRow(ch);
   }
-      
+
   float DetPedestalRetrievalAlg::PedMean(DBChannelID_t ch) const {
     return this->Pedestal(ch).PedMean();
   }
-  
+
   float DetPedestalRetrievalAlg::PedRms(DBChannelID_t ch) const {
     return this->Pedestal(ch).PedRms();
   }
-  
+
   float DetPedestalRetrievalAlg::PedMeanErr(DBChannelID_t ch) const {
     return this->Pedestal(ch).PedMeanErr();
   }
-  
+
   float DetPedestalRetrievalAlg::PedRmsErr(DBChannelID_t ch) const {
     return this->Pedestal(ch).PedRmsErr();
   }

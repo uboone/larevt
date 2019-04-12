@@ -28,17 +28,17 @@ namespace lariov {
    * @brief Class providing information about the quality of channels
    *
    * This class serves information read from a FHiCL configuration file and/or a database.
-   * 
+   *
    * LArSoft interface to this class is through the service
    * SIOVChannelStatusService.
    */
   class SIOVChannelStatusProvider: public DatabaseRetrievalAlg, public ChannelStatusProvider {
-    
+
     public:
-    
+
       /// Constructor
       SIOVChannelStatusProvider(fhicl::ParameterSet const& pset);
-    
+
       ///Default destructor
       virtual ~SIOVChannelStatusProvider() = default;
 
@@ -68,13 +68,13 @@ namespace lariov {
       bool IsNoisy(raw::ChannelID_t channel) const override {
         return GetChannelStatus(channel).IsNoisy();
       }
-      
+
       /// Returns whether the specified channel is physical and good
       bool IsGood(raw::ChannelID_t channel) const override {
-        return GetChannelStatus(channel).IsGood(); 
+        return GetChannelStatus(channel).IsGood();
       }
       /// @}
-      
+
       Status_t Status(raw::ChannelID_t channel) const override {
         return (Status_t) this->GetChannelStatus(channel).Status();
       }
@@ -104,14 +104,14 @@ namespace lariov {
       void AddNoisyChannel(raw::ChannelID_t ch);
 
       ///@}
-      
-      
+
+
       /// Converts LArSoft channel ID in the one proper for the DB
       static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel)
         { return DBChannelID_t(channel); }
-      
+
     private:
-    
+
       /// Do actual database updates.
 
       bool DBUpdate() const;                    // Uses current event time.
@@ -126,12 +126,12 @@ namespace lariov {
       mutable Snapshot<ChannelStatus> fData;    // Lazily updated once per IOV.
       Snapshot<ChannelStatus> fNewNoisy;        // Updated once per event.
       ChannelStatus fDefault;
-      
+
       ChannelSet_t GetChannelsWithStatus(chStatus status) const;
-    
+
   }; // class SIOVChannelStatusProvider
-  
-  
+
+
 } // namespace lariov
 
 

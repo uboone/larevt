@@ -45,14 +45,14 @@ namespace geo { class Geometry; }
 
 namespace caldata {
 
-  /// Base class for creation of raw signals on wires. 
+  /// Base class for creation of raw signals on wires.
   class CalWireAna : public art::EDAnalyzer {
-    
+
   public:
-        
-    explicit CalWireAna(fhicl::ParameterSet const& pset); 
+
+    explicit CalWireAna(fhicl::ParameterSet const& pset);
     virtual ~CalWireAna();
-    
+
     /// read/write access to event
     void analyze (const art::Event& evt);
     void beginJob();
@@ -65,14 +65,14 @@ namespace caldata {
 
     TH1F*                  fDiffsR;            ///< histogram of Raw tdc to tdc differences
     TH1F*                  fDiffsW;            ///< histogram of Wire (post-deconvoution) tdc to tdc differences
-    TH1F*                  fDiffsRW; 
-    TH1F*                  fDiffsRWgph; 
-    TH1F*                  fMin; 
-    TH1F*                  fMax; 
-    TH1F*                  fIR; 
-    TH1F*                  fCR; 
-    TH1F*                  fIW; 
-    TH1F*                  fCW; 
+    TH1F*                  fDiffsRW;
+    TH1F*                  fDiffsRWgph;
+    TH1F*                  fMin;
+    TH1F*                  fMax;
+    TH1F*                  fIR;
+    TH1F*                  fCR;
+    TH1F*                  fIW;
+    TH1F*                  fCW;
     TH1F*                  fRawIndPeak;      //Raw Induction Peak Values
     TH1F*                  fRawColPeak;      //Raw Collection Peak Values
     TH1F*                  fCalIndPeak;      //Calibrated Induction Peak Values
@@ -86,7 +86,7 @@ namespace caldata {
     TH2F*                  fDiffsRWvsR;
     TH2F*                  fDiffsRWvsRgph;
     TH2F*                  fWindow;
-    
+
 
   }; // class CalWireAna
 
@@ -96,12 +96,12 @@ namespace caldata {
 namespace caldata{
 
   //-------------------------------------------------
-  CalWireAna::CalWireAna(fhicl::ParameterSet const& pset) 
-    : EDAnalyzer         (pset) 
+  CalWireAna::CalWireAna(fhicl::ParameterSet const& pset)
+    : EDAnalyzer         (pset)
     , fCalWireModuleLabel(pset.get< std::string >("CalWireModuleLabel"))
     , fDetSimModuleLabel (pset.get< std::string >("DetSimModuleLabel"))
   {
-			 
+
   }
 
   //-------------------------------------------------
@@ -110,7 +110,7 @@ namespace caldata{
   }
 
   //-------------------------------------------------
-  void CalWireAna::beginJob() 
+  void CalWireAna::beginJob()
   {
     // get access to the TFile service
     art::ServiceHandle<art::TFileService const> tfs;
@@ -147,7 +147,7 @@ namespace caldata{
   }
 
   //-------------------------------------------------
-  void CalWireAna::endJob() 
+  void CalWireAna::endJob()
   {
   }
 
@@ -163,11 +163,11 @@ namespace caldata{
     evt.getByLabel(fDetSimModuleLabel,rdHandle);
     art::Handle< std::vector<recob::Wire> > wHandle;
     evt.getByLabel(fCalWireModuleLabel,wHandle);
-    
+
     // get the raw::RawDigit associated by fCalWireModuleLabel to wires in wHandle;
     // RawDigitsFromWire.at(index) will be a art::Ptr<raw::RawDigit>
     art::FindOneP<raw::RawDigit> RawDigitsFromWire(wHandle, evt, fCalWireModuleLabel);
-    
+
     art::PtrVector<recob::Wire> wvec;
     for(unsigned int i = 0; i < wHandle->size(); ++i){
       art::Ptr<recob::Wire> w(wHandle,i);
@@ -190,7 +190,7 @@ namespace caldata{
     uint32_t colChan1=354;
     std::vector<double> ir(fft->FFTSize()),iw(fft->FFTSize()),cr(fft->FFTSize()),cw(fft->FFTSize());
     ir[signalSize]=iw[signalSize]=cr[signalSize]=cw[signalSize]=1.0;
-    /// loop over all the raw digits in a window around peak 
+    /// loop over all the raw digits in a window around peak
     for(unsigned int rd = 0; rd < rdvec.size(); ++rd){
       // Find corresponding wire.
       std::vector<double> signal(fft->FFTSize());
@@ -215,16 +215,16 @@ namespace caldata{
       }
 
       std::vector<double> adc(fft->FFTSize());
-      
+
       for(unsigned int t = 1; t < rdvec[rd]->Samples(); ++t){
-	fDiffsR->Fill(rdvec[rd]->ADC(t) - rdvec[rd]->ADC(t-1)); 
+	fDiffsR->Fill(rdvec[rd]->ADC(t) - rdvec[rd]->ADC(t-1));
 	adc[t-1]=rdvec[rd]->ADC(t-1);
 	fRawSig->Fill(rd,rdvec[rd]->ADC(t));
       }
       //get the last one for the adc vector
       adc[rdvec[rd]->Samples()-1] = rdvec[rd]->ADC(rdvec[rd]->Samples()-1);
-      if(!channelStatus.IsBad(rdvec[rd]->Channel()) && 
-	 (*max_element(adc.begin(),adc.end()) < pedestal+threshold && 
+      if(!channelStatus.IsBad(rdvec[rd]->Channel()) &&
+	 (*max_element(adc.begin(),adc.end()) < pedestal+threshold &&
 	  *min_element(adc.begin(),adc.end()) >pedestal -threshold)) {
 	double sum=0;
 	for(int i = 0; i < signalSize; i++) sum+=pow(adc[i]-pedestal,2.0);
@@ -235,34 +235,34 @@ namespace caldata{
 	fft->DoFFT(temp,fTemp);
 	for(int i = 0; i < fft->FFTSize()/2+1; i++) fNoiseHist->Fill(i,fTemp[i].Rho());
       }
-      if(geom->SignalType(rdvec[rd]->Channel()) == geo::kInduction && 
-	 rdvec[rd]->Channel() > indChan0 && 
-	 rdvec[rd]->Channel() < indChan1){	    
+      if(geom->SignalType(rdvec[rd]->Channel()) == geo::kInduction &&
+	 rdvec[rd]->Channel() > indChan0 &&
+	 rdvec[rd]->Channel() < indChan1){
 	    fft->AlignedSum(ir,adc);
             fft->AlignedSum(iw,signal);
       }
-      if(geom->SignalType(rdvec[rd]->Channel()) == geo::kCollection && 
-	 rdvec[rd]->Channel() > colChan0 && 
+      if(geom->SignalType(rdvec[rd]->Channel()) == geo::kCollection &&
+	 rdvec[rd]->Channel() > colChan0 &&
 	 rdvec[rd]->Channel() < colChan1) {
 	fft->AlignedSum(cr,adc);
 	fft->AlignedSum(cw,signal);
       }
       if(geom->SignalType(rdvec[rd]->Channel()) == geo::kInduction) {
-	if(*max_element(adc.begin(),adc.end()) > pedestal+threshold) 
+	if(*max_element(adc.begin(),adc.end()) > pedestal+threshold)
 	  fRawIndPeak->Fill(*max_element(adc.begin(),adc.end()));
-	if(*max_element(signal.begin(),signal.end()) > pedestal+threshold) 
+	if(*max_element(signal.begin(),signal.end()) > pedestal+threshold)
 	  fCalIndPeak->Fill(*max_element(signal.begin(),signal.end()));
       }
       if(geom->SignalType(rdvec[rd]->Channel()) == geo::kCollection) {
 	if(*max_element(adc.begin(),adc.end()) > pedestal +threshold)
 	  fRawColPeak->Fill(*max_element(adc.begin(),adc.end()));
-	if(*max_element(signal.begin(),signal.end()) > pedestal+threshold) 
+	if(*max_element(signal.begin(),signal.end()) > pedestal+threshold)
 	  fCalColPeak->Fill(*max_element(signal.begin(),signal.end()));
       }
-	
-      int window = 8; 
+
+      int window = 8;
       static unsigned int pulseHeight = 5;
-      unsigned int tmin = 1; 
+      unsigned int tmin = 1;
       unsigned int tmax = 1;
       int indMax = TMath::LocMax(signalSize,&adc[0]);
       double sigMin = 0.0;
@@ -272,27 +272,27 @@ namespace caldata{
 	sigMin = TMath::MinElement(signalSize,&adc[0]);
 	tmin = std::max(indMax-window,0);
 	tmax = std::min(indMin+window,(int)signalSize-1);
-	MF_LOG_DEBUG("CalWireAna") << "Induction channel, indMin,tmin,tmax " 
+	MF_LOG_DEBUG("CalWireAna") << "Induction channel, indMin,tmin,tmax "
 				   << rd<< " " << indMin<< " " << tmin << " " << tmax;
-      } 
+      }
       else if (sigMax>=pulseHeight){
 	tmin = std::max(indMax-window,0);
 	tmax = std::min(indMax+window,(int)signalSize-1);
 	MF_LOG_DEBUG("CalWireAna") << "Collection channel, tmin,tmax "<< rd<< " " << tmin << " " << tmax;
       }
-      
+
       fMin->Fill(sigMin);
       fMax->Fill(sigMax);
       fWindow->Fill(indMax, tmax - tmin);
-      
+
       std::vector<double> winDiffs;
       int cnt=0;
       //	for(unsigned int t = tmin; t < tmax; ++t)
       static unsigned int tRawLead = 0;
-      for(unsigned int t = 1; t < signalSize; ++t){	    
+      for(unsigned int t = 1; t < signalSize; ++t){
 	fDiffsW->Fill(signal[t]-signal[t-1]);
 	fWireSig->Fill(rd,signal[t]);
-	
+
 	if (t>=tmin && t<=tmax && tmax>=pulseHeight && (t+tRawLead)<signalSize){
 	  cnt++;
 	  winDiffs.push_back((adc[t+tRawLead]-signal[t])/adc[t+tRawLead]);
@@ -303,7 +303,7 @@ namespace caldata{
 	    fDiffsRWvsRgph->Fill(rd,adc[t+tRawLead]-signal[t]);
 	  }
 	}
-      }               
+      }
 
       MF_LOG_DEBUG("CalWireAna") << "on channel " << rdvec[rd]->Channel();
       // TMath::Mean with iterators doesn't work. EC,23-Sep-2010.
@@ -319,7 +319,7 @@ namespace caldata{
       }
       fRD_WireMeanDiff2D->Fill(rd,tmp);
       fRD_WireRMSDiff2D->Fill(rd,tmp2);
-      
+
     }//end loop over rawDigits
 
     return;
