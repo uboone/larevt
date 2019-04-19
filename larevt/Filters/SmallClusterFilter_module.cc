@@ -42,7 +42,6 @@ namespace cluster {
     /**METHODS global*/
     explicit SmallClusterFilter(fhicl::ParameterSet const& pset);
     void beginJob();
-    void reconfigure(fhicl::ParameterSet const& pset);
     /**Routine that finds the cluster and sets the dTdW of the 2D shower*/
     bool filter(art::Event& evt);
 
@@ -76,12 +75,6 @@ namespace cluster {
 
 cluster::SmallClusterFilter::SmallClusterFilter(fhicl::ParameterSet const& pset)
   : EDFilter{pset}
-{
-  this->reconfigure(pset);
-}
-
-
-void cluster::SmallClusterFilter::reconfigure(fhicl::ParameterSet const& pset)
 {
   fHitFinderModuleLabel = pset.get< std::string 	> ("HitFinderModuleLabel");
   fMaxHitsByPlane	= pset.get< std::vector<int>    > ("MaxHitsByPlane");

@@ -24,7 +24,6 @@ namespace filt{
     public:
       explicit LArG4ParticleFilter(fhicl::ParameterSet const & pset);
       virtual bool filter(art::Event& e);
-      void reconfigure(fhicl::ParameterSet const& pset);
 
     private:
 
@@ -56,19 +55,15 @@ namespace filt{
   LArG4ParticleFilter::LArG4ParticleFilter::LArG4ParticleFilter(fhicl::ParameterSet const & pset)
     : EDFilter{pset}
   {
-    this->reconfigure(pset);
-    for (unsigned int i = 0; i < fInterestingPDGs.size(); i++){
-      fFoundInterestingParticles.push_back(false);
-    }
-  }
-
-  void LArG4ParticleFilter::reconfigure(fhicl::ParameterSet const& pset){
     fInterestingPDGs = pset.get<std::vector<int> >("InterestingPDGs");
     fParticleMinMomentum = pset.get<std::vector<double> >("ParticleMinMomentum");
     fParticleMaxMomentum = pset.get<std::vector<double> >("ParticleMaxMomentum");
     fStopInTPC = pset.get<std::vector<int> >("StopInTPC");
     fParticleMinTPCLength = pset.get<std::vector<double> >("ParticleMinTPCLength");
     fRequireAllInterestingParticles = pset.get<bool>("RequireAllInterestingParticles");
+    for (unsigned int i = 0; i < fInterestingPDGs.size(); i++){
+      fFoundInterestingParticles.push_back(false);
+    }
   }
 
   bool LArG4ParticleFilter::filter(art::Event & e){

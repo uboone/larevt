@@ -49,7 +49,6 @@ namespace filter {
 		explicit EventTimeFilter(fhicl::ParameterSet const& );
 
 		bool filter(art::Event& evt);
-		void reconfigure(fhicl::ParameterSet const& p);
 
 	private:
 
@@ -62,19 +61,13 @@ namespace filter {
 
 }
 
-void filter::EventTimeFilter::reconfigure(fhicl::ParameterSet const& p) {
-
-	fDateRangeLow   = p.get<UInt_t>("DateRangeLow", 0);   // YYYYMMDD
-	fTimeRangeLow   = p.get<UInt_t>("TimeRangeLow", 0);   // HHMMSS
-	fDateRangeHigh  = p.get<UInt_t>("DateRangeHigh", 0);  // YYYYMMDD
-	fTimeRangeHigh  = p.get<UInt_t>("TimeRangeHigh", 0);  // HHMMSS
-
-}
-
 filter::EventTimeFilter::EventTimeFilter(fhicl::ParameterSet const& pset)
   : EDFilter{pset}
 {
-	this->reconfigure(pset);
+        fDateRangeLow   = pset.get<UInt_t>("DateRangeLow", 0);   // YYYYMMDD
+        fTimeRangeLow   = pset.get<UInt_t>("TimeRangeLow", 0);   // HHMMSS
+        fDateRangeHigh  = pset.get<UInt_t>("DateRangeHigh", 0);  // YYYYMMDD
+        fTimeRangeHigh  = pset.get<UInt_t>("TimeRangeHigh", 0);  // HHMMSS
 }
 
 bool filter::EventTimeFilter::filter(art::Event &evt) {

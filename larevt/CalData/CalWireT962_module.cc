@@ -52,7 +52,6 @@ namespace caldata {
 
     void produce(art::Event& evt);
     void beginJob();
-    void reconfigure(fhicl::ParameterSet const& p);
 
   private:
 
@@ -87,22 +86,15 @@ namespace caldata{
   CalWireT962::CalWireT962(fhicl::ParameterSet const& pset)
     : EDProducer{pset}
   {
-    this->reconfigure(pset);
+    fDigitModuleLabel = pset.get< std::string >("DigitModuleLabel", "daq");
+    fExpEndBins       = pset.get< int >        ("ExponentialEndBins");
+    fPostsample       = pset.get< int >        ("PostsampleBins");
+
+    cet::search_path sp("FW_SEARCH_PATH");
+    sp.find_file(pset.get<std::string>("ResponseFile"), fResponseFile);
 
     produces< std::vector<recob::Wire> >();
     produces<art::Assns<raw::RawDigit, recob::Wire>>();
-
-  }
-
-  //////////////////////////////////////////////////////
-  void CalWireT962::reconfigure(fhicl::ParameterSet const& p)
-  {
-    fDigitModuleLabel = p.get< std::string >("DigitModuleLabel", "daq");
-    fExpEndBins       = p.get< int >        ("ExponentialEndBins");
-    fPostsample       = p.get< int >        ("PostsampleBins");
-
-    cet::search_path sp("FW_SEARCH_PATH");
-    sp.find_file(p.get<std::string>("ResponseFile"), fResponseFile);
 
   }
 

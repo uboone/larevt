@@ -38,7 +38,6 @@ namespace filt {
     explicit FinalStateParticleFilter(fhicl::ParameterSet const& );
 
     bool filter(art::Event& evt);
-    void reconfigure(fhicl::ParameterSet const& p);
     void beginJob();
 
 
@@ -50,7 +49,7 @@ namespace filt {
     TH1D* fSelectedEvents;
     TH1D* fTotalEvents;
 
-    bool isSubset(std::vector<int>& a, std::vector<int>& b);
+    bool isSubset(std::vector<int> const& a, std::vector<int> const& b) const;
 
   }; // class FinalStateParticleFilter
 
@@ -62,14 +61,8 @@ namespace filt{
   FinalStateParticleFilter::FinalStateParticleFilter(fhicl::ParameterSet const & pset)
     : EDFilter{pset}
   {
-    this->reconfigure(pset);
-  }
-
-  //-------------------------------------------------
-  void FinalStateParticleFilter::reconfigure(fhicl::ParameterSet const& p)
-  {
-    fGenieModuleLabel = p.get< std::string      >("GenieModuleLabel");
-    fPDG              = p.get< std::vector<int> >("PDG");
+    fGenieModuleLabel = pset.get< std::string      >("GenieModuleLabel");
+    fPDG              = pset.get< std::vector<int> >("PDG");
   }
 
   //-------------------------------------------------
@@ -113,12 +106,12 @@ namespace filt{
 
 //------------------------------------------------
 
-bool FinalStateParticleFilter::isSubset(std::vector<int>& a, std::vector<int>& b)
+bool FinalStateParticleFilter::isSubset(std::vector<int> const& a, std::vector<int> const& b) const
 {
-  for (std::vector<int>::iterator i = a.begin(); i != a.end(); i++){
+  for (auto const a_int : a) {
     bool found = false;
-    for (std::vector<int>::iterator j = b.begin(); j != b.end(); j++){
-      if (*i == *j){
+    for (auto const b_int : b) {
+      if (a_int == b_int){
 	found = true;
 	break;
       }

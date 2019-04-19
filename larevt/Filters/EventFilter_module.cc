@@ -35,8 +35,6 @@ namespace filter {
     explicit EventFilter(fhicl::ParameterSet const& );
 
     bool filter(art::Event& evt) override;
-    void reconfigure(fhicl::ParameterSet const& p);
-
 
     std::vector < unsigned int > SetOfBadEvents()   const { return fBadEvents;}
     std::vector < unsigned int > SetOfBadRuns()     const { return fBadRuns;  }
@@ -60,13 +58,14 @@ namespace filter {
 
 ///////////////////////////////////////////////////////
 
-void filter::EventFilter::reconfigure(fhicl::ParameterSet const& p)
+filter::EventFilter::EventFilter(fhicl::ParameterSet const& pset)
+  : EDFilter{pset}
 {
-  fBadEvents  = p.get < std::vector <unsigned int> >("BadEvents");
-  fBadRuns    = p.get < std::vector <unsigned int> >("BadRuns");
+  fBadEvents  = pset.get < std::vector <unsigned int> >("BadEvents");
+  fBadRuns    = pset.get < std::vector <unsigned int> >("BadRuns");
 
-  fSelection = p.get< int >("Selection");
-  fEventList = p.get< std::string >("EventList");
+  fSelection = pset.get< int >("Selection");
+  fEventList = pset.get< std::string >("EventList");
   fSelEvents.clear();
   fSelRuns.clear();
   std::ifstream in;
@@ -82,14 +81,6 @@ void filter::EventFilter::reconfigure(fhicl::ParameterSet const& p)
     fSelEvents.push_back(n2);
   }
   in.close();
-
-}
-
-
-filter::EventFilter::EventFilter(fhicl::ParameterSet const& pset)
-  : EDFilter{pset}
-{
-  this->reconfigure(pset);
 }
 
 bool filter::EventFilter::filter(art::Event &evt)

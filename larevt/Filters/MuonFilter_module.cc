@@ -54,7 +54,6 @@ namespace filter {
 
   private:
     bool filter(art::Event& evt) override;
-    void reconfigure(fhicl::ParameterSet const& p);
 
     std::string fClusterModuleLabel;
     std::string fLineModuleLabel;
@@ -72,21 +71,15 @@ namespace filter {
   MuonFilter::MuonFilter(fhicl::ParameterSet const & pset)
     : EDFilter{pset}
   {
-    this->reconfigure(pset);
-  }
-
-  //------------------------------------------------
-  void MuonFilter::reconfigure(fhicl::ParameterSet const& p)
-  {
-    fClusterModuleLabel = p.get< std::string         >("ClusterModuleLabel");
-    fLineModuleLabel    = p.get< std::string               >("LineModuleLabel");
-    fTolerance          = p.get< double                    >("Tolerance");
-    fDelay              = p.get< double                    >("Delay");
-    fDCenter            = p.get< double                    >("DCenter");
-    fMaxIon             = p.get< double                    >("MaxIon");
-    fIonFactor          = p.get< double                    >("IonFactor");
-    fCuts               = p.get< std::vector<double> >("Cuts");
-    fDeltaWire          = p.get< int                 >("DeltaWire");
+    fClusterModuleLabel = pset.get< std::string         >("ClusterModuleLabel");
+    fLineModuleLabel    = pset.get< std::string               >("LineModuleLabel");
+    fTolerance          = pset.get< double                    >("Tolerance");
+    fDelay              = pset.get< double                    >("Delay");
+    fDCenter            = pset.get< double                    >("DCenter");
+    fMaxIon             = pset.get< double                    >("MaxIon");
+    fIonFactor          = pset.get< double                    >("IonFactor");
+    fCuts               = pset.get< std::vector<double> >("Cuts");
+    fDeltaWire          = pset.get< int                 >("DeltaWire");
   }
 
   //-------------------------------------------------

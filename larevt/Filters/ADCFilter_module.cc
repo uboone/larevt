@@ -38,7 +38,6 @@ namespace filter {
 
    private:
       bool filter(art::Event& evt);
-      void reconfigure(fhicl::ParameterSet const& p);
 
       std::string fDigitModuleLabel;
       double      fMinADC;
@@ -48,14 +47,8 @@ namespace filter {
    ADCFilter::ADCFilter(fhicl::ParameterSet const & pset)
      : EDFilter{pset}
    {
-      this->reconfigure(pset);
-   }
-
-   //-------------------------------------------------
-   void ADCFilter::reconfigure(fhicl::ParameterSet const& p)
-   {
-      fDigitModuleLabel = p.get< std::string > ("DigitModuleLabel");
-      fMinADC           = p.get< double      > ("MinADC");
+      fDigitModuleLabel = pset.get< std::string > ("DigitModuleLabel");
+      fMinADC           = pset.get< double      > ("MinADC");
    }
 
    //-------------------------------------------------

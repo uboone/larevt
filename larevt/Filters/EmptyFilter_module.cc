@@ -46,7 +46,6 @@ namespace filt {
     explicit EmptyFilter(fhicl::ParameterSet const& );
 
     bool filter(art::Event& evt);
-    void reconfigure(fhicl::ParameterSet const& p);
     void beginJob();
 
 
@@ -71,15 +70,9 @@ namespace filt {
   EmptyFilter::EmptyFilter(fhicl::ParameterSet const & pset)
     : EDFilter{pset}
   {
-    this->reconfigure(pset);
-  }
-
-  //-------------------------------------------------
-  void EmptyFilter::reconfigure(fhicl::ParameterSet const& p)
-  {
-    fHitsModuleLabel = p.get< std::string > ("HitsModuleLabel");
-    fMinIonization =   p.get< double      > ("MinIonization");
-    fMinNumHits =      p.get< int         > ("MinHits");
+    fHitsModuleLabel = pset.get< std::string > ("HitsModuleLabel");
+    fMinIonization =   pset.get< double      > ("MinIonization");
+    fMinNumHits =      pset.get< int         > ("MinHits");
   }
 
   //-------------------------------------------------

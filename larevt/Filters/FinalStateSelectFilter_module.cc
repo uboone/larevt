@@ -42,7 +42,6 @@ namespace filt {
 
   private:
     bool filter(art::Event& evt) override;
-    void reconfigure(fhicl::ParameterSet const& p);
     void beginJob() override;
 
     std::string fGenieModuleLabel;
@@ -67,18 +66,12 @@ namespace filt{
   FinalStateSelectFilter::FinalStateSelectFilter(fhicl::ParameterSet const & pset)
     : EDFilter{pset}
   {
-    this->reconfigure(pset);
-  }
-
-  //-------------------------------------------------
-  void FinalStateSelectFilter::reconfigure(fhicl::ParameterSet const& p)
-  {
-    fDebug             = p.get< bool >("IsVerbose");
-    fGenieModuleLabel  = p.get< std::string      >("GenieModuleLabel");
-    fPDG               = p.get< std::vector<int> >("PDG");
-    fInclusive         = p.get< bool >("isInclusive");
-    fPDGCount          = p.get< std::vector<int> >("PDGCount");
-    fPDGCountExclusive = p.get< std::vector<bool> >("PDGCountExclusivity");
+    fDebug             = pset.get< bool >("IsVerbose");
+    fGenieModuleLabel  = pset.get< std::string      >("GenieModuleLabel");
+    fPDG               = pset.get< std::vector<int> >("PDG");
+    fInclusive         = pset.get< bool >("isInclusive");
+    fPDGCount          = pset.get< std::vector<int> >("PDGCount");
+    fPDGCountExclusive = pset.get< std::vector<bool> >("PDGCountExclusivity");
   }
 
   //-------------------------------------------------
