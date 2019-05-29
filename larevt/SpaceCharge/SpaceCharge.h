@@ -32,8 +32,8 @@ namespace spacecharge{
 
       virtual geo::Vector_t GetPosOffsets(geo::Point_t const& point) const = 0;
       virtual geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const = 0;
-	  virtual geo::Vector_t GetCalPosOffsets(geo::Point_t const& point) const = 0;
-	  virtual geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point) const = 0;
+	  virtual geo::Vector_t GetCalPosOffsets(geo::Point_t const& point, int const& TPCid) const = 0;
+	  virtual geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point, int const& TPCid) const = 0;
 
     protected:
 

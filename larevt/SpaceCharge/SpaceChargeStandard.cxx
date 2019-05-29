@@ -210,7 +210,7 @@ geo::Vector_t spacecharge::SpaceChargeStandard::GetPosOffsets(geo::Point_t const
   return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
 }
 
-geo::Vector_t spacecharge::SpaceChargeStandard::GetCalPosOffsets(geo::Point_t const& point) const
+geo::Vector_t spacecharge::SpaceChargeStandard::GetCalPosOffsets(geo::Point_t const& point, int const& TPCid) const
 {
 
 	return{ 0., 0., 0.};
@@ -368,7 +368,7 @@ geo::Vector_t spacecharge::SpaceChargeStandard::GetEfieldOffsets(geo::Point_t co
   return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
 }
 
-geo::Vector_t spacecharge::SpaceChargeStandard::GetCalEfieldOffsets(geo::Point_t const& point) const
+geo::Vector_t spacecharge::SpaceChargeStandard::GetCalEfieldOffsets(geo::Point_t const& point, int const& TPCid) const
 {
 
 	return {0., 0., 0.};
