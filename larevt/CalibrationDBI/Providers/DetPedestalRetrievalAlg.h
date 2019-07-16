@@ -16,14 +16,16 @@
 
 // C/C++ standard libraries
 #include <string>
-#include <array>
 
 // LArSoft libraries
 #include "larevt/CalibrationDBI/IOVData/DetPedestal.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
+
+namespace fhicl { class ParameterSet; }
 
 namespace lariov {
 

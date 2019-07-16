@@ -15,12 +15,11 @@
 #define CHANNELFILTER_H
 
 // LArSoft libraries
-#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
+namespace lariov { class ChannelStatusProvider; }
 
 // C/C++ standard libraries
 #include <set>
 #include <stdint.h>
-
 
 namespace filter {
 

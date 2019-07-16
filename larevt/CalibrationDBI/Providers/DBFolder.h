@@ -5,7 +5,6 @@
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace lariov {
 

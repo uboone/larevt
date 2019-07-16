@@ -8,41 +8,32 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#include "TH2D.h"
-
-
-extern "C" {
-#include <sys/types.h>
-#include <sys/stat.h>
-}
-#include <math.h>
-#include <algorithm>
-#include <fstream>
-#include "TMath.h"
-
 //Framework Includes
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Principal/Event.h" 
-#include "fhiclcpp/ParameterSet.h" 
 #include "art/Framework/Principal/Handle.h" 
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "canvas/Persistency/Common/FindManyP.h"
 #include "canvas/Persistency/Common/Ptr.h" 
 #include "canvas/Persistency/Common/PtrVector.h" 
-#include "art/Framework/Services/Registry/ServiceHandle.h" 
-#include "art_root_io/TFileService.h"
-#include "art_root_io/TFileDirectory.h"
+#include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h" 
-
 
 //Larsoft Includes
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardataobj/RecoBase/Cluster.h"
 #include "larcore/Geometry/Geometry.h"
 #include "larcorealg/Geometry/PlaneGeo.h"
-#include "larcorealg/Geometry/WireGeo.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
-#include "lardata/Utilities/AssociationUtil.h"
 
+// C++ includes
+#include <map>
+#include <memory>
+#include <string>
+
+// ROOT includes
+#include "TMathBase.h"
 
 namespace filter {
 

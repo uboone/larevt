@@ -11,14 +11,16 @@
 #define SIOVCHANNELSTATUSPROVIDER_H 1
 
 // LArSoft libraries
+#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 #include "larevt/CalibrationDBI/IOVData/ChannelStatus.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
+#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 
 // Utility libraries
-#include "fhiclcpp/ParameterSet.h"
-
+namespace fhicl { class ParameterSet; }
 
 /// Filters for channels, events, etc
 namespace lariov {

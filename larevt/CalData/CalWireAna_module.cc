@@ -24,7 +24,6 @@
 
 // LArSoft includes
 #include "larcore/Geometry/Geometry.h"
-#include "larcorealg/Geometry/PlaneGeo.h"
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardataobj/RecoBase/Wire.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
@@ -32,16 +31,10 @@
 #include "lardata/Utilities/LArFFT.h"
 
 // ROOT includes
-#include <TMath.h>
-#include <TH1.h>
-#include <TH2.h>
-#include <TGraph.h>
-
-class TH2F;
-class TH1F;
-
-namespace geo { class Geometry; }
-
+#include "TComplex.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TMath.h"
 
 namespace caldata {
 

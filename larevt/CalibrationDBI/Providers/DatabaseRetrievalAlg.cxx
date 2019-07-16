@@ -1,4 +1,9 @@
+#include "fhiclcpp/ParameterSet.h"
+#include "larevt/CalibrationDBI/Providers/DBFolder.h"
+
 #include "DatabaseRetrievalAlg.h"
+
+#include <string>
 
 namespace lariov {
 

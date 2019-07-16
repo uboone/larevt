@@ -1,13 +1,10 @@
 #include "DBFolder.h"
 #include "WebDBIConstants.h"
-#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/IOVData/TimeStampDecoder.h"
 #include "WebError.h"
+
 #include <sstream>
-#include <limits>
-#include <iomanip>
-#include <sys/types.h>
-#include <unistd.h>
+#include <stdlib.h>
 #include <cstring>
 #include "wda.h"
 

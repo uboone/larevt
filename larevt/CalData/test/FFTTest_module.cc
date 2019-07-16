@@ -6,7 +6,7 @@
 // Created:  29-Aug-2011  H. Greenlee
 
 #include <iostream>
-#include <cmath>
+#include <algorithm>
 
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDAnalyzer.h"

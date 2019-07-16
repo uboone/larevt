@@ -14,13 +14,14 @@
 #ifndef DATABASERETRIEVALALG_H
 #define DATABASERETRIEVALALG_H
 
-#include <string>
-#include <vector>
-#include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"
+#include <memory>
 #include "DBFolder.h"
-#include "fhiclcpp/ParameterSet.h"
+
+namespace fhicl { class ParameterSet; }
 
 namespace lariov {
+
+  class IOVTimeStamp;
 
   /**
      \class DatabaseRetrievalAlg
@@ -69,4 +70,3 @@ namespace lariov {
 
 #endif
 /** @} */ // end of doxygen group
-

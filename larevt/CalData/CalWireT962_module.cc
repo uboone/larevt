@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#include <stdint.h>
-
 // Framework includes
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "fhiclcpp/ParameterSet.h"

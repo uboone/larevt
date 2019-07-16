@@ -9,15 +9,18 @@
 
 // C++ language includes
 #include <fstream>
-#include <string>
-#include "math.h"
-#include "stdio.h"
 
 // LArSoft includes
 #include "larevt/SpaceCharge/SpaceChargeStandard.h"
 
 // Framework includes
 #include "canvas/Utilities/Exception.h"
+#include "fhiclcpp/ParameterSet.h"
+
+// ROOT includes
+#include "TFile.h"
+#include "TGraph.h"
+#include "TString.h"
 
 //-----------------------------------------------
 spacecharge::SpaceChargeStandard::SpaceChargeStandard(

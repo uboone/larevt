@@ -11,17 +11,14 @@
 
 // LArSoft libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "fhiclcpp/ParameterSet.h"
 #include "larcore/Geometry/Geometry.h"
-#include "WebError.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/Providers/DBFolder.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // C/C++ standard libraries
-#include <algorithm> // std::copy()
-#include <iterator> // std::inserter()
-#include <utility> // std::pair<>
 #include <fstream>
-
 
 namespace lariov {
 

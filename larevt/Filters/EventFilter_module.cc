@@ -3,21 +3,13 @@
 // EventFilter class
 //
 ////////////////////////////////////////////////////////////////////////
-extern "C" {
-#include <sys/types.h>
-#include <sys/stat.h>
-}
-#include <math.h>
-#include <algorithm>
-#include <iostream>
 #include <fstream>
-#include "TMath.h"
+
 /// Framework includes
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Principal/Event.h" 
 #include "fhiclcpp/ParameterSet.h" 
-#include "art/Framework/Principal/Handle.h" 
 #include "messagefacility/MessageLogger/MessageLogger.h" 
 
 ///filters for events, etc

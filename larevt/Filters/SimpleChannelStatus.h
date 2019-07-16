@@ -15,7 +15,7 @@
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 // Utility libraries
-#include "fhiclcpp/ParameterSet.h"
+namespace fhicl { class ParameterSet; }
 
 // C/C++ standard library
 #include <memory> // std::unique_ptr<>

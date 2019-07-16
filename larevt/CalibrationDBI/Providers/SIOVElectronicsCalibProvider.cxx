@@ -1,5 +1,4 @@
 #include "SIOVElectronicsCalibProvider.h"
-#include "WebError.h"
 
 // art/LArSoft libraries
 #include "cetlib_except/exception.h"

@@ -3,20 +3,20 @@
 //The filter parameters are FHICL configurable but can select based on, momentum, particle flavour, TPC trajectory length and whether the particle stops/starts in the TPC.
 //The user can ask for events which contain multiple types of interesting particles, each with their own requirements.
 
-//STL
-#include <utility>
-
 //ART
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
 
 //LArSoft
 #include "larcore/Geometry/Geometry.h"
-#include "nusimdata/SimulationBase/MCTruth.h"
-#include "lardataobj/RawData/RawDigit.h"
-#include "lardataobj/RawData/raw.h"
-#include "lardataobj/RecoBase/Wire.h"
+#include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
+#include "nusimdata/SimulationBase/MCParticle.h"
+
+// ROOT
+#include "TLorentzVector.h"
+#include "TVector3.h"
 
 namespace filt{
 

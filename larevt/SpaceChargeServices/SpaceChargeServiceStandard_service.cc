@@ -10,14 +10,15 @@
 // C++ language includes
 
 // LArSoft includes
+#include "larevt/SpaceCharge/SpaceChargeStandard.h"
 #include "larevt/SpaceChargeServices/SpaceChargeServiceStandard.h"
 
-// ROOT includes
-#include "TMath.h"
-
 // Framework includes
-#include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib_except/exception.h"
+#include "art/Framework/Principal/Run.h"                            // for Run
+#include "art/Framework/Services/Registry/ActivityRegistry.h"
+#include "art/Framework/Services/Registry/GlobalSignal.h"
+#include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "canvas/Persistency/Provenance/RunID.h"
 
 //-----------------------------------------------
 spacecharge::SpaceChargeServiceStandard::SpaceChargeServiceStandard(fhicl::ParameterSet const& pset, art::ActivityRegistry &reg)

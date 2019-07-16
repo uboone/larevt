@@ -1,11 +1,16 @@
 #include "DetPedestalRetrievalAlg.h"
-#include "WebError.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 
 // art/LArSoft libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h"
-#include "larcore/Geometry/Geometry.h"
 #include "cetlib_except/exception.h"
+#include "fhiclcpp/ParameterSet.h"                           // for Paramete...
+#include "larcore/Geometry/Geometry.h"
+#include "larcorealg/Geometry/GeometryCore.h"                // for wire_id_...
+#include "larcoreobj/SimpleTypesAndConstants/geo_types.h"    // for kCollection
+#include "larevt/CalibrationDBI/IOVData/IOVDataError.h"      // for IOVDataE...
+#include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"      // for IOVTimeS...
+#include "larevt/CalibrationDBI/Providers/DBFolder.h"        // for DBFolder
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 //C/C++

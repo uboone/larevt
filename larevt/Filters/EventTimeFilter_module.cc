@@ -13,16 +13,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 // C++
-extern "C" {
-#include <sys/types.h>
-#include <sys/stat.h>
-}
-#include <math.h>
-#include <algorithm>
 #include <iostream>
-#include <fstream>
 
 // ROOT
+#include "RtypesCore.h"
 #include "TMath.h"
 #include "TTimeStamp.h"
 
@@ -31,8 +25,6 @@ extern "C" {
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Principal/Event.h" 
 #include "fhiclcpp/ParameterSet.h" 
-#include "art/Framework/Principal/Handle.h" 
-#include "messagefacility/MessageLogger/MessageLogger.h" 
 
 ///filters for events, etc
 namespace filter {

@@ -13,6 +13,7 @@
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::isValidChannelID()
 
 // Framework libraries
+#include "fhiclcpp/ParameterSet.h"
 #include "cetlib/container_algorithms.h"
 #include "cetlib_except/exception.h"
 

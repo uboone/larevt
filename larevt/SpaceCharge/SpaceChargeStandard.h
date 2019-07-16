@@ -14,17 +14,16 @@
 #include "larcoreobj/SimpleTypesAndConstants/geo_vectors.h"
 
 // FHiCL libraries
-#include "fhiclcpp/ParameterSet.h"
+namespace fhicl { class ParameterSet; }
 
 // ROOT includes
-#include "TGraph.h"
 #include "TF1.h"
-#include "TFile.h"
+class TGraph;
 
 // C/C++ standard libraries
+#include <stdint.h>
 #include <string>
 #include <vector>
-
 
 namespace spacecharge {
 
