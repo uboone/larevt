@@ -1,21 +1,13 @@
-art_make( NO_PLUGINS
-          
-          LIB_LIBRARIES lardata_Utilities
-	                larcorealg_Geometry
-	                nusimdata_SimulationBase
-                        ${ART_FRAMEWORK_CORE}
-			${ART_FRAMEWORK_PRINCIPAL}
-			${ART_FRAMEWORK_SERVICES_REGISTRY}
-			art_Persistency_Common
-			art_Persistency_Provenance
-			art_Utilities
-                        canvas
-			${MF_MESSAGELOGGER}
-			
-	                ${FHICLCPP}
-			cetlib cetlib_except
-			${ROOT_BASIC_LIB_LIST}
-        )
+art_make(NO_PLUGINS
+         LIB_LIBRARIES
+           canvas
+           ${FHICLCPP}
+           ${ROOT_CORE}
+           ${ROOT_HIST}
+           ${ROOT_RIO}
+           cetlib
+           cetlib_except
+         )
 
 install_headers()
 install_fhicl()
