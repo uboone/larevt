@@ -23,6 +23,7 @@ simple_plugin(CalWire "module"
               ${ROOT_RIO})
 
 simple_plugin(CalWireT962 "module"
+              larcorealg_Geometry
               lardataobj_RawData
               lardata_ArtDataHelper
               ${ART_FRAMEWORK_SERVICES_REGISTRY}
