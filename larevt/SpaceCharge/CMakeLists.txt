@@ -2,9 +2,9 @@ art_make(NO_PLUGINS
          LIB_LIBRARIES
            canvas
            ${FHICLCPP}
-           ${ROOT_CORE}
-           ${ROOT_HIST}
-           ${ROOT_RIO}
+           ROOT::Core
+           ROOT::Hist
+           ROOT::RIO
            cetlib
            cetlib_except
          )

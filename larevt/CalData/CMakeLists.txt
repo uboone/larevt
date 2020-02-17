@@ -7,9 +7,9 @@ simple_plugin(CalWireAna "module"
               ${ART_ROOT_IO_TFILESERVICE_SERVICE}
               ${ART_ROOT_IO_TFILE_SUPPORT}
 	      ${MF_MESSAGELOGGER}
-              ${ROOT_CORE}
-              ${ROOT_HIST}
-              ${ROOT_MATHCORE})
+              ROOT::Core
+              ROOT::Hist
+              ROOT::MathCore)
 
 simple_plugin(CalWire "module"
               larcorealg_Geometry
@@ -17,10 +17,10 @@ simple_plugin(CalWire "module"
               lardata_ArtDataHelper
               ${ART_FRAMEWORK_SERVICES_REGISTRY}
               ${MF_MESSAGELOGGER}
-              ${ROOT_CORE}
-              ${ROOT_HIST}
-              ${ROOT_MATHCORE}
-              ${ROOT_RIO})
+              ROOT::Core
+              ROOT::Hist
+              ROOT::MathCore
+              ROOT::RIO)
 
 simple_plugin(CalWireT962 "module"
               larcorealg_Geometry
@@ -28,10 +28,10 @@ simple_plugin(CalWireT962 "module"
               lardata_ArtDataHelper
               ${ART_FRAMEWORK_SERVICES_REGISTRY}
               ${MF_MESSAGELOGGER}
-              ${ROOT_CORE}
-              ${ROOT_HIST}
-              ${ROOT_MATHCORE}
-              ${ROOT_RIO})
+              ROOT::Core
+              ROOT::Hist
+              ROOT::MathCore
+              ROOT::RIO)
 
 install_headers()
 install_fhicl()

@@ -12,16 +12,16 @@ art_make(LIB_LIBRARIES
            ${ART_ROOT_IO_TFILESERVICE_SERVICE}
            ${ART_ROOT_IO_TFILE_SUPPORT}
            ${MF_MESSAGELOGGER}
-           ${ROOT_CORE}
-           ${ROOT_HIST}
-           ${ROOT_PHYSICS}
+           ROOT::Core
+           ROOT::Hist
+           ROOT::Physics
            larcorealg_Geometry
            lardataobj_RawData
            nusimdata_SimulationBase
          SERVICE_LIBRARIES
            larevt_Filters
            ${MF_MESSAGELOGGER}
-           ${ROOT_CORE}
+           ROOT::Core
          )
 
 install_headers()
