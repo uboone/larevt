@@ -32,8 +32,8 @@ namespace lariov {
     public:
       
       /// Constructors
-      DatabaseRetrievalAlg(const std::string& foldername, const std::string& url, const std::string& tag="") : 
-        fFolder(new DBFolder(foldername, url, tag)) {}
+      DatabaseRetrievalAlg(const std::string& foldername, const std::string& url, const std::string& tag="", bool usesqlite=false) : 
+        fFolder(new DBFolder(foldername, url, tag, usesqlite)) {}
 
       DatabaseRetrievalAlg(fhicl::ParameterSet const& p) {
         this->Reconfigure(p);

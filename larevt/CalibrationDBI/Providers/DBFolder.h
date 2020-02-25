@@ -15,7 +15,8 @@ namespace lariov {
   class DBFolder {
   
     public:
-      DBFolder(const std::string& name, const std::string& url, const std::string& tag = "");
+      DBFolder(const std::string& name, const std::string& url, const std::string& tag = "",
+	       bool useqlite=false);
       virtual ~DBFolder();
       
       int GetNamedChannelData(DBChannelID_t channel, const std::string& name, bool& data);
@@ -32,8 +33,12 @@ namespace lariov {
       const IOVTimeStamp& CachedEnd() const   {return fCachedEnd;}
       
       bool UpdateData(DBTimeStamp_t raw_time);
+
+      Dataset GetSQLiteData(int t) const;
       
       int GetChannelList( std::vector<DBChannelID_t>& channels ) const;
+
+      void DumpDataset(Dataset data) const;
      
     private:  
       size_t GetTupleColumn( DBChannelID_t channel, const std::string& name, Tuple& tup );
@@ -47,6 +52,8 @@ namespace lariov {
       std::string fURL;
       std::string fFolderName;
       std::string fTag;
+      bool        fUseSQLite;
+      std::string fSQLitePath;
       int         fMaximumTimeout;
       
       Dataset                  fCachedDataset;   
