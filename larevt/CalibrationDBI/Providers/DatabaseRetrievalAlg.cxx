@@ -11,7 +11,8 @@ namespace lariov {
     std::string foldername = p.get<std::string>("DBFolderName");
     std::string url        = p.get<std::string>("DBUrl");
     std::string tag        = p.get<std::string>("DBTag", "");
-    fFolder.reset(new DBFolder(foldername, url, tag));
+    bool usesqlite         = p.get<bool>("UseSQLite", false);
+    fFolder.reset(new DBFolder(foldername, url, tag, usesqlite));
   }
 }
 #endif
