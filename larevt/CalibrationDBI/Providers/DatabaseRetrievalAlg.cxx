@@ -10,9 +10,11 @@ namespace lariov {
 
     std::string foldername = p.get<std::string>("DBFolderName");
     std::string url        = p.get<std::string>("DBUrl");
+    std::string url2       = p.get<std::string>("DBUrl2", "");
     std::string tag        = p.get<std::string>("DBTag", "");
     bool usesqlite         = p.get<bool>("UseSQLite", false);
-    fFolder.reset(new DBFolder(foldername, url, tag, usesqlite));
+    bool testmode          = p.get<bool>("TestMode", false);
+    fFolder.reset(new DBFolder(foldername, url, url2, tag, usesqlite, testmode));
   }
 }
 #endif
