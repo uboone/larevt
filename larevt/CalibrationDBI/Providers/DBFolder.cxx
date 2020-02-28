@@ -462,10 +462,10 @@ namespace lariov {
     // It is an error if we don't get at least one row.
 
     rc = sqlite3_step(stmt);
-    int iov_id = 0;
+    //int iov_id = 0;
     int begin_time = 0;
     if(rc == SQLITE_ROW) {
-      iov_id = sqlite3_column_int(stmt, 0);
+      //iov_id = sqlite3_column_int(stmt, 0);
       begin_time = sqlite3_column_int(stmt, 1);
       //std::cout << "iov_id = " << iov_id << std::endl;
       //std::cout << "begin_time = " << begin_time << std::endl;
@@ -519,13 +519,18 @@ namespace lariov {
 
     sqlite3_finalize(stmt);
 
-    // Query count of data rows.
+    // Query count of channels.
     // We do this so that we know how much memory to allocate for fake http response.
 
     std::string table_data = fFolderName + "_data";
     sql.str("");
-    sql << "SELECT COUNT(*) FROM " << table_data
-	<< " WHERE __iov_id = " << iov_id;
+    sql << "SELECT COUNT(DISTINCT channel)"
+	<< " FROM " << table_data << "," << table_iovs << "," << table_tag_iovs
+	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
+	<< " AND " << table_iovs << ".iov_id=" << table_tag_iovs << ".iov_id"
+	<< " AND " << table_data << ".__iov_id=" << table_tag_iovs << ".iov_id"
+	<< " AND " << table_iovs << ".active=1"
+	<< " AND " << table_iovs << ".begin_time <= " << t;
     //std::cout << "sql = " << sql.str() << std::endl;
 
     // Prepare query.
@@ -621,13 +626,19 @@ namespace lariov {
     }
     result->dataRecs[1] = dataRec;
 
-    // Query data.
+    // Main data query.
 
     sql.str("");
-    sql << "SELECT * FROM " << table_data
-	<< " WHERE __iov_id = " << iov_id 
-	<< " ORDER BY channel;";
-    //std::cout << "sql = " << sql.str() << std::endl;
+    sql << "SELECT " << table_data << ".*,MAX(begin_time)"
+	<< " FROM " << table_data << "," << table_iovs << "," << table_tag_iovs
+	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
+	<< " AND " << table_iovs << ".iov_id=" << table_tag_iovs << ".iov_id"
+	<< " AND " << table_data << ".__iov_id=" << table_tag_iovs << ".iov_id"
+	<< " AND " << table_iovs << ".active=1"
+	<< " AND " << table_iovs << ".begin_time <= " << t
+	<< " GROUP BY channel"
+	<< " ORDER BY channel";
+    std::cout << "sql = " << sql.str() << std::endl;
 
     // Prepare query.
 
@@ -653,8 +664,9 @@ namespace lariov {
 	std::string colname = sqlite3_column_name(stmt, col);
 
 	// Ignore columns that begin with "_".
+	// Also ignore utility column MAX(begin_time).
 
-	if(colname[0] != '_') {
+	if(colname[0] != '_' && colname.substr(0,3) != "MAX") {
 	  column_names.push_back(colname);
 	  int dtype = sqlite3_column_type(stmt, col);
 	  if(dtype == SQLITE_INTEGER)
@@ -743,7 +755,7 @@ namespace lariov {
       rc = sqlite3_step(stmt);
       if(rc == SQLITE_ROW) {
 	++nrows;
-	//std::cout << "Got row." << std::endl;
+	//std::cout << nrows << " rows." << std::endl;
 
 	// Add row to fake http response.
 
@@ -772,8 +784,9 @@ namespace lariov {
 	  std::string colname = sqlite3_column_name(stmt, col);
 
 	  // Ignore columns that begin with "_".
+	  // Also ignore utility column MAX(begin_time).
 
-	  if(colname[0] != '_') {
+	  if(colname[0] != '_' && colname.substr(0,3) != "MAX") {
 	    int dtype = sqlite3_column_type(stmt, col);
 
 	    if(dtype == SQLITE_INTEGER) {
