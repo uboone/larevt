@@ -638,7 +638,7 @@ namespace lariov {
 	<< " AND " << table_iovs << ".begin_time <= " << t
 	<< " GROUP BY channel"
 	<< " ORDER BY channel";
-    std::cout << "sql = " << sql.str() << std::endl;
+    //std::cout << "sql = " << sql.str() << std::endl;
 
     // Prepare query.
 
