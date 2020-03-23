@@ -23,9 +23,8 @@
 //-----------------------------------------------
 spacecharge::SpaceChargeServiceStandard::SpaceChargeServiceStandard(fhicl::ParameterSet const& pset,
                                                                     art::ActivityRegistry& reg)
+  : fProp{pset}
 {
-  fProp.reset(new spacecharge::SpaceChargeStandard(pset));
-
   reg.sPreBeginRun.watch(this, &SpaceChargeServiceStandard::preBeginRun);
 }
 
@@ -33,15 +32,14 @@ spacecharge::SpaceChargeServiceStandard::SpaceChargeServiceStandard(fhicl::Param
 void
 spacecharge::SpaceChargeServiceStandard::preBeginRun(const art::Run& run)
 {
-  fProp->Update(run.id().run());
+  fProp.Update(run.run());
 }
 
 //------------------------------------------------
 void
 spacecharge::SpaceChargeServiceStandard::reconfigure(fhicl::ParameterSet const& pset)
 {
-  fProp->Configure(pset);
-  return;
+  fProp.Configure(pset);
 }
 
 //------------------------------------------------

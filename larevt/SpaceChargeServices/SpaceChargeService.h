@@ -10,23 +10,18 @@
 #define SPACECHARGESERVICE_H
 
 #include "art/Framework/Services/Registry/ServiceMacros.h"
-#include "fhiclcpp/ParameterSet.h"
-#include "larcore/CoreUtils/ServiceUtil.h"
 #include "larevt/SpaceCharge/SpaceCharge.h"
 
 namespace spacecharge {
   class SpaceChargeService {
-
   public:
-    typedef spacecharge::SpaceCharge provider_type;
+    using provider_type = spacecharge::SpaceCharge;
 
-  public:
     virtual ~SpaceChargeService() = default;
-
-    virtual void reconfigure(fhicl::ParameterSet const& pset) = 0;
     virtual const spacecharge::SpaceCharge* provider() const = 0;
+  };
+}
 
-  }; // class SpaceChargeService
-} //namespace spacecharge
-DECLARE_ART_SERVICE_INTERFACE(spacecharge::SpaceChargeService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(spacecharge::SpaceChargeService, SHARED)
+
 #endif // SPACECHARGESERVICE_H

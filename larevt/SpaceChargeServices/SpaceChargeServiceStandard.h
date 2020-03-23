@@ -21,25 +21,28 @@ namespace spacecharge {
   class SpaceChargeServiceStandard : public SpaceChargeService {
   public:
     // this enables art to print the configuration help:
-    //using Parameters = art::ServiceTable<spacecharge::SpaceChargeStandard::ConfigurationParameters_t>;
+    // using Parameters =
+    // art::ServiceTable<spacecharge::SpaceChargeStandard::ConfigurationParameters_t>;
 
     SpaceChargeServiceStandard(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
 
-    virtual void reconfigure(fhicl::ParameterSet const& pset) override;
+  private:
+    void reconfigure(fhicl::ParameterSet const& pset);
     void preBeginRun(const art::Run& run);
 
-    virtual const provider_type*
+    const provider_type*
     provider() const override
     {
-      return fProp.get();
+      return &fProp;
     }
 
-  private:
-    std::unique_ptr<spacecharge::SpaceChargeStandard> fProp;
+    spacecharge::SpaceChargeStandard fProp;
 
   }; // class SpaceChargeServiceStandard
-} //namespace spacecharge
+} // namespace spacecharge
+
 DECLARE_ART_SERVICE_INTERFACE_IMPL(spacecharge::SpaceChargeServiceStandard,
                                    spacecharge::SpaceChargeService,
-                                   LEGACY)
+                                   SHARED)
+
 #endif // SPACECHARGESERVICESTANDARD_H
