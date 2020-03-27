@@ -41,10 +41,8 @@ namespace spacecharge {
       
       bool EnableSimSpatialSCE() const override;
       bool EnableSimEfieldSCE() const override;
-      bool EnableCorrSCE() const override;
       bool EnableCalSpatialSCE() const override;
       bool EnableCalEfieldSCE() const override;
-      
       geo::Vector_t GetPosOffsets(geo::Point_t const& point) const override;
       geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const override;
       geo::Vector_t GetCalPosOffsets(geo::Point_t const& point) const override;
@@ -65,9 +63,8 @@ namespace spacecharge {
       bool fEnableSimSpatialSCE;
       bool fEnableSimEfieldSCE;
       bool fEnableCalSpatialSCE;
-      bool fEnableCalEfieldSCE;
-      bool fEnableCorrSCE;
-      
+	  bool fEnableCalEfieldSCE;
+	      
       std::string fRepresentationType;
       std::string fInputFilename;
       

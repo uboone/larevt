@@ -36,7 +36,6 @@ bool spacecharge::SpaceChargeStandard::Configure(fhicl::ParameterSet const& pset
   fEnableSimEfieldSCE = pset.get<bool>("EnableSimEfieldSCE");
   fEnableCalSpatialSCE = pset.get<bool>("EnableCalSpatialSCE");
   fEnableCalEfieldSCE = pset.get<bool>("EnableCalEfieldSCE");
-  fEnableCorrSCE = pset.get<bool>("EnableCorrSCE");
   
   // check that the old obsoleted parameter is not in configuration:
   if (pset.has_key("EnableSimulationSCE")) {
@@ -139,7 +138,7 @@ bool spacecharge::SpaceChargeStandard::Configure(fhicl::ParameterSet const& pset
     infile->Close();
   }
 
-  if(fEnableCorrSCE == true)
+  if((fEnableCalSpatialSCE == true) || (fEnableCalEfieldSCE == true))
   {
     // Grab other parameters from pset  
   }
@@ -173,17 +172,12 @@ bool spacecharge::SpaceChargeStandard::EnableSimEfieldSCE() const
 
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to apply SCE corrections
-bool spacecharge::SpaceChargeStandard::EnableCorrSCE() const
-{
-  return fEnableCorrSCE;
-}
-
-/// Return boolean indicating whether or not to apply SCE corrections
 bool spacecharge::SpaceChargeStandard::EnableCalSpatialSCE() const
 {
   return fEnableCalSpatialSCE;
 }
 
+//----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to apply SCE corrections
 bool spacecharge::SpaceChargeStandard::EnableCalEfieldSCE() const
 {
@@ -214,8 +208,7 @@ geo::Vector_t spacecharge::SpaceChargeStandard::GetPosOffsets(geo::Point_t const
 
 geo::Vector_t spacecharge::SpaceChargeStandard::GetCalPosOffsets(geo::Point_t const& point) const
 {
-
-	return{ 0., 0., 0.};
+	return { 0.0, 0.0, 0.0 };
 }
 
 //----------------------------------------------------------------------------
@@ -372,8 +365,7 @@ geo::Vector_t spacecharge::SpaceChargeStandard::GetEfieldOffsets(geo::Point_t co
 
 geo::Vector_t spacecharge::SpaceChargeStandard::GetCalEfieldOffsets(geo::Point_t const& point) const
 {
-
-	return {0., 0., 0.};
+  return {0.0, 0.0, 0.0};
 }
 
 //----------------------------------------------------------------------------
