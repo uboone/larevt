@@ -8,7 +8,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-//Framework Includes
+// Framework Includes
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
@@ -20,9 +20,10 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-//Larsoft Includes
+// Larsoft Includes
 #include "larcore/Geometry/Geometry.h"
 #include "larcorealg/Geometry/PlaneGeo.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardataobj/RecoBase/Cluster.h"
 #include "lardataobj/RecoBase/Hit.h"
@@ -38,53 +39,53 @@
 namespace filter {
 
   class MuonFilter : public art::EDFilter {
-
   public:
     explicit MuonFilter(fhicl::ParameterSet const&);
 
   private:
     bool filter(art::Event& evt) override;
 
-    std::string fClusterModuleLabel;
-    std::string fLineModuleLabel;
-    std::vector<double> fCuts;
-    double fDCenter;
-    double fDelay;
-    double fTolerance;
-    double fMaxIon;
-    double fIonFactor;
-    int fDeltaWire; ///< allowed differences in wire number between 2 planes
+    std::string const fClusterModuleLabel;
+    std::string const fLineModuleLabel;
+    std::vector<double> const fCuts;
+    double const fDCenter;
+    double const fDelay;
+    double const fTolerance;
+    double const fMaxIon;
+    double const fIonFactor;
+    int const fDeltaWire; ///< allowed differences in wire number between 2 planes
 
   }; // class MuonFilter
 
   //-------------------------------------------------
-  MuonFilter::MuonFilter(fhicl::ParameterSet const& pset) : EDFilter{pset}
-  {
-    fClusterModuleLabel = pset.get<std::string>("ClusterModuleLabel");
-    fLineModuleLabel = pset.get<std::string>("LineModuleLabel");
-    fTolerance = pset.get<double>("Tolerance");
-    fDelay = pset.get<double>("Delay");
-    fDCenter = pset.get<double>("DCenter");
-    fMaxIon = pset.get<double>("MaxIon");
-    fIonFactor = pset.get<double>("IonFactor");
-    fCuts = pset.get<std::vector<double>>("Cuts");
-    fDeltaWire = pset.get<int>("DeltaWire");
-  }
+  MuonFilter::MuonFilter(fhicl::ParameterSet const& pset)
+    : EDFilter{pset}
+    , fClusterModuleLabel{pset.get<std::string>("ClusterModuleLabel")}
+    , fLineModuleLabel{pset.get<std::string>("LineModuleLabel")}
+    , fCuts{pset.get<std::vector<double>>("Cuts")}
+    , fDCenter{pset.get<double>("DCenter")}
+    , fDelay{pset.get<double>("Delay")}
+    , fTolerance{pset.get<double>("Tolerance")}
+    , fMaxIon{pset.get<double>("MaxIon")}
+    , fIonFactor{pset.get<double>("IonFactor")}
+    , fDeltaWire{pset.get<int>("DeltaWire")}
+  {}
 
   //-------------------------------------------------
   bool
   MuonFilter::filter(art::Event& evt)
   {
     art::ServiceHandle<geo::Geometry const> geom;
-    //    art::ServiceHandle<detinfo::LArPropertiesService const> larprop_s;
-    //    art::ServiceHandle<detinfo::DetectorPropertiesService const> detprop_s;
-    auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+    auto const clockData =
+      art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
+    auto const detProp =
+      art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataFor(evt, clockData);
 
-    //Drift Velocity in cm/us Sampling rate in ns
-    double drift = detprop->DriftVelocity(detprop->Efield(), detprop->Temperature()) *
-                   detprop->SamplingRate() / 1000.0;
+    // Drift Velocity in cm/us Sampling rate in ns
+    double drift = detProp.DriftVelocity(detProp.Efield(), detProp.Temperature()) *
+                   sampling_rate(clockData) / 1000.0;
 
-    //This code only works comparing 2 planes so for now these are the
+    // This code only works comparing 2 planes so for now these are the
     // last induction plane and collection plane
     int vPlane = geom->Nplanes() - 1;
     geo::View_t vView = geom->Plane(vPlane).View();
@@ -175,18 +176,18 @@ namespace filter {
           mf::LogInfo("MuonFilter")
             << "U's " << uPos1 << " " << uPos2 << "V's " << vPos1 << " " << vPos2 << " times "
             << trk1End << " " << trk2End << " " << trk1Start << " " << trk2Start;
-          //need to have the corresponding endpoints matched
-          //check if they match in this order else switch
-          //really should use the crossing function and then have limits
-          //on distance outide tpc, or some other way of dealing with
-          //imperfect matches
+          // need to have the corresponding endpoints matched
+          // check if they match in this order else switch
+          // really should use the crossing function and then have limits
+          // on distance outide tpc, or some other way of dealing with
+          // imperfect matches
           if ((TMath::Abs(uPos1 - vPos1) > fDeltaWire || TMath::Abs(uPos2 - vPos2) > fDeltaWire) &&
               (TMath::Abs(uPos1 - vPos2) <= fDeltaWire &&
                TMath::Abs(uPos2 - vPos1) <= fDeltaWire)) {
             mf::LogInfo("MuonFilter") << "Swapped1";
             std::swap(uPos1, uPos2);
           }
-          //check for time tolerance
+          // check for time tolerance
           if ((TMath::Abs(trk1Start - trk2Start) > fTolerance &&
                TMath::Abs(trk1End - trk2End) > fTolerance) &&
               (TMath::Abs(trk1Start - trk2End) < fTolerance &&
@@ -197,9 +198,10 @@ namespace filter {
           }
           mf::LogInfo("MuonFilter")
             << "Times: " << trk1Start << " " << trk2Start << " " << trk1End << " " << trk2End;
-          //again needs to be fixed
+          // again needs to be fixed
           ///\todo: the delta wire numbers seem a bit magic,
-          ///\todo: should also change to using Geometry::ChannelsIntersect method
+          ///\todo: should also change to using Geometry::ChannelsIntersect
+          ///method
           if ((TMath::Abs(trk1Start - trk2Start) < fTolerance &&
                TMath::Abs(trk1End - trk2End) < fTolerance) &&
               (TMath::Abs(uPos1 - vPos1) <= fDeltaWire + 2 &&
@@ -272,17 +274,17 @@ namespace filter {
               rLook.push_back(pairTemp);
               matched.push_back(pointTemp);
             }
-            break; //advances i, makes j=0;
+            break; // advances i, makes j=0;
           }
         }
       }
     }
-    //after all matches are made, remove deltas
+    // after all matches are made, remove deltas
     double distance = 0;
     for (unsigned int i = 0; i < tGoing.size(); i++)
       for (unsigned int j = 0; j < matched.size(); j++) {
         mf::LogInfo("MuonFilter") << tGoing.size() << " " << matched.size() << " " << i << " " << j;
-        //test if one is contained within the other in the z-direction
+        // test if one is contained within the other in the z-direction
         if ((tGoing[i][2] <= matched[j][2]) && (tGoing[i][5] >= matched[j][5])) {
           TVector3 a1(&tGoing[i][0]);
           TVector3 a2(&tGoing[i][3]);
@@ -310,4 +312,4 @@ namespace filter {
 
   DEFINE_ART_MODULE(MuonFilter)
 
-} //namespace filt
+} // namespace filt
