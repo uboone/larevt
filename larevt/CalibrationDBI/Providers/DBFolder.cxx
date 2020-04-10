@@ -443,7 +443,6 @@ namespace lariov {
 	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
 	<< " AND " << table_tag_iovs << ".iov_id=" << table_iovs << ".iov_id"
 	<< " AND " << table_iovs << ".begin_time <= " << t
-	<< " AND " << table_iovs << ".active=1"
 	<< " ORDER BY " << table_iovs << ".begin_time desc";
     //std::cout << "sql = " << sql.str() << std::endl;
 
@@ -487,7 +486,6 @@ namespace lariov {
 	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
 	<< " AND " << table_tag_iovs << ".iov_id=" << table_iovs << ".iov_id"
 	<< " AND " << table_iovs << ".begin_time > " << t
-	<< " AND " << table_iovs << ".active=1"
 	<< " ORDER BY " << table_iovs << ".begin_time";
     //std::cout << "sql = " << sql.str() << std::endl;
 
@@ -529,7 +527,6 @@ namespace lariov {
 	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
 	<< " AND " << table_iovs << ".iov_id=" << table_tag_iovs << ".iov_id"
 	<< " AND " << table_data << ".__iov_id=" << table_tag_iovs << ".iov_id"
-	<< " AND " << table_iovs << ".active=1"
 	<< " AND " << table_iovs << ".begin_time <= " << t;
     //std::cout << "sql = " << sql.str() << std::endl;
 
@@ -634,7 +631,6 @@ namespace lariov {
 	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
 	<< " AND " << table_iovs << ".iov_id=" << table_tag_iovs << ".iov_id"
 	<< " AND " << table_data << ".__iov_id=" << table_tag_iovs << ".iov_id"
-	<< " AND " << table_iovs << ".active=1"
 	<< " AND " << table_iovs << ".begin_time <= " << t
 	<< " GROUP BY channel"
 	<< " ORDER BY channel";
