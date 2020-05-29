@@ -15,6 +15,7 @@ art_make(LIB_LIBRARIES
            ROOT::Core
            ROOT::Hist
            ROOT::Physics
+           lardataalg_DetectorInfo
            larcorealg_Geometry
            lardataobj_RawData
            nusimdata_SimulationBase
