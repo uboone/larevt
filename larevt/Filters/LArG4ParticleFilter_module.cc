@@ -27,19 +27,19 @@ namespace filt{
 
     private:
 
-      bool IsInterestingParticle(const art::Ptr<simb::MCParticle> &particle, const unsigned int index);
-      bool PDGCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index);
-      bool IsPrimaryCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index);
-      bool MinMomentumCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index);
-      bool MaxMomentumCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index);
-      bool StartInTPCCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index);
-      bool StopInTPCCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index);
-      bool TPCTrajLengthCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index);
+      bool IsInterestingParticle(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const;
+      bool PDGCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const;
+      bool IsPrimaryCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const;
+      bool MinMomentumCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const;
+      bool MaxMomentumCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const;
+      bool StartInTPCCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const;
+      bool StopInTPCCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const;
+      bool TPCTrajLengthCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const;
 
-      double CalculateLength(const std::vector<TVector3> &position_segment);
+      double CalculateLength(const std::vector<TVector3> &position_segment) const;
 
-      void VerifyDataMembers();
-      void VerifyElementRequest(const unsigned int index);
+      void VerifyDataMembers() const;
+      void VerifyElementRequest(const unsigned int index) const;
 
       art::ServiceHandle<geo::Geometry const> fGeom;
 
@@ -73,8 +73,8 @@ namespace filt{
       VerifyDataMembers();
   }
 
-  bool LArG4ParticleFilter::filter(art::Event & e){
-
+  bool LArG4ParticleFilter::filter(art::Event & e)
+  {
     //Reset the found vector
     for (unsigned int i = 0; i < fFoundInterestingParticles.size(); i++){
       fFoundInterestingParticles[i] = false;
@@ -105,12 +105,12 @@ namespace filt{
         }
       }
     }
-
     //Assume that the event is not worth saving
     return false;
   }
 
-  bool LArG4ParticleFilter::IsInterestingParticle(const art::Ptr<simb::MCParticle> &particle, const unsigned int index){
+  bool LArG4ParticleFilter::IsInterestingParticle(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const
+  {
       VerifyElementRequest(index);
     //Run the checks
     if (!PDGCheck(particle,index)) return false;
@@ -123,14 +123,15 @@ namespace filt{
     return true;
   }
 
-  bool LArG4ParticleFilter::PDGCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index){
+  bool LArG4ParticleFilter::PDGCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const
+  {
     int pdg = fInterestingPDGs[index];
     if (pdg == 0) return true; //User does not care what the PDG is
     if (particle->PdgCode() != pdg) return false;
     return true;
   }
 
-  bool LArG4ParticleFilter::IsPrimaryCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index)
+  bool LArG4ParticleFilter::IsPrimaryCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const
   {
       const int isPrimaryCondition(fIsPrimary[index]);
       if (isPrimaryCondition==-1) return true;
@@ -139,17 +140,20 @@ namespace filt{
       return true;
   }
 
-  bool LArG4ParticleFilter::MinMomentumCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index){
+  bool LArG4ParticleFilter::MinMomentumCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const
+  {
     if (fParticleMinMomentum[index] > 0 && particle->Momentum(0).Vect().Mag() < fParticleMinMomentum[index]) return false;
     return true;
   }
 
-  bool LArG4ParticleFilter::MaxMomentumCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index){
+  bool LArG4ParticleFilter::MaxMomentumCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const
+  {
     if (fParticleMaxMomentum[index] > 0 && particle->Momentum(0).Vect().Mag() > fParticleMaxMomentum[index]) return false;
     return true;
   }
 
-  bool LArG4ParticleFilter::StartInTPCCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index){
+  bool LArG4ParticleFilter::StartInTPCCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const
+  {
     //Firstly check if we even care if the particle starts in the TPC or not
     int demand = fStartInTPC[index];
     if (demand == 0) return true; //We don't care if the particle starts in the TPC or not so pass the check
@@ -179,7 +183,8 @@ namespace filt{
   }
 
 
-  bool LArG4ParticleFilter::StopInTPCCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index){
+  bool LArG4ParticleFilter::StopInTPCCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const
+  {
     //Firstly check if we even care if the particle stops in the TPC or not
     int demand = fStopInTPC[index];
     if (demand == 0) return true; //We don't care if the particle stops in the TPC or not so pass the check
@@ -208,7 +213,8 @@ namespace filt{
     return true;
   }
 
-  bool LArG4ParticleFilter::TPCTrajLengthCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index){
+  bool LArG4ParticleFilter::TPCTrajLengthCheck(const art::Ptr<simb::MCParticle> &particle, const unsigned int index) const
+  {
     double min_traj_length = fParticleMinTPCLength[index];
 
     //Firstly, if we don't care about the TPC trajectory length then pass the check
@@ -263,7 +269,8 @@ namespace filt{
     return true;
   }
 
-  double LArG4ParticleFilter::CalculateLength(const std::vector<TVector3> &position_segment){
+  double LArG4ParticleFilter::CalculateLength(const std::vector<TVector3> &position_segment) const
+  {
     double length = 0;
     //Check how many points we have in the segment.  If it is one or less, there is nothing to calculate so return 0
     if (position_segment.size() <= 1) return length;
@@ -276,7 +283,8 @@ namespace filt{
     return length;
   }
 
-  void LArG4ParticleFilter::VerifyDataMembers(){
+  void LArG4ParticleFilter::VerifyDataMembers() const
+  {
       if (fInterestingPDGs.size() != fIsPrimary.size())
            throw art::Exception(art::errors::Configuration) << "Config error: InterestingPDGs and IsPrimary FCL vectors are different sizes\n";
       if (fInterestingPDGs.size() != fParticleMinMomentum.size())
@@ -308,7 +316,8 @@ namespace filt{
       return;
   }
 
-  void LArG4ParticleFilter::VerifyElementRequest(const unsigned int index){
+  void LArG4ParticleFilter::VerifyElementRequest(const unsigned int index) const
+  {
       if (index > fInterestingPDGs.size())
               throw art::Exception(art::errors::InvalidNumber) << "Bounds error:  Requested element " << index <<" from InterestingPDGs vector which is size "
               << fInterestingPDGs.size() << "\n";
