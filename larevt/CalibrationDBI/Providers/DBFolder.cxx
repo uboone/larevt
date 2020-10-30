@@ -19,28 +19,11 @@
 
 namespace lariov {
 
-  // Copied from wda.c
-
-  typedef struct {
-      size_t ncolumns;    // Number of columns in CSV row
-      size_t nelements;   // Number of elements in data array
-      char **columns;     // Pointers to columns
-  } DataRec;
-
-  typedef struct {
-    char *memory;       // The buffer from HTTP response
-    size_t size;        // The size of the buffer (in bytes)
-    size_t allocsize;   // The allocated size of the buffer (in bytes)
-    char **rows;        // Array of rows in the buffer
-    size_t nrows;       // Number of rows
-    size_t idx;         // Current index
-    long http_code;     // Status code
-    DataRec *dataRecs[1]; // Array of parsed data records. Filled by getTuple calls
-  } HttpResponse;
+  // Constructor.
 
   DBFolder::DBFolder(const std::string& name, const std::string& url, const std::string& url2,
-		     const std::string& tag, bool usesqlite, bool testmode) :
-    fCachedStart(0,0), fCachedEnd(0,0) {
+		     const std::string& tag, bool usesqlite, bool testmode)
+  {
 
     fFolderName = name;
     fURL = url;
@@ -52,11 +35,7 @@ namespace lariov {
       fURL = fURL.substr(0, fURL.length()-1);
     }
 
-    fCachedDataset = 0;
-    fNRows =0;
-    fColumns.clear();
-    fTypes.clear();
-    fCachedRow = -1;
+    fCachedRowNumber = -1;
     fCachedChannel = 0;
     
     fMaximumTimeout = 4*60; //4 minutes
@@ -85,82 +64,113 @@ namespace lariov {
       std::cout << fSQLitePath << "\n" << std::endl;
     }
   }
-  
-  DBFolder::~DBFolder() {
-    if (fCachedDataset) releaseDataset(fCachedDataset);
-  }
+
+  // Destructor.
+
+  DBFolder::~DBFolder() {}
+
+  // Data accessors.
 
   int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, bool& data) {
-  
-    Tuple tup;
-    size_t col = this->GetTupleColumn(channel, name, tup);
-    int err=0;
-    char buf[kBUFFER_SIZE];
-    int str_size = getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
-    std::string value = std::string(buf, str_size);
+
+    int err = 0;
+
+    // Make sure cached row is valid.
+
+    GetRow(channel);
+
+    // Get column index.
+
+    size_t col = GetColumn(name);
+
+    // Get value.
+
+    const std::string& value = fCachedRow.getData(col);
     data = false;
-    if (value =="True" or value == "1") {
+    if (value =="True" or value == "1")
       data = true;
-    }
-    else if (value == "False" or value == "0") {
+    else if (value == "False" or value == "0")
       data = false;
+    else {
+      std::cout<<"(DBFolder) ERROR: Can't identify data: "<< value << " as boolean!"<<std::endl;
+      err = 1;
     }
-    else std::cout<<"(DBFolder) ERROR: Can't identify data: "<<std::string(buf, str_size)<<" as boolean!"<<std::endl;
-    
-    releaseTuple(tup);
+
     return err;
   }
   
   int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, long& data) {
 
-    Tuple tup;
-    size_t col = this->GetTupleColumn(channel, name, tup);
-    int err=0;
-    
-    //first handle special case that the db data is boolean, but user mistakenly used long version of this function
-    char buf[kBUFFER_SIZE];
-    int str_size = getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
-    if (std::string(buf, str_size)=="True") {
-      data = 1;
-    }
-    else if (std::string(buf, str_size)=="False") {
-      data = 0;
-    }
-    else { //ok, we really have a long (hopefully)   
-      data = getLongValue(tup, col, &err);
-    }
-    releaseTuple(tup);
+    int err = 0;
+
+    // Make sure cached row is valid.
+
+    GetRow(channel);
+
+    // Get column index.
+
+    size_t col = GetColumn(name);
+
+    // Get value.
+
+    data = fCachedRow.getLongData(col);
+
+    // Done.
+
     return err;
   }
 
   int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, double& data) {
 
-    Tuple tup;
-    size_t col = this->GetTupleColumn(channel, name, tup);
-    int err=0;
-    data = getDoubleValue(tup, col, &err);
-    releaseTuple(tup);
+    int err = 0;
+
+    // Make sure cached row is valid.
+
+    GetRow(channel);
+
+    // Get column index.
+
+    size_t col = GetColumn(name);
+
+    // Get value.
+
+    data = fCachedRow.getDoubleData(col);
+
+    // Done.
+
     return err;
   }
 
   int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::string& data) {
 
-    Tuple tup;
-    size_t col = this->GetTupleColumn(channel, name, tup);
-    int err=0;
-    char buf[kBUFFER_SIZE];
-    int str_size = getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
-    data = std::string(buf, str_size);
-    releaseTuple(tup);
+    int err = 0;
+
+    // Make sure cached row is valid.
+
+    GetRow(channel);
+
+    // Get column index.
+
+    size_t col = GetColumn(name);
+
+    // Get value.
+
+    data = fCachedRow.getData(col);
+
+    // Done.
+
     return err;
   }
-  
+
+  // Not sure why the following accessor is included.  Doesn't seem to be used.
+
+  /*
   int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::vector<double>& data) {
     
     data.clear();
     
     Tuple tup;
-    size_t col = this->GetTupleColumn(channel, name, tup);
+    size_t col = this->GetRow(channel, name, tup);
     int err=0;
     double buf[kBUFFER_SIZE];
     
@@ -197,80 +207,59 @@ namespace lariov {
     releaseTuple(tup);
     return err;
   }
-  
+  */
+
   int DBFolder::GetChannelList( std::vector<DBChannelID_t>& channels ) const {
-    
-    channels.clear();
-    if (!fCachedDataset) return 1;
-    
-    Tuple tup;
-    int err=0;
-    for ( int row = 0; row != fNRows; ++row) {
-      tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS);
-      channels.push_back( (DBChannelID_t)getLongValue(tup,0,&err) );
-      releaseTuple(tup);
-    }  
-    return err;
+
+    channels = fCache.channels();
+    return 0;
   }
 
+  // Update cached row.
 
-  size_t DBFolder::GetTupleColumn(DBChannelID_t channel, const std::string& name, Tuple& tup ) {
+  void DBFolder::GetRow(DBChannelID_t channel) {
 
-    //check if cached row is still valid
-    int err;
-    int row = -1;
-    if (fCachedRow != -1 && fCachedChannel == channel) {
-      tup = getTuple(fCachedDataset, fCachedRow + kNUMBER_HEADER_ROWS);
-      if ( channel == (DBChannelID_t)getLongValue(tup,0,&err) ) {
-	row = fCachedRow;
-      }
-      else releaseTuple(tup);
-    }
+    // Check if we need to update the cached row.
 
-    //if cached row is not valid, find the new row
-    if (row == -1) {   
-//std::cout<<"Channel "<<channel<<" not cached"<<std::endl;
-      //binary search for channel
-      DBChannelID_t val;
-      int l = 0, h = fNRows - 1;
-      row = (l + h )/2;
-      while ( l <= h ) {
-//std::cout<<"  "<<l<<"  "<<h<<"  "<<row<<std::endl;
-	tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS);
-	val = getLongValue(tup, 0, &err);
-	releaseTuple(tup);
+    if (fCachedChannel != channel ||
+	!fCachedRow.isValid() ||
+	fCachedRow.getLongData(0) != channel) {
 
-	if (val == channel ) break;
-	  
-	if (val > channel) h = row - 1;
-	else            l = row + 1;
+      // Update cached row number (binary serach).
 
-	row = (l + h)/2;
-      }
-      
-      //get the tuple to be returned, check that the found row matches the requested channel
-      tup = getTuple(fCachedDataset, row + kNUMBER_HEADER_ROWS); 
-      if ( channel != (DBChannelID_t)getLongValue(tup, 0, &err) ) {
-        releaseTuple(tup);
+      int row = fCache.getRowNumber(channel);
+
+      //  Throw an exception if we didn't find a matching role.
+
+      if(row < 0) {
 	std::string msg = "Channel " + std::to_string(channel) + " is not found in database!";
 	throw WebError(msg);
       }
-      
-      
-      //update caching info
+
+      // Update cached row.
+
+      fCachedRowNumber = row;
       fCachedChannel = channel;
-      fCachedRow = row;
-    
+      fCachedRow = fCache.getRow(row);
+    }
+  }
+
+  // Find matching column.
+
+  size_t DBFolder::GetColumn(const std::string& name) const
+  {
+    int col = fCache.getColNumber(name);
+
+    // See if we found a matching column.
+
+    if(col < 0) {
+      std::string msg = "Column " + name + " is not found in database!";
+      throw WebError(msg);
     }
 
-    //get the column corresponding to input string name and return
-    for (size_t c=1; c < fColumns.size(); ++c ) {
-      if (name == fColumns[c]) return c;
-    }
+    // Done.
 
-    std::string msg = "Column named " + name + " is not found in the database!";
-    throw WebError(msg);
-    return 0;
+    return col;
   }
 
   //returns true if an Update is performed, false if not
@@ -280,13 +269,14 @@ namespace lariov {
     IOVTimeStamp ts = TimeStampDecoder::DecodeTimeStamp(raw_time);
 
     //check if cache is updated
-    if (this->IsValid(ts)) return false;
+    if (IsValid(ts)) return false;
 
-    int err=0;
-
-    //release old dataset
-    if (fCachedDataset) releaseDataset(fCachedDataset);
-
+    //release cached data.
+    fCache.clear();
+    fCachedRow.clear();
+    fCachedRowNumber = -1;
+    fCachedChannel = 0;
+      
     //get full url string
     std::stringstream fullurl;
     fullurl << fURL << "/data?f=" << fFolderName
@@ -298,111 +288,53 @@ namespace lariov {
     //std::cout << "Full url = " << fullurl.str() << std::endl;
 
     //get new dataset
-    int status = -1;
     if(fSQLitePath != "" && !fTestMode) {
-      fCachedDataset  = GetSQLiteData(raw_time/1000000000);
+      GetSQLiteData(raw_time/1000000000, fCache);
     }
     else {
       if(fTestMode) {
 	std::cout << "Accessing primary calibration data from http conditions database server." << std::endl;
 	std::cout << "Folder = " << fFolderName << std::endl;
       }
-      fCachedDataset = getDataWithTimeout(fullurl.str().c_str(), NULL, fMaximumTimeout, &err);
+      int err = 0;
+      Dataset data = getDataWithTimeout(fullurl.str().c_str(), NULL, fMaximumTimeout, &err);
+      int status = getHTTPstatus(data);
+      if (status != 200) {
+	std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(data));
+	throw WebError(msg);
+      }
+      fCache.update(data, true);
     }
-    status = getHTTPstatus(fCachedDataset);
-    //DumpDataset(fCachedDataset);
+    //DumpDataset(fCache);
 
-    //Can add some more queries here if we get http error 504
-    /*if (status == 504) {
-      //try again
-    }*/
-    
-    if (status != 200) {
-      std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(fCachedDataset));
-      throw WebError(msg);
-    }
 
     // If test mode is selected, get comparison data.
 
     if(fTestMode) {
       if(fSQLitePath != "") {
+	DBDataset compare1;
 	std::cout << "Accessing comparison data from sqlite database " << fSQLitePath << std::endl;
-	Dataset compare1 = GetSQLiteData(raw_time/1000000000);
-	CompareDataset(fCachedDataset, compare1);
+	GetSQLiteData(raw_time/1000000000, compare1);
+	CompareDataset(fCache, compare1);
       }
       if(fURL2 != "") {
 	std::cout <<"Accessing comparison data from second database url." << std::endl;
 	std::stringstream fullurl2;
 	fullurl2 << fURL2 << "/data?f=" << fFolderName
-		<< "&t=" << ts.DBStamp();
+		 << "&t=" << ts.DBStamp();
 	if (fTag.length() > 0) fullurl2 << "&tag=" << fTag;
 	std::cout << "Full url = " << fullurl2.str() << std::endl;
-	Dataset compare2 = getDataWithTimeout(fullurl2.str().c_str(), NULL, fMaximumTimeout, &err);
-	status = getHTTPstatus(compare2);
+	int err = 0;
+	Dataset data = getDataWithTimeout(fullurl2.str().c_str(), NULL, fMaximumTimeout, &err);
+	int status = getHTTPstatus(data);
 	if (status != 200) {
-	  std::string msg = "HTTP error from " + fullurl2.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(compare2));
+	  std::string msg = "HTTP error from " + fullurl2.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(data));
 	  throw WebError(msg);
 	}
-	CompareDataset(fCachedDataset, compare2);
+	DBDataset compare2(data, true);
+	CompareDataset(fCache, compare2);
       }
     }
-
-    
-    //update info about cached data
-    fNRows = getNtuples(fCachedDataset) - kNUMBER_HEADER_ROWS;
-    //std::cout<<"Retrieved "<<fNRows<<" rows from "<<fullurl.str()<<std::endl;
-    if (fNRows < 1) {
-      std::stringstream msg;
-      msg << "Time " << ts.DBStamp() << ": Data not found in database.";
-      throw WebError(msg.str());
-      fCachedStart = fCachedEnd = ts;
-    }
-
-    //start and end times
-    Tuple tup;
-    tup = getTuple(fCachedDataset, 0);   
-    char buf[kBUFFER_SIZE];
-    getStringValue(tup,0, buf, kBUFFER_SIZE, &err);
-    //std::cout << "IOV start time = " << buf << std::endl;
-    fCachedStart = IOVTimeStamp::GetFromString(std::string(buf));
-    //std::cout << "IOV start time converted = "
-    //      << fCachedStart.Stamp() << "." << fCachedStart.SubStamp() << std::endl;
-    releaseTuple(tup);
-
-    tup = getTuple(fCachedDataset, 1);
-    getStringValue(tup,0, buf, kBUFFER_SIZE, &err);
-    if ( 0 == strcmp(buf,"-") ) {
-      //std::cout << "IOV end time = max" << std::endl;
-      fCachedEnd = IOVTimeStamp::MaxTimeStamp();
-    }
-    else {
-      //std::cout << "IOV end time = " << buf << std::endl;
-      fCachedEnd = IOVTimeStamp::GetFromString(std::string(buf));
-      //std::cout << "IOV end time converted = "
-      //	<< fCachedEnd.Stamp() << "." << fCachedEnd.SubStamp() << std::endl;
-    }
-    releaseTuple(tup);
-
-    //column names
-    tup = getTuple(fCachedDataset, 2);
-    fColumns.clear();
-    for (int c=0; c < getNfields(tup); ++c) {
-      getStringValue(tup, c, buf, kBUFFER_SIZE, &err);
-      //std::cout << "Column name = " << buf << std::endl;
-      fColumns.push_back(buf);
-    }
-    releaseTuple(tup);
-
-    //column types
-    tup = getTuple(fCachedDataset, 3);
-    fTypes.clear();
-    for (int c=0; c < getNfields(tup); ++c) {
-      getStringValue(tup, c, buf, kBUFFER_SIZE, &err);
-      //std:: cout << "Type = " << buf << std::endl;
-      fTypes.push_back(buf);
-    }
-    releaseTuple(tup);
-
     return true;
   }
 
@@ -410,14 +342,10 @@ namespace lariov {
   // The return value of type Dataset (aka void*), is partially opaque type HttpResponse*
   // (defined in wda.c and copied above).
 
-  Dataset DBFolder::GetSQLiteData(int t) const
+  void DBFolder::GetSQLiteData(int t, DBDataset& data) const
   {
     if(fSQLitePath == "")
-      return 0;
-
-    // Result struct (allocate and initialize later).
-
-    HttpResponse* result = 0;
+      return;
 
     //std::cout << "DBFolder::GetSQLiteData" << std::endl;
     //std::cout << "t=" << t << std::endl;
@@ -518,7 +446,7 @@ namespace lariov {
     sqlite3_finalize(stmt);
 
     // Query count of channels.
-    // We do this so that we know how much memory to allocate for fake http response.
+    // We do this so that we know how much memory to allocate.
 
     std::string table_data = fFolderName + "_data";
     sql.str("");
@@ -558,70 +486,20 @@ namespace lariov {
 
     sqlite3_finalize(stmt);
 
-    // Initialize fake HttpResponse.
-    // Allocate space for data rows and four header rows.
+    // Stash begin time.
 
-    result = (HttpResponse*)malloc(sizeof(HttpResponse) + (nrows+3)*sizeof(DataRec *));
-    if(result == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    result->memory = 0;
-    result->size = 0;
-    result->allocsize = 0;
-    result->rows = 0;
-    result->nrows = nrows + 4;
-    result->idx = 0;
-    result->http_code = 200;
+    data.setBeginTime(IOVTimeStamp(begin_time, 0));
 
-    // Stash begin time in fake http response (row 0).
+    // Stash end time.
 
-    DataRec *dataRec = (DataRec *)malloc(sizeof (DataRec));
-    if(dataRec == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    memset(dataRec, 0, sizeof (DataRec));
-    dataRec->ncolumns = 1;
-    dataRec->columns = (char**)calloc(1, sizeof(char*));
-    if(dataRec->columns == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    std::ostringstream ostr;
-    ostr << begin_time << ".0";
-    dataRec->columns[0] = strdup(ostr.str().c_str());
-    if(dataRec->columns[0] == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    result->dataRecs[0] = dataRec;
-
-    // Stash end time in fake http response (row 1).
-
-    dataRec = (DataRec *)malloc(sizeof (DataRec));
-    if(dataRec == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    memset(dataRec, 0, sizeof (DataRec));
-    dataRec->ncolumns = 1;
-    dataRec->columns = (char**)calloc(1, sizeof(char*));
-    if(dataRec->columns == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    ostr.str("");
     if(end_time == 0)
-      ostr << "-";
+      data.setEndTime(IOVTimeStamp::MaxTimeStamp());
     else
-      ostr << end_time << ".0";
-    dataRec->columns[0] = strdup(ostr.str().c_str());
-    if(dataRec->columns[0] == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    result->dataRecs[1] = dataRec;
+      data.setEndTime(IOVTimeStamp(end_time, 0));
+
+    // Stash number of rows.
+
+    data.setNRows(nrows);
 
     // Main data query.
 
@@ -649,8 +527,10 @@ namespace lariov {
     // We do this to extract the number, names, and types of relevant columns.
 
     int ncols = sqlite3_column_count(stmt);
-    std::vector<std::string> column_names;
-    std::vector<std::string> column_types;
+    std::vector<std::string>& column_names = data.colNames();
+    std::vector<std::string>& column_types = data.colTypes();
+    column_names.reserve(ncols);
+    column_types.reserve(ncols);
     rc = sqlite3_step(stmt);
     if(rc == SQLITE_ROW) {
 
@@ -688,58 +568,19 @@ namespace lariov {
       throw cet::exception("DBFolder") << "No data rows.";
     }
 
-    // Get the number of relevant columns.
+    // Stash the number of relevant columns.
 
-    unsigned int nrcols = column_names.size();
+    data.setNCols(column_names.size());
 
-    // Stash the names of columns in fake http response.
+    // Get modifiable values and channels collections, and reserve memory for them.
 
-    dataRec = (DataRec *)malloc(sizeof (DataRec));
-    if(dataRec == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    memset(dataRec, 0, sizeof (DataRec));
-    dataRec->ncolumns = nrcols;
-    dataRec->columns = (char**)calloc(nrcols, sizeof(char*));
-    if(dataRec->columns == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    for(unsigned int icol=0; icol<nrcols; ++icol) {
-      dataRec->columns[icol] = strdup(column_names[icol].c_str());
-      if(dataRec->columns[icol] == 0) {
-	std::cout << "Out of memory." << std::endl;
-	throw cet::exception("DBFolder") << "Out of memory.";
-      }
-    }	  
-    result->dataRecs[2] = dataRec;
-
-    // Stash the types of columns in fake http response.
-
-    dataRec = (DataRec *)malloc(sizeof (DataRec));
-    if(dataRec == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    memset(dataRec, 0, sizeof (DataRec));
-    dataRec->ncolumns = nrcols;
-    dataRec->columns = (char**)calloc(nrcols, sizeof(char*));
-    if(dataRec->columns == 0) {
-      std::cout << "Out of memory." << std::endl;
-      throw cet::exception("DBFolder") << "Out of memory.";
-    }
-    for(unsigned int icol=0; icol<nrcols; ++icol) {
-      dataRec->columns[icol] = strdup(column_types[icol].c_str());
-      if(dataRec->columns[icol] == 0) {
-	std::cout << "Out of memory." << std::endl;
-	throw cet::exception("DBFolder") << "Out of memory.";
-      }
-    }	  
-    result->dataRecs[3] = dataRec;
+    std::vector<std::string>& values = data.data();
+    std::vector<DBChannelID_t>& channels = data.channels();
+    values.reserve(data.nrows() * data.ncols());
+    channels.reserve(data.nrows());
 
     // Re-execute query.
-    // Retrieve all data rows and stash in fake http response.
+    // Retrieve all data rows and stash in result.
 
     rc = sqlite3_reset(stmt);
     if(rc != SQLITE_OK) {
@@ -752,30 +593,16 @@ namespace lariov {
       if(rc == SQLITE_ROW) {
 	++nrows;
 	//std::cout << nrows << " rows." << std::endl;
-
-	// Add row to fake http response.
-
-	if(nrows+4 > result->nrows) {
-	  std::cout << "Too many data rows " << result->nrows << std::endl;
-	  throw cet::exception("DBFolder") << "Too many data rows " << result->nrows;
+	if(nrows > data.nrows()) {
+	  std::cout << "Too many data rows " << nrows << std::endl;
+	  throw cet::exception("DBFolder") << "Too many data rows " << nrows;
 	}
-	dataRec = (DataRec *)malloc(sizeof (DataRec));
-	if(dataRec == 0) {
-	  std::cout << "Out of memory." << std::endl;
-	  throw cet::exception("DBFolder") << "Out of memory.";
-	}
-	memset(dataRec, 0, sizeof (DataRec));
-	dataRec->ncolumns = nrcols;
-	dataRec->columns = (char**)calloc(nrcols, sizeof(char*));
-	if(dataRec->columns == 0) {
-	  std::cout << "Out of memory." << std::endl;
-	  throw cet::exception("DBFolder") << "Out of memory.";
-	}
-	result->dataRecs[nrows+3] = dataRec;
 
 	// Loop over columns.
+	// Remember that ncols is the number of columns returned by the query,
+	// not the number of columns that get stored (some columns are ignored).
 
-	int rcol = 0;
+	bool firstcol = true;
 	for(int col = 0; col < ncols; ++col) {
 	  std::string colname = sqlite3_column_name(stmt, col);
 
@@ -790,36 +617,43 @@ namespace lariov {
 	      //std::cout << "Value = " << value << std::endl;
 	      std::ostringstream ostr;
 	      ostr << value;
-	      result->dataRecs[nrows+3]->columns[rcol] = strdup(ostr.str().c_str());
-	      if(result->dataRecs[nrows+3]->columns[rcol] == 0) {
-		std::cout << "Out of memory." << std::endl;
-		throw cet::exception("DBFolder") << "Out of memory.";
-	      }
+	      values.push_back(ostr.str());
+	      if(firstcol)
+		channels.push_back(value);
 	    }
 	    else if(dtype == SQLITE_FLOAT) {
 	      double value = sqlite3_column_double(stmt, col);
 	      //std::cout << "Value = " << value << std::endl;	    
 	      std::ostringstream ostr;
 	      ostr << value;
-	      result->dataRecs[nrows+3]->columns[rcol] = strdup(ostr.str().c_str());
-	      if(result->dataRecs[nrows+3]->columns[rcol] == 0) {
-		std::cout << "Out of memory." << std::endl;
-		throw cet::exception("DBFolder") << "Out of memory.";
+	      values.push_back(ostr.str());
+	      if(firstcol) {
+		std::cout << "First column has wrong type float." << std::endl;
+		throw cet::exception("DBFolder") << "First column has wrong type float.";
 	      }
 	    }
 	    else if(dtype == SQLITE_TEXT) {
 	      const char* s = (const char*)sqlite3_column_text(stmt, col);
 	      //std::cout << "Value = " << s << std::endl;	    
-	      result->dataRecs[nrows+3]->columns[rcol] = strdup(s);
-	      if(result->dataRecs[nrows+3]->columns[rcol] == 0) {
-		std::cout << "Out of memory." << std::endl;
-		throw cet::exception("DBFolder") << "Out of memory.";
+	      values.push_back(std::string(s));
+	      if(firstcol) {
+		std::cout << "First column has wrong type text." << std::endl;
+		throw cet::exception("DBFolder") << "First column has wrong type text.";
 	      }
 	    }
 	    else if(dtype == SQLITE_NULL) {
+	      values.push_back(std::string());
 	      //std::cout << "Value = NULL" << std::endl;	    
+	      if(firstcol) {
+		std::cout << "First column has wrong type null." << std::endl;
+		throw cet::exception("DBFolder") << "First column has wrong type null.";
+	      }
 	    }
-	    ++rcol;
+	    else {
+	      std::cout << "Unrecognized sqlite data type" << std::endl;
+	      throw cet::exception("DBFolder") << "Unrecognized sqlite data type.";
+	    }
+	    firstcol = false;
 	  }
 	}
       }
@@ -828,9 +662,13 @@ namespace lariov {
 	throw cet::exception("DBFolder") << "sqlite3_step error.";
       }
     }
-    if(nrows+4 != result->nrows) {
-      std::cout << "Wrong number of data rows " << result->nrows << std::endl;
-      throw cet::exception("DBFolder") << "Wrong number of data rows " << result->nrows;
+    if(nrows != data.nrows()) {
+      std::cout << "Wrong number of data rows " << nrows << std::endl;
+      throw cet::exception("DBFolder") << "Wrong number of data rows " << nrows;
+    }
+    if(values.size() != data.nrows() * data.ncols()) {
+      std::cout << "Wrong number of values " << values.size() << std::endl;
+      throw cet::exception("DBFolder") << "Wrong number of values " << values.size();
     }
 
     // Delete statement.
@@ -843,251 +681,221 @@ namespace lariov {
 
     // Done.
 
-    return result;
+    return;
   }
 
   // Dump dataset by rows.
-  // Row 0 - IOV start time.
-  // Row 1 - IOV end time.
-  // Row 2 - Data column names.
-  // Row 3 - Data column types.
-  // Rows 4-N - Data.
 
-  void DBFolder::DumpDataset(Dataset data) const
+  void DBFolder::DumpDataset(const DBDataset& data) const
   {
-    std::vector<std::string> names;
-    std::vector<std::string> types;
+    size_t nrows = data.nrows();
+    size_t ncols = data.ncols();
+    std::cout << "Dataset contains " << nrows << " rows and " << ncols << " columns." << std::endl;
 
-    int nrows = getNtuples(data) - kNUMBER_HEADER_ROWS;
-    std::cout << "Dataset contains " << nrows << " rows." << std::endl;
+    // Begin time.
 
-    // Row 0 - start time.
-    int err = 0;
-    Tuple tup;
-    tup = getTuple(data, 0);
-    char buf[kBUFFER_SIZE];
-    getStringValue(tup, 0, buf, kBUFFER_SIZE, &err);
-    std::cout << "IOV start time = " << buf << std::endl;
-    releaseTuple(tup);
+    std::cout << "IOV start time = " << data.beginTime().DBStamp() << std::endl;
 
-    // Row 1 - end time.
+    // End time.
 
-    tup = getTuple(data, 1);
-    getStringValue(tup, 0, buf, kBUFFER_SIZE, &err);
-    if ( 0 == strcmp(buf,"-") )
-      std::cout << "IOV end time = max" << std::endl;
-    else
-      std::cout << "IOV end time = " << buf << std::endl;
-    releaseTuple(tup);
+    std::cout << "IOV end time = " << data.endTime().DBStamp() << std::endl;
 
-    // Row 2 - column names.
-    tup = getTuple(data, 2);
-    for (int c=0; c < getNfields(tup); ++c) {
-      getStringValue(tup, c, buf, kBUFFER_SIZE, &err);
-      std::cout << "Column " << c << ", name = " << buf << std::endl;
-      names.push_back(buf);
-    }
-    releaseTuple(tup);
+    // Columnn names.
+
+    const std::vector<std::string>& names = data.colNames();
+    for (size_t c=0; c<ncols; ++c)
+      std::cout << "Column " << c << ", name = " << names[c] << std::endl;
 
     // Row 3 - column types.
-    tup = getTuple(data, 3);
-    for (int c=0; c < getNfields(tup); ++c) {
-      getStringValue(tup, c, buf, kBUFFER_SIZE, &err);
-      std::cout << "Column " << c << ", type = " << buf << std::endl;
-      types.push_back(buf);
-    }
-    releaseTuple(tup);
+
+    const std::vector<std::string>& types = data.colTypes();
+    for (size_t c=0; c<ncols; ++c)
+      std::cout << "Column " << c << ", type = " << types[c] << std::endl;
 
     // Data rows.
-    for(int row = 0; row < nrows; ++row) {
+
+    for(size_t row=0; row<nrows; ++row) {
       std::cout << "\nRow " << row << std::endl;
-      tup = getTuple(data, row + kNUMBER_HEADER_ROWS);
+      DBDataset::DBRow dbrow = data.getRow(row);
 
       // Loop over columns.
 
-      for(unsigned int col = 0; col < names.size(); ++col) {
+      for(size_t col=0; col<ncols; ++col) {
 	if(types[col] == "bigint" || types[col] == "integer") {
-	  long value = getLongValue(tup, col, &err);
+	  long value = dbrow.getLongData(col);
 	  std::cout << names[col] << " = " << value << std::endl;
 	}
 	else if(types[col] == "real") {
-	  double value = getDoubleValue(tup, col, &err);
+	  double value = dbrow.getDoubleData(col);
 	  std::cout << names[col] << " = " << value << std::endl;
 	}
 	else if(types[col] == "text" or types[col] == "boolean") {
-	  char buf[kBUFFER_SIZE];
-	  getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
-	  std::cout << names[col] << " = " << buf << std::endl;
+	  std::string value = dbrow.getData(col);
+	  std::cout << names[col] << " = " << value << std::endl;
 	}
 	else {
 	  std::cout << "Unknown type " << types[col] << std::endl;
 	  throw cet::exception("DBFolder") << "Unknown type.";
 	}
       }
-      releaseTuple(tup);
     }
   }
 
-  void DBFolder::CompareDataset(Dataset data1, Dataset data2) const
+  void DBFolder::CompareDataset(const DBDataset& data1, DBDataset& data2) const
   {
     bool compare_ok = true;
     std::cout << "\nComparing datasets." << std::endl;
-    std::vector<std::string> names1;
-    std::vector<std::string> types1;
-    std::vector<std::string> names2;
-    std::vector<std::string> types2;
 
-    int nrows1 = getNtuples(data1) - kNUMBER_HEADER_ROWS;
-    int nrows2 = getNtuples(data2) - kNUMBER_HEADER_ROWS;
+    size_t nrows1 = data1.nrows();
+    size_t nrows2 = data2.nrows();
     //std::cout << "Dataset 1 contains " << nrows1 << " rows." << std::endl;
     //std::cout << "Dataset 2 contains " << nrows2 << " rows." << std::endl;
     if(nrows1 != nrows2)
       compare_ok = false;
 
-    // Row 0 - start time.
-    int err = 0;
-    Tuple tup1, tup2;
-    tup1 = getTuple(data1, 0);
-    tup2 = getTuple(data2, 0);
-    char buf1[kBUFFER_SIZE];
-    char buf2[kBUFFER_SIZE];
-    getStringValue(tup1, 0, buf1, kBUFFER_SIZE, &err);
-    getStringValue(tup1, 0, buf2, kBUFFER_SIZE, &err);
-    //std::cout << "IOV start time 1 = " << buf1 << std::endl;
-    //std::cout << "IOV start time 2 = " << buf2 << std::endl;
-    if(strcmp(buf1, buf2) != 0)
+    // Compare begin time.
+
+    std::string begin1 = data1.beginTime().DBStamp();
+    std::string begin2 = data2.beginTime().DBStamp();
+    if(begin1 != begin2)
       compare_ok = false;
-    releaseTuple(tup1);
-    releaseTuple(tup2);
 
-    // Row 1 - end time.
+    // Compare end time.
 
-    tup1 = getTuple(data1, 1);
-    tup2 = getTuple(data2, 1);
-    getStringValue(tup1, 0, buf1, kBUFFER_SIZE, &err);
-    getStringValue(tup2, 0, buf2, kBUFFER_SIZE, &err);
-    //if ( 0 == strcmp(buf1,"-") )
-    //std::cout << "IOV end time 1 = max" << std::endl;
-    //else
-    //std::cout << "IOV end time 1 = " << buf1 << std::endl;
-    //if ( 0 == strcmp(buf2,"-") )
-    //std::cout << "IOV end time 2 = max" << std::endl;
-    //else
-    //std::cout << "IOV end time 2 = " << buf2 << std::endl;
-    if(strcmp(buf1, buf2) != 0)
+    std::string end1 = data1.beginTime().DBStamp();
+    std::string end2 = data2.beginTime().DBStamp();
+    if(end1 != end2)
       compare_ok = false;
-    releaseTuple(tup1);
-    releaseTuple(tup2);
 
-    // Row 2 - column names.
-    tup1 = getTuple(data1, 2);
-    tup2 = getTuple(data2, 2);
-    for (int c=0; c < getNfields(tup1); ++c) {
-      getStringValue(tup1, c, buf1, kBUFFER_SIZE, &err);
-      //std::cout << "Column " << c << ", name 1 = " << buf1 << std::endl;
-      names1.push_back(buf1);
-    }
-    for (int c=0; c < getNfields(tup2); ++c) {
-      getStringValue(tup2, c, buf2, kBUFFER_SIZE, &err);
-      //std::cout << "Column " << c << ", name 2 = " << buf2 << std::endl;
-      names2.push_back(buf2);
-      if(c >= int(names1.size()) || names1[c] != names2.back()) {
-	std::cout << "Name mismatch " << names1[c] << " vs. " << names2.back() << std::endl;
-	compare_ok = false;
-      }
-    }
-    if(names1.size() != names2.size()) {
-      std::cout << "Size mismatch " << names1.size() << " vs. " << names2.size() << std::endl;
+    // Compare column names.
+
+    size_t ncols1 = data1.ncols();
+    size_t ncols2 = data2.ncols();
+    const std::vector<std::string>& names1 = data1.colNames();
+    const std::vector<std::string>& names2 = data2.colNames();
+    if(ncols1 != ncols2 || ncols1 != names1.size() || ncols2 != names2.size()) {
+      std::cout << "Columns names size mismatch " << ncols1 
+		<< " vs. " << ncols2 
+		<< " vs. " << names1.size()
+		<< " vs. " << names2.size()
+		<< std::endl;
       compare_ok = false;
     }
-    releaseTuple(tup1);
-    releaseTuple(tup2);
-
-    // Row 3 - column types.
-    tup1 = getTuple(data1, 3);
-    tup2 = getTuple(data2, 3);
-    for (int c=0; c < getNfields(tup1); ++c) {
-      getStringValue(tup1, c, buf1, kBUFFER_SIZE, &err);
-      //std::cout << "Column " << c << ", type 1 = " << buf1 << std::endl;
-      types1.push_back(buf1);
-      if(types1.back() == "bigint")
-	types1.back() = "integer";
-    }
-    for (int c=0; c < getNfields(tup2); ++c) {
-      getStringValue(tup2, c, buf2, kBUFFER_SIZE, &err);
-      //std::cout << "Column " << c << ", type 2 = " << buf2 << std::endl;
-      types2.push_back(buf2);
-      if(types2.back() == "bigint")
-	types2.back() = "integer";
-      if(c >= int(types1.size()) || types1[c] != types2.back()) {
-	if(types1[c] != "boolean" || types2.back() != "integer") {
-	  std::cout << "Type mismatch " << types1[c] << " vs. " << types2.back() << std::endl;
+    if(compare_ok) {
+      for (size_t c=0; c<ncols1; ++c) {
+	if(names1[c] != names2[c]) {
+	  std::cout << "Name mismatch " << names1[c] << " vs. " << names2[c] << std::endl;
 	  compare_ok = false;
 	}
       }
     }
-    if(types1.size() != types2.size()) {
-      std::cout << "Size mismatch " << types1.size() << " vs. " << types2.size() << std::endl;
+
+    // Compare column types.
+
+    const std::vector<std::string>& types1 = data1.colTypes();
+    const std::vector<std::string>& types2 = data2.colTypes();
+    if(ncols1 != ncols2 || ncols1 != types1.size() || ncols2 != types2.size()) {
+      std::cout << "Column types ize mismatch " << ncols1 
+		<< " vs. " << ncols2 
+		<< " vs. " << types1.size()
+		<< " vs. " << types2.size()
+		<< std::endl;
       compare_ok = false;
     }
-    releaseTuple(tup1);
-    releaseTuple(tup2);
+    if(compare_ok) {
+      for (size_t c=0; c<ncols2; ++c) {
+
+	// Type "bigint" matches "integer."
+	// Type "boolean" matches "integer."
+
+	std::string type1 = types1[c];
+	std::string type2 = types2[c];
+	if(type1 == "bigint" || type1 == "boolean")
+	  type1 = "integer";
+	if(type2 == "bigint" || type2 == "boolean")
+	  type2 = "integer";
+	if(type1 != type2) {
+	  std::cout << "Type mismatch " << type1 << " vs. " << type2 << std::endl;
+	  compare_ok = false;
+	}
+      }
+    }
+
+    // Compare channels.
+
+    const std::vector<DBChannelID_t>& channels1 = data1.channels();
+    const std::vector<DBChannelID_t>& channels2 = data2.channels();
+    if(nrows1 != nrows2 || nrows1 != channels1.size() || nrows2 != channels2.size()) {
+      std::cout << "Channels size mismatch " << nrows1 
+		<< " vs. " << nrows2 
+		<< " vs. " << channels1.size()
+		<< " vs. " << channels2.size()
+		<< std::endl;
+      compare_ok = false;
+    }
+    if(compare_ok) {
+      for (size_t r=0; r<nrows1; ++r) {
+	if(channels1[r] != channels2[r]) {
+	  std::cout << "Channel mismatch " << channels1[r] << " vs. " << channels2[r] << std::endl;
+	  compare_ok = false;
+	}
+      }
+    }
+
+    // Compare number of values.
+
+    if(data1.data().size() != data2.data().size()) {
+      std::cout << "Values size mismatch " << data1.data().size()
+		<< " vs. " << data2.data().size()
+		<< std::endl;
+      compare_ok = false;
+    }
 
     // Data rows.
-    for(int row = 0; row < nrows1; ++row) {
-      //std::cout << "\nRow " << row << std::endl;
-      tup1 = getTuple(data1, row + kNUMBER_HEADER_ROWS);
-      tup2 = getTuple(data2, row + kNUMBER_HEADER_ROWS);
+    if(compare_ok) {
+      for(size_t row=0; row<nrows1; ++row) {
 
-      // Loop over columns.
+	DBDataset::DBRow dbrow1 = data1.getRow(row);
+	DBDataset::DBRow dbrow2 = data2.getRow(row);
+	//std::cout << "\nRow " << row << std::endl;
 
-      for(unsigned int col = 0; col < names1.size(); ++col) {
-	if(types1[col] == "integer") {
-	  long value1 = getLongValue(tup1, col, &err);
-	  long value2 = getLongValue(tup2, col, &err);
-	  //std::cout << names1[col] << " 1 = " << value1 << std::endl;
-	  //std::cout << names2[col] << " 2 = " << value2 << std::endl;
-	  if(value1 != value2) {
-	    std::cout << "Value mismatch " << value1 << " vs. " << value2 << std::endl;
-	    compare_ok = false;
-	  }
-	}
-	else if(types1[col] == "real") {
-	  double value1 = getDoubleValue(tup1, col, &err);
-	  double value2 = getDoubleValue(tup2, col, &err);
-	  //std::cout << names1[col] << " 1 = " << value1 << std::endl;
-	  //std::cout << names2[col] << " 2 = " << value2 << std::endl;
-	  if(value1 != value2) {
-	    std::cout << "Value mismatch " << value1 << " vs. " << value2 << std::endl;
-	    compare_ok = false;
-	  }
-	}
-	else if(types1[col] == "text" or types1[col] == "boolean") {
-	  char buf1[kBUFFER_SIZE];
-	  char buf2[kBUFFER_SIZE];
-	  getStringValue(tup1, col, buf1, kBUFFER_SIZE, &err);
-	  getStringValue(tup2, col, buf2, kBUFFER_SIZE, &err);
-	  //std::cout << names1[col] << " 1 = " << buf1 << std::endl;
-	  //std::cout << names2[col] << " 2 = " << buf2 << std::endl;
-	  if(strcmp(buf1, buf2) != 0) {
-	    bool never_mind = false;
-	    if(strcmp(buf1, "True") == 0 && strcmp(buf2, "1") == 0)
-	      never_mind = true;
-	    if(strcmp(buf1, "False") == 0 && strcmp(buf2, "0") == 0)
-	      never_mind = true;
-	    if(!never_mind) {
-	      std::cout << "Value mismatch " << buf1 << " vs. " << buf2 << std::endl;
+	// Loop over columns.
+
+	for(size_t col=0; col<ncols1; ++col) {
+	  if(types1[col] == "integer" || types1[col] == "bigint") {
+	    long value1 = dbrow1.getLongData(col);
+	    long value2 = dbrow2.getLongData(col);
+	    //std::cout << names1[col] << " 1 = " << value1 << std::endl;
+	    //std::cout << names2[col] << " 2 = " << value2 << std::endl;
+	    if(value1 != value2) {
+	      std::cout << "Value mismatch " << value1 << " vs. " << value2 << std::endl;
 	      compare_ok = false;
 	    }
 	  }
-	}
-	else {
-	  std::cout << "Unknown type " << types1[col] << std::endl;
-	  throw cet::exception("DBFolder") << "Unknown type.";
+	  else if(types1[col] == "real") {
+	    double value1 = dbrow1.getDoubleData( col);
+	    double value2 = dbrow2.getDoubleData( col);
+	    //std::cout << names1[col] << " 1 = " << value1 << std::endl;
+	    //std::cout << names2[col] << " 2 = " << value2 << std::endl;
+	    if(value1 != value2) {
+	      std::cout << "Value mismatch " << value1 << " vs. " << value2 << std::endl;
+	      compare_ok = false;
+	    }
+	  }
+	  else if(types1[col] == "text" or types1[col] == "boolean") {
+	    std::string value1 = dbrow2.getData(col);
+	    std::string value2 = dbrow2.getData(col);
+	    if(value1 != value2) {
+	      std::cout << "Value mismatch " << value1 << " vs. " << value2 << std::endl;
+	      compare_ok = false;
+	    }
+	  }
+	  else {
+	    std::cout << "Unknown type " << types1[col] << std::endl;
+	    throw cet::exception("DBFolder") << "Unknown type.";
+	  }
 	}
       }
-      releaseTuple(tup1);
-      releaseTuple(tup2);
     }
 
     if(compare_ok) {
