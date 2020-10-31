@@ -10,11 +10,14 @@
 //          particular database table in an IOV database.  Data is extracted and 
 //          copied from the Dataset struct using the wda api.
 //
-//          Database data are essentially a rectangular array of strings, indexed by
+//          Database data are essentially a rectangular array of values, indexed by
 //          (row, column).  Accessors are provided to access data as string, long, 
 //          or double.
 //
-//          Rows are labeled by channel number.
+//          Rows are labeled by channel number.  Columns are labeled by name and type.
+//
+//          Binary values, which are stored as strings by wda, are stored as
+//          boost::variant<long, double, unique_ptr<std::string> > > in this class.
 //
 //          Columns are labeled by column name and type.
 //
@@ -49,6 +52,7 @@
 
 #include <string>
 #include <vector>
+#include "boost/variant.hpp"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"
 
@@ -59,6 +63,10 @@ namespace lariov
 
   public:
 
+    // Typedef
+
+    typedef boost::variant<long, double, std::unique_ptr<std::string> > value_type;
+
     // Nested class representing data from one row.
 
     class DBRow
@@ -68,14 +76,16 @@ namespace lariov
       // Constructors.
 
       DBRow() : fData(0) {}
-      DBRow(const std::string* s) : fData(s) {}
+      DBRow(const value_type* s) : fData(s) {}
 
       // Accessors.
 
       bool isValid() const {return fData != 0;}
-      const std::string& getData(size_t col) const {return fData[col];}
-      long getLongData(size_t col) const {return strtol(getData(col).c_str(), 0, 10);}
-      double getDoubleData(size_t col) const {return strtod(getData(col).c_str(), 0);}
+      const value_type& getData(size_t col) const {return fData[col];}
+      const std::string& getStringData(size_t col) const {
+	return *boost::get<std::unique_ptr<std::string> >(fData[col]);}
+      long getLongData(size_t col) const {return boost::get<long>(fData[col]);}
+      double getDoubleData(size_t col) const {return boost::get<double>(fData[col]);}
 
       // Modifiers.
 
@@ -85,10 +95,10 @@ namespace lariov
 
       // Data member.
 
-      const std::string* fData;   // Borrowed referenced from enclosing class.
+      const value_type* fData;   // Borrowed referenced from enclosing class.
     };
 
-  // Back to clase DBDataset.
+  // Back to main class.
 
   public:
 
@@ -107,7 +117,7 @@ namespace lariov
     const std::vector<std::string>& colNames() const {return fColNames;}
     const std::vector<std::string>& colTypes() const {return fColTypes;}
     const std::vector<DBChannelID_t>& channels() const {return fChannels;}
-    const std::vector<std::string>& data() const {return fData;}
+    const std::vector<value_type>& data() const {return fData;}
 
     // Determine row and column numbers.
 
@@ -132,7 +142,7 @@ namespace lariov
     std::vector<std::string>& colNames() {return fColNames;}
     std::vector<std::string>& colTypes() {return fColTypes;}
     std::vector<DBChannelID_t>& channels() {return fChannels;}
-    std::vector<std::string>& data() {return fData;}
+    std::vector<value_type>& data() {return fData;}
 
   private:
 
@@ -145,7 +155,7 @@ namespace lariov
     std::vector<std::string> fColNames;    // Column names.
     std::vector<std::string> fColTypes;    // Column types.
     std::vector<DBChannelID_t> fChannels;  // Channels.
-    std::vector<std::string> fData;        // Calibration data (length fNRows*fNCols).
+    std::vector<value_type> fData;         // Calibration data (length fNRows*fNCols).
   };
 }
 
