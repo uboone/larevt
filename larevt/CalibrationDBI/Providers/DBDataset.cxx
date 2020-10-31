@@ -13,6 +13,7 @@
 #include "WebDBIConstants.h"
 #include "DBDataset.h"
 #include "wda.h"
+#include "cetlib_except/exception.h"
 
 // Default constructor.
 
@@ -185,14 +186,63 @@ void lariov::DBDataset::update(void* dataset, bool release)
 
     for(size_t col = 0; col < fNCols; ++col) {
       getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
-      if(col == 0) {
-	DBChannelID_t ch = strtol(buf, 0, 10);
-	fChannels.push_back(ch);
-	//std::cout << "DBDataset: channel=" << fChannels.back() << std::endl;
-      }	
-      fData.push_back(std::string(buf));
-      //std::cout << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back() 
-      //	<< std::endl;
+
+      // Convert string value to boost::variant.
+
+      if(fColTypes[col] == "integer" || fColTypes[col] == "bigint") {
+	long value = strtol(buf, 0, 10);
+	fData.push_back(value_type(value));
+	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back() 
+	//	<< std::endl;
+	if(col == 0) {
+	  fChannels.push_back(value);
+	  //std::cout << "DBDataset: channel=" << fChannels.back() << std::endl;
+	}
+      }
+      else if(fColTypes[col] == "real") {
+	double value = strtod(buf, 0);
+	fData.push_back(value_type(value));
+	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back() 
+	//	<< std::endl;
+	if(col == 0) {
+	  std::cout << "First column has wrong type real." << std::endl;
+	  throw cet::exception("DBDataset") << "First column has wrong type real.";
+	}	
+      }
+      else if(fColTypes[col] == "text") {
+	fData.emplace_back(std::make_unique<std::string>(buf));
+	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back() 
+	//	<< std::endl;
+	if(col == 0) {
+	  std::cout << "First column has wrong type text." << std::endl;
+	  throw cet::exception("DBDataset") << "First column has wrong type text.";
+	}	
+      }
+      else if(fColTypes[col] == "boolean") {
+	long value = 0;
+	std::string s = std::string(buf);
+	if(s == "true" || s == "True" || s == "TRUE" || s == "1")
+	  value = 1;
+	else if(s == "false" || s == "False" || s == "FALSE" || s == "0")
+	  value = 0;
+	else {
+	  std::cout << "Unknown string representation of boolean " << s << std::endl;
+	  throw cet::exception("DBDataset") << "Unknown string representation of boolean " << s
+					    << std::endl;
+	}
+	fData.push_back(value_type(value));
+	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back() 
+	//	<< std::endl;
+	if(col == 0) {
+	  std::cout << "First column has wrong type boolean." << std::endl;
+	  throw cet::exception("DBDataset") << "First column has wrong type boolean.";
+	}	
+      }
+      else {
+	std::cout << "Unknown datatype = " << fColTypes[col] << std::endl;
+	throw cet::exception("DBDataset") << "Unknown datatype = " << fColTypes[col] 
+					  << ": " << buf << std::endl;
+      }
     }
     releaseTuple(tup);
   }

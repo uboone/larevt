@@ -85,16 +85,8 @@ namespace lariov {
 
     // Get value.
 
-    const std::string& value = fCachedRow.getData(col);
-    data = false;
-    if (value =="True" or value == "1")
-      data = true;
-    else if (value == "False" or value == "0")
-      data = false;
-    else {
-      std::cout<<"(DBFolder) ERROR: Can't identify data: "<< value << " as boolean!"<<std::endl;
-      err = 1;
-    }
+    long value = fCachedRow.getLongData(col);
+    data = (value != 0);
 
     return err;
   }
@@ -155,7 +147,7 @@ namespace lariov {
 
     // Get value.
 
-    data = fCachedRow.getData(col);
+    data = fCachedRow.getStringData(col);
 
     // Done.
 
@@ -574,7 +566,7 @@ namespace lariov {
 
     // Get modifiable values and channels collections, and reserve memory for them.
 
-    std::vector<std::string>& values = data.data();
+    std::vector<DBDataset::value_type>& values = data.data();
     std::vector<DBChannelID_t>& channels = data.channels();
     values.reserve(data.nrows() * data.ncols());
     channels.reserve(data.nrows());
@@ -613,20 +605,16 @@ namespace lariov {
 	    int dtype = sqlite3_column_type(stmt, col);
 
 	    if(dtype == SQLITE_INTEGER) {
-	      int value = sqlite3_column_int(stmt, col);
+	      long value = sqlite3_column_int(stmt, col);
 	      //std::cout << "Value = " << value << std::endl;
-	      std::ostringstream ostr;
-	      ostr << value;
-	      values.push_back(ostr.str());
+	      values.push_back(DBDataset::value_type(value));
 	      if(firstcol)
 		channels.push_back(value);
 	    }
 	    else if(dtype == SQLITE_FLOAT) {
 	      double value = sqlite3_column_double(stmt, col);
 	      //std::cout << "Value = " << value << std::endl;	    
-	      std::ostringstream ostr;
-	      ostr << value;
-	      values.push_back(ostr.str());
+	      values.push_back(DBDataset::value_type(value));
 	      if(firstcol) {
 		std::cout << "First column has wrong type float." << std::endl;
 		throw cet::exception("DBFolder") << "First column has wrong type float.";
@@ -635,14 +623,14 @@ namespace lariov {
 	    else if(dtype == SQLITE_TEXT) {
 	      const char* s = (const char*)sqlite3_column_text(stmt, col);
 	      //std::cout << "Value = " << s << std::endl;	    
-	      values.push_back(std::string(s));
+	      values.emplace_back(std::make_unique<std::string>(s));
 	      if(firstcol) {
 		std::cout << "First column has wrong type text." << std::endl;
 		throw cet::exception("DBFolder") << "First column has wrong type text.";
 	      }
 	    }
 	    else if(dtype == SQLITE_NULL) {
-	      values.push_back(std::string());
+	      values.push_back(DBDataset::value_type());
 	      //std::cout << "Value = NULL" << std::endl;	    
 	      if(firstcol) {
 		std::cout << "First column has wrong type null." << std::endl;
@@ -721,7 +709,7 @@ namespace lariov {
       // Loop over columns.
 
       for(size_t col=0; col<ncols; ++col) {
-	if(types[col] == "bigint" || types[col] == "integer") {
+	if(types[col] == "bigint" || types[col] == "integer" || types[col] == "boolean") {
 	  long value = dbrow.getLongData(col);
 	  std::cout << names[col] << " = " << value << std::endl;
 	}
@@ -730,7 +718,7 @@ namespace lariov {
 	  std::cout << names[col] << " = " << value << std::endl;
 	}
 	else if(types[col] == "text" or types[col] == "boolean") {
-	  std::string value = dbrow.getData(col);
+	  std::string value = dbrow.getStringData(col);
 	  std::cout << names[col] << " = " << value << std::endl;
 	}
 	else {
@@ -862,7 +850,7 @@ namespace lariov {
 	// Loop over columns.
 
 	for(size_t col=0; col<ncols1; ++col) {
-	  if(types1[col] == "integer" || types1[col] == "bigint") {
+	  if(types1[col] == "integer" || types1[col] == "bigint" ||  types1[col] == "boolean") {
 	    long value1 = dbrow1.getLongData(col);
 	    long value2 = dbrow2.getLongData(col);
 	    //std::cout << names1[col] << " 1 = " << value1 << std::endl;
@@ -882,9 +870,9 @@ namespace lariov {
 	      compare_ok = false;
 	    }
 	  }
-	  else if(types1[col] == "text" or types1[col] == "boolean") {
-	    std::string value1 = dbrow2.getData(col);
-	    std::string value2 = dbrow2.getData(col);
+	  else if(types1[col] == "text") {
+	    std::string value1 = dbrow2.getStringData(col);
+	    std::string value2 = dbrow2.getStringData(col);
 	    if(value1 != value2) {
 	      std::cout << "Value mismatch " << value1 << " vs. " << value2 << std::endl;
 	      compare_ok = false;
