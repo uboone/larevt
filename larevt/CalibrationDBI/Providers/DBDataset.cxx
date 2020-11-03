@@ -187,7 +187,7 @@ void lariov::DBDataset::update(void* dataset, bool release)
     for(size_t col = 0; col < fNCols; ++col) {
       getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
 
-      // Convert string value to boost::variant.
+      // Convert string value to DBDataset::value_type (std::variant).
 
       if(fColTypes[col] == "integer" || fColTypes[col] == "bigint") {
 	long value = strtol(buf, 0, 10);

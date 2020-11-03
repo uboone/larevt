@@ -17,7 +17,7 @@
 //          Rows are labeled by channel number.  Columns are labeled by name and type.
 //
 //          Binary values, which are stored as strings by wda, are stored as
-//          boost::variant<long, double, unique_ptr<std::string> > > in this class.
+//          std::variant<long, double, unique_ptr<std::string> > > in this class.
 //
 //          Columns are labeled by column name and type.
 //
@@ -52,7 +52,8 @@
 
 #include <string>
 #include <vector>
-#include "boost/variant.hpp"
+#include <variant>
+#include <memory>
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"
 
@@ -65,7 +66,7 @@ namespace lariov
 
     // Typedef
 
-    typedef boost::variant<long, double, std::unique_ptr<std::string> > value_type;
+    typedef std::variant<long, double, std::unique_ptr<std::string> > value_type;
 
     // Nested class representing data from one row.
 
@@ -83,9 +84,9 @@ namespace lariov
       bool isValid() const {return fData != 0;}
       const value_type& getData(size_t col) const {return fData[col];}
       const std::string& getStringData(size_t col) const {
-	return *boost::get<std::unique_ptr<std::string> >(fData[col]);}
-      long getLongData(size_t col) const {return boost::get<long>(fData[col]);}
-      double getDoubleData(size_t col) const {return boost::get<double>(fData[col]);}
+	return *std::get<std::unique_ptr<std::string> >(fData[col]);}
+      long getLongData(size_t col) const {return std::get<long>(fData[col]);}
+      double getDoubleData(size_t col) const {return std::get<double>(fData[col]);}
 
       // Modifiers.
 
