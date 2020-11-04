@@ -37,7 +37,18 @@ lariov::DBDataset::DBDataset(void* dataset, bool release) :
 // Destructor.
 
 lariov::DBDataset::~DBDataset()
-{}
+{
+
+  // Loop over rows and columns and delete text strings.
+
+  for(size_t row = 0; row < fNRows; ++row) {
+    for(size_t col = 0; col < fNCols; ++col) {
+      if(fColTypes[col] == "text") {
+	delete[] fData[row*fNCols + col].charValue;
+      }
+    }
+  }
+}
 
 // Get row number by channel number.
 // Return -1 if not found.
@@ -186,53 +197,52 @@ void lariov::DBDataset::update(void* dataset, bool release)
 
     for(size_t col = 0; col < fNCols; ++col) {
       getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
+      fData.emplace_back(DBDataset::value_type());
 
       // Convert string value to DBDataset::value_type (std::variant).
 
       if(fColTypes[col] == "integer" || fColTypes[col] == "bigint") {
-	long value = strtol(buf, 0, 10);
-	fData.push_back(value_type(value));
-	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back() 
-	//	<< std::endl;
+	fData.back().longValue = strtol(buf, 0, 10);
+	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value="
+	// << fData.back().longValue << std::endl;
 	if(col == 0) {
-	  fChannels.push_back(value);
+	  fChannels.push_back(fData.back().longValue);
 	  //std::cout << "DBDataset: channel=" << fChannels.back() << std::endl;
 	}
       }
       else if(fColTypes[col] == "real") {
-	double value = strtod(buf, 0);
-	fData.push_back(value_type(value));
-	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back() 
-	//	<< std::endl;
+	fData.back().doubleValue = strtod(buf, 0);
+	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value="
+	// << fData.back().doubleValue << std::endl;
 	if(col == 0) {
 	  std::cout << "First column has wrong type real." << std::endl;
 	  throw cet::exception("DBDataset") << "First column has wrong type real.";
 	}	
       }
       else if(fColTypes[col] == "text") {
-	fData.emplace_back(std::make_unique<std::string>(buf));
-	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back() 
-	//	<< std::endl;
+	size_t nch = strlen(buf) + 1;
+	fData.back().charValue = new char[nch];
+	memcpy(fData.back().charValue, buf, nch);
+	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value="
+	// << fData.back().charValue << std::endl;
 	if(col == 0) {
 	  std::cout << "First column has wrong type text." << std::endl;
 	  throw cet::exception("DBDataset") << "First column has wrong type text.";
 	}	
       }
       else if(fColTypes[col] == "boolean") {
-	long value = 0;
 	std::string s = std::string(buf);
 	if(s == "true" || s == "True" || s == "TRUE" || s == "1")
-	  value = 1;
+	  fData.back().longValue = 1;
 	else if(s == "false" || s == "False" || s == "FALSE" || s == "0")
-	  value = 0;
+	  fData.back().longValue = 0;
 	else {
 	  std::cout << "Unknown string representation of boolean " << s << std::endl;
 	  throw cet::exception("DBDataset") << "Unknown string representation of boolean " << s
 					    << std::endl;
 	}
-	fData.push_back(value_type(value));
-	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back() 
-	//	<< std::endl;
+	//std::cout << "DBDataset: row=" << row << ", column=" << col << ", value="
+	// << fData.back().longValue << std::endl;
 	if(col == 0) {
 	  std::cout << "First column has wrong type boolean." << std::endl;
 	  throw cet::exception("DBDataset") << "First column has wrong type boolean.";

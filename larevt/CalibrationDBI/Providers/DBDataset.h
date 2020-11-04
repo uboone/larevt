@@ -17,7 +17,7 @@
 //          Rows are labeled by channel number.  Columns are labeled by name and type.
 //
 //          Binary values, which are stored as strings by wda, are stored as
-//          std::variant<long, double, unique_ptr<std::string> > > in this class.
+//          binary values in a union in this class.
 //
 //          Columns are labeled by column name and type.
 //
@@ -52,8 +52,6 @@
 
 #include <string>
 #include <vector>
-#include <variant>
-#include <memory>
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"
 
@@ -64,9 +62,15 @@ namespace lariov
 
   public:
 
-    // Typedef
+    // Nested union for storing binary values.
 
-    typedef std::variant<long, double, std::unique_ptr<std::string> > value_type;
+    union Value
+    {
+      long longValue;
+      double doubleValue;
+      char* charValue;
+    };
+    typedef Value value_type;
 
     // Nested class representing data from one row.
 
@@ -82,11 +86,9 @@ namespace lariov
       // Accessors.
 
       bool isValid() const {return fData != 0;}
-      const value_type& getData(size_t col) const {return fData[col];}
-      const std::string& getStringData(size_t col) const {
-	return *std::get<std::unique_ptr<std::string> >(fData[col]);}
-      long getLongData(size_t col) const {return std::get<long>(fData[col]);}
-      double getDoubleData(size_t col) const {return std::get<double>(fData[col]);}
+      std::string getStringData(size_t col) const {return std::string(fData[col].charValue);}
+      long getLongData(size_t col) const {return (fData[col].longValue);}
+      double getDoubleData(size_t col) const {return fData[col].doubleValue;}
 
       // Modifiers.
 
@@ -96,7 +98,7 @@ namespace lariov
 
       // Data member.
 
-      const value_type* fData;   // Borrowed referenced from enclosing class.
+      const value_type* fData;   // Borrowed reference from enclosing class.
     };
 
   // Back to main class.
@@ -107,7 +109,14 @@ namespace lariov
 
     DBDataset();                                   // Default constructor.
     DBDataset(void* dataset, bool release=false);  // Initializing constructor.
+    DBDataset(const DBDataset&) = delete;          // Uncopyable.
+    DBDataset(DBDataset&&) = delete;               // Unmovable.
     ~DBDataset();                                  // Destructor.
+
+    // Assignment.
+
+    DBDataset& operator=(const DBDataset&) = delete;  // Uncopyable.
+    DBDataset& operator=(DBDataset&&) = delete;       // Unmovable.
 
     // Simple accessors.
 

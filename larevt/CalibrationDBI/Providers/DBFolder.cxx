@@ -603,18 +603,17 @@ namespace lariov {
 
 	  if(colname[0] != '_' && colname.substr(0,3) != "MAX") {
 	    int dtype = sqlite3_column_type(stmt, col);
+	    values.emplace_back(DBDataset::value_type());
 
 	    if(dtype == SQLITE_INTEGER) {
-	      long value = sqlite3_column_int(stmt, col);
-	      //std::cout << "Value = " << value << std::endl;
-	      values.push_back(DBDataset::value_type(value));
+	      values.back().longValue = sqlite3_column_int(stmt, col);
+	      //std::cout << "Value = " << values.back().longValue << std::endl;
 	      if(firstcol)
-		channels.push_back(value);
+		channels.push_back(values.back().longValue);
 	    }
 	    else if(dtype == SQLITE_FLOAT) {
-	      double value = sqlite3_column_double(stmt, col);
-	      //std::cout << "Value = " << value << std::endl;	    
-	      values.push_back(DBDataset::value_type(value));
+	      values.back().doubleValue = sqlite3_column_double(stmt, col);
+	      //std::cout << "Value = " << values.back().doubleValue << std::endl;	    
 	      if(firstcol) {
 		std::cout << "First column has wrong type float." << std::endl;
 		throw cet::exception("DBFolder") << "First column has wrong type float.";
@@ -622,15 +621,17 @@ namespace lariov {
 	    }
 	    else if(dtype == SQLITE_TEXT) {
 	      const char* s = (const char*)sqlite3_column_text(stmt, col);
-	      //std::cout << "Value = " << s << std::endl;	    
-	      values.emplace_back(std::make_unique<std::string>(s));
+	      size_t nch = strlen(s) + 1;
+	      values.back().charValue = new char[nch];
+	      memcpy(values.back().charValue, s, nch);
+	      //std::cout << "Value = " << values.back().charValue << std::endl;
 	      if(firstcol) {
 		std::cout << "First column has wrong type text." << std::endl;
 		throw cet::exception("DBFolder") << "First column has wrong type text.";
 	      }
 	    }
 	    else if(dtype == SQLITE_NULL) {
-	      values.push_back(DBDataset::value_type());
+	      values.back().longValue = 0;
 	      //std::cout << "Value = NULL" << std::endl;	    
 	      if(firstcol) {
 		std::cout << "First column has wrong type null." << std::endl;
