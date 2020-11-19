@@ -40,7 +40,7 @@ namespace lariov {
 
       void DumpDataset(const DBDataset& data) const;
 
-      void CompareDataset(const DBDataset& data1, DBDataset& data2) const;
+      bool CompareDataset(const DBDataset& data1, const DBDataset& data2) const;
 
     private:
 

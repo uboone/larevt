@@ -25,8 +25,6 @@
 //
 // fBeginTime - IOV begin validity time.
 // fEndTime   - IOV end validity time.
-// fNRows     - Number of rows.
-// fNCols     - Number of columns.
 // fColNames  - Names of columns.
 // fColTypes  - Data types of columns.
 // fChannels  - Channel numbers (indexed by row number).
@@ -36,11 +34,11 @@
 // Furthermore, it can be assumed that rows are ordered by increasing channel number.
 // 
 // Calibration data is contained in data member fData, which is a rectangular array 
-// of strings of dimension fNRows x fNCols.  For efficiency, calibration data are
-// stored using a single std::vector<std::string>, which array is allocated at
+// of strings of dimension # channels x # cols.  For efficiency, calibration data are
+// stored using a single std::vector, which array is allocated once at
 // construction or update time.  Elements are accessed columnwise as follows.
 //
-// value = fData[fNCols*row + column]
+// value = fData[ncols*row + column]
 //
 // Or use the provided accessors.
 //
@@ -76,21 +74,17 @@ namespace lariov
 
       // Constructors.
 
-      DBRow() : fData(0) {}
+      DBRow() : fData(nullptr) {}
       DBRow(const value_type* s) : fData(s) {}
 
       // Accessors.
 
-      bool isValid() const {return fData != 0;}
+      bool isValid() const {return fData != nullptr;}
       const value_type& getData(size_t col) const {return fData[col];}
       const std::string& getStringData(size_t col) const {
 	return *std::get<std::unique_ptr<std::string> >(fData[col]);}
       long getLongData(size_t col) const {return std::get<long>(fData[col]);}
       double getDoubleData(size_t col) const {return std::get<double>(fData[col]);}
-
-      // Modifiers.
-
-      void clear() {fData = 0; return;}
 
     private:
 
@@ -103,18 +97,31 @@ namespace lariov
 
   public:
 
-    // Constructors, destructor.
+    // Constructors.
 
     DBDataset();                                   // Default constructor.
-    DBDataset(void* dataset, bool release=false);  // Initializing constructor.
-    ~DBDataset();                                  // Destructor.
+
+    // Initializing constructor based on libwda struct.
+
+    DBDataset(void* dataset, bool release=false);
+
+    // Initializing move constructor.
+    // This constructor is used to initialize sqlite data.
+
+    DBDataset(const IOVTimeStamp& begin_time,         // IOV begin time.
+	      const IOVTimeStamp& end_time,           // IOV end time.
+	      std::vector<std::string>&& col_names,   // Column names.
+	      std::vector<std::string>&& col_types,   // Column types.
+	      std::vector<DBChannelID_t>&& channels,  // Channels.
+	      std::vector<value_type>&& data);        // Calibration data (length nchan*ncol).
+
 
     // Simple accessors.
 
     const IOVTimeStamp& beginTime() const {return fBeginTime;}
     const IOVTimeStamp& endTime() const {return fEndTime;}
-    size_t nrows() const {return fNRows;}
-    size_t ncols() const {return fNCols;}
+    size_t nrows() const {return fChannels.size();}
+    size_t ncols() const {return fColNames.size();}
     const std::vector<std::string>& colNames() const {return fColNames;}
     const std::vector<std::string>& colTypes() const {return fColTypes;}
     const std::vector<DBChannelID_t>& channels() const {return fChannels;}
@@ -127,23 +134,7 @@ namespace lariov
 
     // Access one row.
 
-    DBRow getRow(size_t row) const {return DBRow(&fData[fNCols*row]);}
-
-    // Modifiers.
-
-    void clear();                                    // Return to default-constructed state.
-    void update(void* dataset, bool release=false);  // Reinitialize.
-    void setBeginTime(const IOVTimeStamp& t) {fBeginTime = t;}
-    void setEndTime(const IOVTimeStamp& t) {fEndTime = t;}
-    void setNRows(size_t nrows) {fNRows = nrows;}
-    void setNCols(size_t ncols) {fNCols = ncols;}
-
-    // Modifiable collection accessors.
-
-    std::vector<std::string>& colNames() {return fColNames;}
-    std::vector<std::string>& colTypes() {return fColTypes;}
-    std::vector<DBChannelID_t>& channels() {return fChannels;}
-    std::vector<value_type>& data() {return fData;}
+    DBRow getRow(size_t row) const {return DBRow(&fData[ncols()*row]);}
 
   private:
 
@@ -151,12 +142,10 @@ namespace lariov
 
     IOVTimeStamp fBeginTime;               // IOV begin time.
     IOVTimeStamp fEndTime;                 // IOV end time.
-    size_t fNRows;                         // Number of rows.
-    size_t fNCols;                         // Number of columns.
     std::vector<std::string> fColNames;    // Column names.
     std::vector<std::string> fColTypes;    // Column types.
     std::vector<DBChannelID_t> fChannels;  // Channels.
-    std::vector<value_type> fData;         // Calibration data (length fNRows*fNCols).
+    std::vector<value_type> fData;         // Calibration data (length nchan*ncols).
   };
 }
 
