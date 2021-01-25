@@ -40,7 +40,6 @@ find_ups_product( messagefacility )
 find_ups_root()
 find_ups_product( postgresql )
 find_ups_product( libwda )
-find_ups_product( cetbuildtools )
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)
